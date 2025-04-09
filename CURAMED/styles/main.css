@@ -850,3 +850,39 @@ footer {
     height: 200px;
   }
 }
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+/* Remove red border styling on the input container */
+.input-container.error {
+  /* No additional border styling on the container */
+  border: none;
+  padding: 0;
+}
+
+/* Apply a red border only on the input fields when there's an error */
+.input-container.error input,
+.input-container.error select,
+.input-container.error textarea {
+  border: 1px solid red;
+}
+
+/* Optional: Keep label styling unchanged */
+.input-container.error label {
+  color: inherit;
+}
