@@ -34,8 +34,8 @@ if (mysqli_query($conn, $req)) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'fadiyghribie@gmail.com';  // Your Gmail address
-        $mail->Password = 'sift11ff';  // Your Gmail password
+        $mail->Username = 'topfadighribi11@gmail.com';  // Your Gmail address
+        $mail->Password = 'skbqackvjratqaxn';  // Your Gmail password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;  // Set the SMTP port
 
@@ -51,7 +51,7 @@ if (mysqli_query($conn, $req)) {
         $mail->send();
 
         // Store verification code in the database (assuming you have a `verification_code` column)
-        $updateQuery = "UPDATE utilisateur SET verification_code = '$verification_code' WHERE email = '$email'";
+        $updateQuery = "UPDATE utilisateur SET token = '$verification_code' WHERE email = '$email'";
         mysqli_query($conn, $updateQuery);
 
         echo 'Inscription réussie ! Un code de vérification a été envoyé à votre email.';
