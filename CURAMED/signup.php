@@ -1,66 +1,48 @@
 <?php
-require 'vendor/autoload.php';  // Include Composer's autoloader
+session_start();
+require 'vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = mysqli_connect("localhost", "root", "", "curamed");
-if (!$conn) {
-    echo("Erreur lors de la connexion");
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $prenom = $_POST["prenom"];
-    $nom = $_POST["nom"];
-    $age = (int)$_POST["age"];
-    $email = $_POST["email"];
-    $tel = $_POST["tel"];
-    $mdp = $_POST["mdp"];
-    $type = $_POST["userType"];
-}
 
-$mdp_hash = password_hash($mdp, PASSWORD_DEFAULT);
 
-$req = "INSERT INTO utilisateur (prenom, nom, age, email, mot_de_passe, telephone, type_utilisateur) 
-        VALUES ('$prenom', '$nom', $age, '$email', '$mdp_hash', '$tel', '$type')";
-
-if (mysqli_query($conn, $req)) {
+    $_SESSION['registration_data'] = [
+        'prenom'   => $_POST["prenom"],
+        'nom'      => $_POST["nom"],
+        'age'      => $_POST["age"],
+        'email'    => $_POST["email"],
+        'tel'      => $_POST["tel"],
+        'mdp'      => $_POST["mdp"],
+        'userType' => $_POST["userType"]
+    ];
+    
     $verification_code = rand(1000, 9999);
+    $_SESSION['verification_code'] = $verification_code;
 
-    // Send verification email with PHPMailer
+
     $mail = new PHPMailer(true);
     try {
-        // Server settings
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'topfadighribi11@gmail.com';  // Your Gmail address
-        $mail->Password = 'skbqackvjratqaxn';  // Your Gmail password
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'topfadighribi11@gmail.com';
+        $mail->Password   = 'skbqackvjratqaxn';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;  // Set the SMTP port
-
-        // Recipients
-        $mail->setFrom('fadiyghribie@gmail.com', 'Mailer');
-        $mail->addAddress($email, $prenom . ' ' . $nom);  // Send to the user's email
-
-        // Content
+        $mail->Port       = 587;
+        $mail->setFrom('topfadighribi11@gmail.com', 'Curamed');
+        $mail->addAddress($_SESSION['registration_data']['email'], $_SESSION['registration_data']['prenom'] . ' ' . $_SESSION['registration_data']['nom']);
         $mail->isHTML(true);
-        $mail->Subject = 'Code de Vérification';
-        $mail->Body    = 'Voici votre code de vérification: <b>' . $verification_code . '</b>';
-
+        $mail->Subject = 'Votre code de vérification';
+        $mail->Body    = 'Votre code de vérification est : <b>' . $verification_code . '</b>';
         $mail->send();
 
-        // Store verification code in the database (assuming you have a `verification_code` column)
-        $updateQuery = "UPDATE utilisateur SET token = '$verification_code' WHERE email = '$email'";
-        mysqli_query($conn, $updateQuery);
-
-        echo 'Inscription réussie ! Un code de vérification a été envoyé à votre email.';
+        header("Location: verification.php");
+        exit;
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        echo "L'email n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
     }
-} else {
-    echo "Inscription échouée : " . mysqli_error($conn);
+    exit;
 }
-
-mysqli_close($conn);
 ?>

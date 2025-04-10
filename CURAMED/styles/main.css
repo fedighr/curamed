@@ -580,7 +580,8 @@ footer {
   font-weight: 500;
 }
 
-.auth-form input {
+.auth-form input,
+.auth-form select {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #ddd;
@@ -589,10 +590,20 @@ footer {
   transition: border 0.3s ease;
 }
 
-.auth-form input:focus {
+.auth-form input:focus,
+.auth-form select:focus {
   border-color: #1171bb;
   outline: none;
   box-shadow: 0 0 0 3px rgba(17, 113, 187, 0.2);
+}
+
+.auth-form select {
+  -webkit-appearance: none; 
+  -moz-appearance: none;
+  appearance: none;
+  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="none" d="M1 4l7 7 7-7z"%3E%3C/path%3E%3C/svg%3E') no-repeat right 1rem center;
+  background-size: 12px 12px;
+  padding-right: 2.5rem; 
 }
 
 .forgot-password {
@@ -885,4 +896,46 @@ input[type="number"] {
 /* Optional: Keep label styling unchanged */
 .input-container.error label {
   color: inherit;
+}
+
+.verification-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4f8f9;
+}
+
+.verification-card {
+  background-color: #fff;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 450px;
+}
+
+.verification-card h3 {
+  font-weight: 600;
+}
+
+.verification-card .form-control {
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.verification-card .btn {
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: 500;
+}
+
+#group_sanguin option:disabled {
+  color: #aaa; 
+  font-style: italic; 
+}
+
+
+#group_sanguin:not(:disabled) {
+  color: #000; 
 }

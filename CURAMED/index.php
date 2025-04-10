@@ -1,0 +1,189 @@
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CuraMed</title>
+  <link rel="stylesheet" href="styles\main.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="images\logo.png">
+  <script src="scripts\app.js" defer></script>
+  <script src="scripts\signin.js" defer></script>
+</head>
+<body>
+  <div class="nav-overlay" onclick="toggleMenu()"></div>
+  <header>
+    <div class="d-flex align-items-center">
+      <div class="menu-btn me-3" onclick="toggleMenu()" aria-label="Menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <a href="index.php" class="logo-link">
+        <img src="images\logo.png" class="img-fluid" alt="CuraMed">
+      </a>
+    </div>
+    <nav>
+      <?php if (isset($_SESSION['user_id'])): ?>
+
+        <a href="profile.php" class="btn btn-success">
+          <i class="fas fa-user me-2"></i>Bonjour, <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Invité'; ?>
+        </a>
+        <a href="logout.php" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+        </a>
+      <?php else: ?>
+
+        <a href="login.html" class="btn btn-success">
+          <i class="fas fa-sign-in-alt me-2"></i>Connexion
+        </a>
+      <?php endif; ?>
+    </nav>
+  </header>
+
+  <div class="side-nav">
+    <span class="close-btn" onclick="toggleMenu()">×</span>
+    <a href="index.php"><i class="fas fa-home me-2"></i>Accueil</a>
+    <a href="booking.html"><i class="fas fa-search me-2"></i>Rechercher</a>
+    <a href="space.html"><i class="fas fa-user me-2"></i>Mon Profil</a>
+    <a href="#aide"><i class="fas fa-question-circle me-2"></i>Aide</a>
+    <a href="#parametres"><i class="fas fa-cog me-2"></i>Paramètres</a>
+  </div>
+
+  <main>
+    <section class="hero animate__animated animate__fadeInDown">
+      <div class="hero-content">
+        <h2>Prenez rapidement un rendez-vous avec votre médecin !</h2>
+        <p class="hero-tagline">Des soins fiables et accessibles pour des milliers de patients.</p>
+        <div class="hero-steps">
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-notes-medical"></i>
+              <span>1</span>
+            </div>
+            <p>Décrivez vos symptômes</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-user-md"></i>
+              <span>2</span>
+            </div>
+            <p>Choisissez votre médecin</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">
+              <i class="fas fa-calendar-check"></i>
+              <span>3</span>
+            </div>
+            <p>Prenez rendez-vous</p>
+          </div>
+        </div>
+        <button class="btn btn-success mt-3 animate__animated animate__pulse"
+          onclick="window.location.href='booking.html'">
+          Commencer maintenant <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+      </div>
+    </section>
+
+    
+    <section class="featured-section animate__animated animate__fadeInUp">
+      <div class="featured-image">
+        
+        <img src="C:\Users\abdel\Downloads\image1.svg"alt="Soins médicaux">
+      </div>
+      <div class="featured-content">
+        <h2>Des Soins de Qualité pour Vous</h2>
+        <p>
+          Chez CuraMed, nous nous engageons à offrir un service rapide et fiable.
+          Nos médecins experts et nos technologies de pointe vous garantissent des soins personnalisés.
+        </p>
+        <button class="btn btn-success">
+          En savoir plus <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    
+    <section class="stats-section animate__animated animate__fadeInUp">
+      <div class="stats-container">
+        <div class="stat-card doctor-stat">
+          <i class="fas fa-user-md stat-icon"></i>
+          <div class="stat-number" data-count="100">200</div>
+          <div class="stat-label">Médecins Qualifiés</div>
+        </div>
+        <div class="stat-card patient-stat">
+          <i class="fas fa-user-injured stat-icon"></i>
+          <div class="stat-number" data-count="100">200</div>
+          <div class="stat-label">Patients Satisfaits</div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section class="why-us animate__animated animate__fadeIn">
+      <div class="why-us-bg"></div>
+      <div class="container">
+        <h2>Pourquoi nous choisir</h2>
+        <p class="section-subtitle">
+          L'excellence en matière de soins de santé repose sur notre engagement et notre expertise.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <i class="fas fa-couch icon"></i>
+            <h3>Confort optimal</h3>
+            <p>Environnement apaisant et équipements modernes pour votre bien-être.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-user-shield icon"></i>
+            <h3>Approche patient-centrée</h3>
+            <p>Respect des besoins individuels de chaque patient.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-microscope icon"></i>
+            <h3>Expertise avancée</h3>
+            <p>Des traitements à la pointe de la technologie médicale.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-users icon"></i>
+            <h3>Équipe expérimentée</h3>
+            <p>Professionnels avec plus de 15 ans d'expérience moyenne.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-heartbeat icon"></i>
+            <h3>Résultats exceptionnels</h3>
+            <p>Taux de satisfaction patient de 98%.</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-hand-holding-heart icon"></i>
+            <h3>Engagement total</h3>
+            <p>Soins personnalisés et suivi continu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  
+  
+  </main>
+
+<footer>
+  <div class="footer-content">
+    <p>© 2025 CuraMed. Tous droits réservés.</p>
+    <div class="social-icons">
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
