@@ -44,7 +44,7 @@
       <p class="auth-subtitle">Créez votre compte</p>
       
       
-      <form class="auth-form" method="POST" novalidate onsubmit="return verif();" action="signup.php" enctype="multipart/form-data">
+      <form class="auth-form"  id="signupForm" method="POST" novalidate action="signup.php" enctype="multipart/form-data" onsubmit="return verif();" >
         <div class="form-row">
           <div class="form-group col-md-6 input-container">
             <label for="prenom"><i class="fas fa-user me-2"></i>Prénom</label>

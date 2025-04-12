@@ -956,3 +956,21 @@ input[type="file"]::file-selector-button {
   border-radius: 4px;
   cursor: pointer;
 }
+
+.input-container select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s ease;
+  background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="none" d="M1 4l7 7 7-7z"%3E%3C/path%3E%3C/svg%3E') no-repeat right 1rem center;
+  background-size: 12px 12px;
+  appearance: none;
+}
+
+.input-container.error select,
+.input-container.error input[type="text"],
+.input-container.error input[type="number"] {
+  border: 1px solid red;
+}

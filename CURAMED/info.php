@@ -16,20 +16,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $email = mysqli_real_escape_string($conn, $_SESSION['registration_data']['email']);
 
-            $taille = $_POST["taille"];
-            $poids = $_POST["poids"];
-            $mc = $_POST["maladies_chroniques"];
-            $g_s = $_POST["group_sanguin"];
-            $info = $_POST["info"];
-
-            $query = "SELECT id_utilisateur FROM utilisateur WHERE email='$email'";
+            $query = "SELECT id_utilisateur,type_utilisateur FROM utilisateur WHERE email='$email'";
             $result = mysqli_query($conn, $query);
 
             if ($row = mysqli_fetch_assoc($result)) {
                 $id = $row['id_utilisateur'];
+                $type = $row['type_utilisateur'];
+                if($type == 'patient'){
 
-                $query = "INSERT INTO patient 
+                    $taille = $_POST["taille"];
+                    $poids = $_POST["poids"];
+                    $mc = $_POST["maladies_chroniques"];
+                    $g_s = $_POST["group_sanguin"];
+                    $info = $_POST["info"];
+
+                    $query = "INSERT INTO patient 
                           VALUES ('$id', '$taille', '$poids', '$mc', '$g_s', '$info')";
+                }
+                else{
+                    $spec = $_POST["specialite"];
+                    $adresse = $_POST["adresse"];
+                    $experience = $POST["experience"];
+                    $query = "INSERT INTO medecin 
+                          VALUES ('$id', '$spec', '$adresse', '$experience')";
+
+                }
 
                 if (mysqli_query($conn, $query)) {
                     echo "<script type='text/javascript'>";

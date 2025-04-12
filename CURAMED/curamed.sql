@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2025 at 12:12 AM
+-- Generation Time: Apr 12, 2025 at 10:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -90,7 +90,7 @@ CREATE TABLE `historique` (
 CREATE TABLE `medecin` (
   `id_medecin` int(11) NOT NULL,
   `specialite` varchar(20) NOT NULL,
-  `adresse_cabinet` varchar(20) NOT NULL,
+  `adresse_cabinet` varchar(50) NOT NULL,
   `experience` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -106,7 +106,9 @@ CREATE TABLE `notification` (
   `message` text NOT NULL,
   `date_envoi` date NOT NULL,
   `type` enum('email','sms') NOT NULL,
-  `statut` enum('envoyé','non_lu','lu','échoué') NOT NULL
+  `statut` enum('envoyé','non_lu','lu','échoué') NOT NULL,
+  `verifecation_code` varchar(4) NOT NULL,
+  `is_verif` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -137,7 +139,6 @@ CREATE TABLE `patient` (
   `poids` double NOT NULL,
   `maladies_chroniques` varchar(255) NOT NULL,
   `group_sanguin` varchar(10) NOT NULL,
-  `date_naissance` date NOT NULL,
   `informations` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -180,28 +181,13 @@ CREATE TABLE `utilisateur` (
   `prenom` varchar(50) NOT NULL,
   `age` int(11) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `mot_de_passe` varchar(50) NOT NULL,
-  `telephone` int(11) NOT NULL,
+  `mot_de_passe` text NOT NULL,
+  `telephone` varchar(11) NOT NULL,
   `type_utilisateur` enum('patient','medecin') NOT NULL,
   `photo_profil` text NOT NULL,
-  `token` varchar(4) DEFAULT NULL,
-  `is_verified` tinyint(1) DEFAULT 0
+  `role` enum('admin','regular') NOT NULL DEFAULT 'regular',
+  `date_connexion` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `utilisateur`
---
-
-INSERT INTO `utilisateur` (`id_utilisateur`, `nom`, `prenom`, `age`, `email`, `mot_de_passe`, `telephone`, `type_utilisateur`, `photo_profil`, `token`, `is_verified`) VALUES
-(6, 'ghribi', 'fedi', 20, 'jimmysins60@gmail.com', '$2y$10$F2H3Vb7LG.V3EifEx.0EtuzgEuuratLxbZv25c/AVTh', 50078199, 'patient', '', NULL, 0),
-(7, 'ghribi', 'fedi', 20, 'jimmysins60@gmail.com', '$2y$10$8RLeDecxdeX/FUVtFQt47uQntjXY9xU6b9epi.sdzGd', 50078199, 'patient', '', NULL, 0),
-(8, 'ghribi', 'fedi', 20, 'topfadighribi11@gmail.com', '$2y$10$.w4EgxbHEUZpod0kuKb5tuNsA/aEmfZDCLhTV0.buik', 123456789, 'patient', '', '3781', 0),
-(9, 'ghribi', 'fedi', 20, 'jimmysins60@gmail.com', '$2y$10$efx4up6Ypdq1/JTrs4Tf/O0.VTiOCBTZtSdjOuo6gXu', 12345678, 'patient', '', '8088', 0),
-(10, 'ghribi', 'fedi', 20, 'jimmysins60@gmail.com', '$2y$10$BFJMJ/kW7/ruyxOobVhGHejFeQqWcUycP.N2BiXUcJx', 12345678, 'patient', '', NULL, 0),
-(11, 'ghribi', 'fedi', 20, 'topfadighribi11@gmail.com', '$2y$10$GVLsQIbRoxFswS1o9/fIueQATWSaEudGj6TYneXO..R', 12345678, 'patient', '', NULL, 0),
-(12, 'ghribi', 'fedi', 20, 'topfadighribi11@gmail.com', '$2y$10$k8AP4GV5q3JRrr.SULc.8u5zr5Od5ZUuaTfpZa./z3c', 12345678, 'patient', '', NULL, 0),
-(13, 'fedi', 'ghribi', 20, 'topfadighribi11@gmail.com', '$2y$10$25lh/K23lpuXnWzqRexZR.D4.8MNJrTMph7ULwB4E9Z', 12345678, 'patient', '', NULL, 0),
-(14, 'ghribi', 'fedi', 20, 'topfadighribi11@gmail.com', '$2y$10$lmrq7q3HcEYsGUsMwY.ecO1FpCNnkM5SoAurG4tTT3Z', 12345678, 'patient', '', NULL, 0);
 
 --
 -- Indexes for dumped tables
@@ -282,7 +268,8 @@ ALTER TABLE `symptome`
 -- Indexes for table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  ADD PRIMARY KEY (`id_utilisateur`);
+  ADD PRIMARY KEY (`id_utilisateur`),
+  ADD UNIQUE KEY `unique_email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -340,7 +327,7 @@ ALTER TABLE `symptome`
 -- AUTO_INCREMENT for table `utilisateur`
 --
 ALTER TABLE `utilisateur`
-  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_utilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- Constraints for dumped tables

@@ -9,16 +9,20 @@ session_start();
     <title>CuraMed - Prendre rendez-vous en ligne</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles/home.css">
+    <link rel="stylesheet" href="styles/home.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+    <script src="./scripts/home.js"></script>
+
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <nav class="nav-container container">
-            <a href="home.html" class="logo-link">
+            <a href="index.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             
@@ -50,6 +54,12 @@ session_start();
                         <a href="settings.html" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
+                        <?php
+                         if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+                            <a href="dashboard.php" class="dropdown-item">
+                                <i class="fas fa-th-large"></i> Tableau de bord
+                            </a>
+                        <?php endif; ?>
                         <a href="logout.php" class="dropdown-item">
                             <i class="fas fa-sign-out-alt"></i> Se déconnecter
                         </a>
@@ -356,6 +366,6 @@ session_start();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./scripts/home.js"></script>
+    <?php mysqli_close($conn); ?>
 </body>
 </html>

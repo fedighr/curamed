@@ -30,8 +30,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (mysqli_query($conn, $query)) {
             echo "<script type='text/javascript'>";
             echo "alert('Compte créé avec succès!');";
-            echo "window.location.href = 'information.html';";
             echo "</script>";
+
+            if($userType == 'patient'){
+              echo "<script type='text/javascript'>";
+            echo "window.location.href = 'information_patient.html';";
+            echo "</script>";
+          }
+            else{
+              echo "<script type='text/javascript'>";
+              echo "window.location.href = 'information_medecin.html';";
+              echo "</script>";
+            }
+
         } else {
             echo "<h2>Erreur lors de l'enregistrement : " . mysqli_error($conn) . "</h2>";
         }
