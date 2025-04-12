@@ -36,7 +36,7 @@ session_start();
           <i class="fas fa-user me-2"></i>Bonjour, <?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Invité'; ?>
         </a>
         <a href="logout.php" class="btn btn-danger">
-          <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+          <i class="fas fa-sign-out-alt me-2"></i>Déconnexion 
         </a>
       <?php else: ?>
 

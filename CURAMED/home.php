@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -15,14 +18,43 @@
     <!-- Header -->
     <header class="header">
         <nav class="nav-container container">
-            <a href="#" class="logo-link">
+            <a href="home.html" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
+            
             <div class="nav-links">
-                <a href="#patients" class="nav-link">Acceuil</a>
-                <a href="#professionnels" class="nav-link">Médecins</a>
-                <a href="#entreprise" class="nav-link">A propos</a>
-                <button class="nav-button btn btn-outline-primary">Mon profil</button>
+                <a href="doctors.html" class="nav-icon" title="Médecins">
+                    <i class="fas fa-user-md"></i>
+                </a>
+                
+                <div class="nav-icon notifications-wrapper" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                    <div class="notifications-dropdown">
+                        <div class="notification-header">
+                        </div>
+                        <div class="notification-list"></div>
+                    </div>
+                </div>
+                
+                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                    <i class="fas fa-calendar-alt"></i>
+                </a>
+                
+                <div class="profile-dropdown">
+                    <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
+                    <div class="dropdown-menu">
+                        <a href="profile.html" class="dropdown-item">
+                            <i class="fas fa-user"></i> Mon profil
+                        </a>
+                        <a href="settings.html" class="dropdown-item">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                        <a href="logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </a>
+                    </div>
+                </div>
             </div>
             <button class="mobile-menu-btn d-lg-none">
                 <i class="fas fa-bars"></i>
@@ -56,7 +88,7 @@
                     </div>
                 </div>
                 <div class="hero-image">
-                    <img src="C:\Users\abdel\curamed\CURAMED\images\im2.png" alt="Docteur en consultation" class="img-fluid">
+                    <img src="images\im2.png" alt="Docteur en consultation" class="img-fluid">
                 </div>
             </div>
         </div>
@@ -268,7 +300,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <img src="C:\Users\abdel\curamed\CURAMED\images\logo.png" alt="CuraMed" class="footer-logo">
+                    <img src="images\logo.png" alt="CuraMed" class="footer-logo">
                     <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>

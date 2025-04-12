@@ -29,9 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
 
+       
+
         if (password_verify($password, $user['mot_de_passe'])) {
             $_SESSION['user_id'] = $user['id_utilisateur'];
             $_SESSION['user_email'] = $user['email'];
+            $_SESSION['photo'] = $user['photo_profil'];
 
             // Send a successful response
             echo json_encode(['success' => true]);

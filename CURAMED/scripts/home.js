@@ -65,3 +65,62 @@ document.addEventListener("DOMContentLoaded", () => {
       cardWidth = document.querySelector(".doctor-card").offsetWidth + 16;
     });
   });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Gestion du dropdown profil
+    const profileDropdown = document.querySelector('.profile-dropdown');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    profileDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+
+    // Fermer le dropdown quand on clique ailleurs
+    document.addEventListener('click', () => {
+        dropdownMenu.classList.remove('show');
+    });
+
+    // Notifications
+    document.querySelector('.notifications-btn').addEventListener('click', () => {
+        // Ajouter la logique d'affichage des notifications ici
+        console.log('Afficher les notifications');
+    });
+
+    // Animation au survol du logo
+    const logo = document.querySelector('.logo-img');
+    logo.addEventListener('mouseenter', () => {
+        logo.style.transform = 'scale(1.05)';
+    });
+    logo.addEventListener('mouseleave', () => {
+        logo.style.transform = 'scale(1)';
+    });
+});
+
+const notificationsWrapper = document.querySelector('.notifications-wrapper');
+const notificationsDropdown = document.querySelector('.notifications-dropdown');
+
+notificationsWrapper.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationsDropdown.classList.toggle('show');
+});
+
+// Fermer les dropdowns au clic externe
+document.addEventListener('click', (e) => {
+    if (!notificationsWrapper.contains(e.target)) {
+        notificationsDropdown.classList.remove('show');
+    }
+    if (!profileDropdown.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
+    }
+});
+
+// Animation hover
+document.querySelectorAll('.nav-icon').forEach(icon => {
+    icon.addEventListener('mouseenter', () => {
+        icon.style.transform = 'translateY(-3px)';
+    });
+    icon.addEventListener('mouseleave', () => {
+        icon.style.transform = 'none';
+    });
+});

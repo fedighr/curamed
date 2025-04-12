@@ -20,11 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $tel      = mysqli_real_escape_string($conn, $_SESSION['registration_data']['tel']);
         $mdp      = $_SESSION['registration_data']['mdp'];
         $userType = mysqli_real_escape_string($conn, $_SESSION['registration_data']['userType']);
+        $userPhoto = mysqli_real_escape_string($conn, $_SESSION['registration_data']['photo_profil']);
         $mdp_hash = password_hash($mdp, PASSWORD_DEFAULT);
 
         // Insert into database
-        $query = "INSERT INTO utilisateur (prenom, nom, age, email, mot_de_passe, telephone, type_utilisateur)
-                  VALUES ('$prenom', '$nom', $age, '$email', '$mdp_hash', '$tel', '$userType')";
+        $query = "INSERT INTO utilisateur (prenom, nom, age, email, mot_de_passe, telephone, type_utilisateur,photo_profil)
+                  VALUES ('$prenom', '$nom', $age, '$email', '$mdp_hash', '$tel', '$userType','$userPhoto')";
 
         if (mysqli_query($conn, $query)) {
             echo "<script type='text/javascript'>";

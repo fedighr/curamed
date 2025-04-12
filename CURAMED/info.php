@@ -22,7 +22,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $g_s = $_POST["group_sanguin"];
             $info = $_POST["info"];
 
-
             $query = "SELECT id_utilisateur FROM utilisateur WHERE email='$email'";
             $result = mysqli_query($conn, $query);
 
