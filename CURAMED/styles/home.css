@@ -1074,6 +1074,9 @@ a {
   background: white;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
+  border-collapse: separate;
+  border-spacing: 10px 5px;
+
 }
 
 .user-info {
@@ -1200,3 +1203,4 @@ a {
   position: relative;
   min-height: 500px;
 }
+

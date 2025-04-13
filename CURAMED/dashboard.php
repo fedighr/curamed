@@ -158,9 +158,8 @@ exit();
             </button>
         </div>
 
-        <!-- Content Sections -->
+    <form id="patientForm" enctype="multipart/form-data" action="controll_dashboard.php" method='POST'>
         <div class="dashboard-content">
-            <!-- Patients Section -->
             <section id="patients" class="content-section active">
             <div class="container mt-3">
                 <?php if(isset($_SESSION['message'])): ?>
@@ -172,9 +171,9 @@ exit();
             </div>
                 <div class="section-header">
                     <h2><i class="fas fa-procedures"></i> Gestion des Patients</h2>
-                <button class="btn btn-primary" data-target-modal="userModal" data-user-type="patient">
-                    <i class="fas fa-plus"></i> Nouveau Patient
-                </button>
+                    <button type="button" class="btn btn-primary" data-target-modal="userModal" data-user-type="patient">
+                        <i class="fas fa-plus"></i> Nouveau Patient
+                    </button>
                 </div>
                 
                 <div class="animated-table-container">
@@ -182,15 +181,16 @@ exit();
                         $result = $conn->query($sql);
                     ?>
                     <table class="hover-table">
-                        <thead>
-                            <tr>
-                                <th>Patient</th>
-                                <th>Contact</th>
-                                <th>Dernière Visite</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Rôle</th>
+                            <th>Contact</th>
+                            <th>Dernière Visite</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                         <tbody>
                             <?php while($user = $result->fetch_assoc()) { ?>
                             <tr>
@@ -198,9 +198,16 @@ exit();
                                     <div class="user-info">
                                         <img src="<?php echo $user['photo_profil']; ?>" class="user-avatar">
                                         <div>
-                                            <div class="user-name"><?php echo $user['prenom']." ".$user['nom'];  ?></div>
-                                            <div class="user-id">ID: <?php echo $user['id_utilisateur'];  ?></div>
+                                        <div class="user-name"><?php echo $user['prenom']." ".$user['nom']; ?></div>
+                                        <div class="user-id" name="id_user" value="<?php echo $user['id_utilisateur']; ?>">ID: <?php echo $user['id_utilisateur']; ?></div>
                                         </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="role-info">
+                                        <span class="role-badge role-<?= strtolower($user['role']) ?>">
+                                            <?= ucfirst($user['role']) ?>
+                                        </span>
                                     </div>
                                 </td>
                                 <td>
@@ -213,28 +220,38 @@ exit();
                                 <td><span class="status-badge success">Actif</span></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="icon-btn" title="Voir le profil">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="icon-btn" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="icon-btn delete-btn" title="supprimer" 
-                                                data-user-id="<?= $user['id_utilisateur'] ?>" 
-                                                data-user-type="patient">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </button>
+                                        <form method="POST" action="controll_dashboard.php">
+                                            <input type="hidden" name="user_id" value="<?php echo $user['id_utilisateur']; ?>">
+                                            <input type="hidden" name="user_type" value="patient">
+                                            <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="submit" class="icon-btn" title="Modifier" name="modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <?php if($user['role'] === 'regular') : ?>
+                                                <button type="submit" class="icon-btn" title="Rendre admin" name="admin">
+                                                    <i class="fas fa-user-cog"></i>
+                                                </button>
+                                            <?php else : ?>
+                                                <button type="submit" class="icon-btn" title="Supprimer admin" name="nadmin">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                            <button type="submit" class="icon-btn delete-btn" title="supprimer" name="supp">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
-                        </tbody>
-                        <?php } ?>
+                            <?php } ?>
                     </table>
                 </div>
             </section>
+    </form>
 
-            <!-- Doctors Section -->
+    <form id="doctorForm" enctype="multipart/form-data" action ="controll_dashboard.php" method="POST">
             <section id="doctors" class="content-section">
                     <div class="container mt-3">
             <?php if(isset($_SESSION['message'])): ?>
@@ -246,7 +263,7 @@ exit();
             </div>
     <div class="section-header">
         <h2><i class="fas fa-user-md"></i> Gestion des Médecins</h2>
-        <button class="btn btn-primary" data-target-modal="userModal" data-user-type="medecin">
+        <button type="button" class="btn btn-primary" data-target-modal="userModal" data-user-type="medecin">
             <i class="fas fa-plus"></i> Nouveau Médecin
         </button>
     </div>
@@ -257,9 +274,10 @@ exit();
         $result = $conn->query($sql);
         ?>
         <table class="hover-table">
-            <thead>
+        <thead>
                 <tr>
                     <th>Médecin</th>
+                    <th>Rôle</th>
                     <th>Spécialité</th>
                     <th>Contact</th>
                     <th>Statut</th>
@@ -278,6 +296,13 @@ exit();
                             </div>
                         </div>
                     </td>
+                    <td>
+                    <div class="role-info">
+                        <span class="role-badge role-<?= strtolower($doctor['role']) ?>">
+                            <?= ucfirst($doctor['role']) ?>
+                        </span>
+                    </div>
+                </td>
                     <td><?php 
 
                         $req = "SELECT * FROM medecin WHERE id_medecin = " . $doctor['id_utilisateur'];
@@ -300,17 +325,28 @@ exit();
                     <td><span class="status-badge success">Actif</span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="icon-btn" title="Voir le planning">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                            <button class="icon-btn" title="Envoyer message">
-                                <i class="fas fa-envelope"></i>
-                            </button>
-                            <button class="icon-btn delete-btn" title="supprimer" 
-                                    data-user-id="<?= $doctor['id_utilisateur'] ?>" 
-                                    data-user-type="medecin">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <form id="modalUserForm " method="POST" action="controll_dashboard.php" enctype="multipart/form-data">
+                                <input type="hidden" name="user_id" value="<?php echo $doctor['id_utilisateur']; ?>">
+                                <input type="hidden" name="user_type" value="medecin">
+                                <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="submit" class="icon-btn" title="Modifier" name="modifier">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <?php if($doctor['role'] === 'regular') : ?>
+                                    <button type="submit" name="admin" class="icon-btn">
+                                        <i class="fas fa-user-cog"></i>
+                                    </button>
+                                <?php else : ?>
+                                    <button type="submit" class="icon-btn" title="Supprimer admin" name="nadmin">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <button type="submit" name="supp" class="icon-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
@@ -319,6 +355,7 @@ exit();
         </table>
     </div>
 </section>
+</form>
 
         <aside class="recent-activity">
             <h3><i class="fas fa-bell"></i> Activité Récente</h3>
@@ -353,10 +390,10 @@ exit();
                 <h5 class="modal-title" id="userModalLabel">Nouvel Utilisateur</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="userForm" enctype="multipart/form-data">
+            <form id="userForm" enctype="multipart/form-data" action="controll_dashboard.php" method="POST">
                 <div class="modal-body">
                     <div class="row g-3">
-                        <input type="hidden" name="user_type" id="userType">
+                        <input type="hidden" name="user_type" id="modalUserType">
                         
                         <div class="col-md-6">
                             <label class="form-label">Nom</label>
@@ -392,7 +429,6 @@ exit();
                             <input type="file" name="photo" class="form-control">
                         </div>
 
-                        <!-- Hidden by default, shown for doctors -->
                         <div class="col-md-6 specialite-field" style="display: none;">
                             <label class="form-label">Spécialité</label>
                             <input type="text" name="specialite" class="form-control">

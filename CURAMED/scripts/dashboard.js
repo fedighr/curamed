@@ -54,35 +54,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        if(confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-            const userId = this.dataset.userId;
-            const userType = this.dataset.userType;
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal trigger logic
+    document.querySelectorAll('[data-target-modal="userModal"]').forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            const userType = button.dataset.userType;
             
-            fetch('dashboard.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `delete_user=1&user_id=${userId}&user_type=${userType}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    this.closest('tr').remove();
-                    const alert = document.createElement('div');
-                    alert.className = 'alert alert-success';
-                    alert.textContent = data.type === 'patient' ? 
-                        'Patient supprimé avec succès' : 
-                        'Médecin supprimé avec succès';
-                    document.body.prepend(alert);
-                    setTimeout(() => alert.remove(), 3000);
-                } else {
-                    alert('Erreur lors de la suppression');
-                }
-            })
-                    }
-                });
-            });
+            const specialiteField = document.querySelector('.specialite-field');
+            if (userType === 'medecin') {
+                specialiteField.style.display = 'block';
+                specialiteField.querySelector('input').setAttribute('required', 'true');
+            } else {
+                specialiteField.style.display = 'none';
+                specialiteField.querySelector('input').removeAttribute('required');
+            }
 
+            document.getElementById('modalUserType').value = userType;
+            document.getElementById('userModalLabel').textContent = 
+                userType === 'patient' ? 'Nouveau Patient' : 'Nouveau Médecin';
+            
+            // Toggle specialité field
+            document.querySelector('.specialite-field').style.display = 
+                userType === 'medecin' ? 'block' : 'none';
+            
+            modal.show();
+        });
+    });
+});
