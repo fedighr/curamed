@@ -48,10 +48,10 @@ exit();
 
 </head>
 <body>
-    <!-- Header (Same as Homepage) -->
+
     <header class="header">
         <nav class="nav-container container">
-            <a href="index.php" class="logo-link">
+            <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             

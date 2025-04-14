@@ -44,7 +44,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['supp'])) {
         $id_user = intval($_POST['user_id']);
+
+        $sql = "SELECT photo_profil FROM utilisateur WHERE id_utilisateur = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $id_user);
+
+        if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_bind_result($stmt, $photo);
+            mysqli_stmt_fetch($stmt);
+
+            if (file_exists($photo)) {
+                if (!unlink($photo)) {
+                    echo "Erreur lors de la suppression de la photo.";
+                }
+            }
+        } else {
+            echo "Query failed.";
+        }
         
+        mysqli_stmt_close($stmt);
+
         $sql = "DELETE FROM utilisateur WHERE id_utilisateur = ?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "i", $id_user);
@@ -62,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         else{
             header('Location: dashboard.php');
         }
+        mysqli_stmt_close($stmt);
         exit();
     }
 

@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 else{
                     $spec = $_POST["specialite"];
                     $adresse = $_POST["adresse"];
-                    $experience = $POST["experience"];
+                    $experience = $_POST["experience"];
                     $query = "INSERT INTO medecin 
                           VALUES ('$id', '$spec', '$adresse', '$experience')";
 

@@ -22,7 +22,7 @@ session_start();
     <!-- Header -->
     <header class="header">
         <nav class="nav-container container">
-            <a href="index.php" class="logo-link">
+            <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             
@@ -366,6 +366,5 @@ session_start();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <?php mysqli_close($conn); ?>
 </body>
 </html>
