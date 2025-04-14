@@ -4,31 +4,6 @@ $conn = mysqli_connect("localhost", "root", "", "curamed");
 if (!$conn) {
     die("Database connection error");
 }
-
-if (isset($_POST['delete_user'])) {
-    $user_id = intval($_POST['user_id']);
-    $type = $_POST['user_type'];
-
-    $sql_medecin = "DELETE FROM medecin WHERE id_medecin = ?";
-$stmt_medecin = mysqli_prepare($conn, $sql_medecin);
-mysqli_stmt_bind_param($stmt_medecin, "i", $user_id);
-
-if (mysqli_stmt_execute($stmt_medecin)) {
-
-    $sql_utilisateur = "DELETE FROM utilisateur WHERE id_utilisateur = ?";
-    $stmt_utilisateur = mysqli_prepare($conn, $sql_utilisateur);
-    mysqli_stmt_bind_param($stmt_utilisateur, "i", $user_id);
-    
-    if (mysqli_stmt_execute($stmt_utilisateur)) {
-        echo json_encode(['success' => true, 'type' => $type]);
-    } else {
-        echo json_encode(['success' => false, 'error' => mysqli_error($conn)]);
-    }
-} else {
-    echo json_encode(['success' => false, 'error' => 'Failed to delete from medecin table']);
-}
-exit();
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -44,6 +19,7 @@ exit();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/dashboard.js"></script>
 
 </head>
@@ -77,7 +53,7 @@ exit();
                 <div class="profile-dropdown" id="profileDropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile.html" class="dropdown-item">
+                        <a href="profile.php" class="dropdown-item">
                             <i class="fas fa-user"></i> Mon profil
                         </a>
                         <a href="settings.html" class="dropdown-item">
@@ -98,7 +74,14 @@ exit();
 
     <!-- Dashboard Main Content -->
     <main class="dashboard-main container">
-        <!-- Quick Stats -->
+    <div class="container mt-3">
+        <?php if(isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <?= $_SESSION['error']; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); endif; ?>
+    </div>
         <div class="quick-stats-grid">
             <div class="stat-card primary">
                 <i class="fas fa-user-injured"></i>
@@ -146,7 +129,7 @@ exit();
             </div>
         </div>
 
-        <!-- Main Content Tabs -->
+
         <div class="dashboard-tabs">
             <button class="tab-btn active" data-target="patients">
                 <i class="fas fa-procedures"></i>
@@ -168,6 +151,18 @@ exit();
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 <?php unset($_SESSION['message']); endif; ?>
+            </div>
+            <div class="container mt-3">
+                <?php if(isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <?= $_SESSION['error']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['error']); endif; ?>
+
+                <?php if(isset($_SESSION['message'])): ?>
+                <!-- Existing success message code -->
+                <?php endif; ?>
             </div>
                 <div class="section-header">
                     <h2><i class="fas fa-procedures"></i> Gestion des Patients</h2>
@@ -226,7 +221,9 @@ exit();
                                             <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button type="submit" class="icon-btn" title="Modifier" name="modifier">
+                                            <button type="button" class="icon-btn" title="Modifier" 
+                                                    data-user-id="<?php echo $user['id_utilisateur']; ?>"
+                                                    data-user-type="patient">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <?php if($user['role'] === 'regular') : ?>
@@ -261,6 +258,18 @@ exit();
             </div>
                 <?php unset($_SESSION['message']); endif; ?>
             </div>
+            <div class="container mt-3">
+        <?php if(isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <?= $_SESSION['error']; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php unset($_SESSION['error']); endif; ?>
+
+        <?php if(isset($_SESSION['message'])): ?>
+        <!-- Existing success message code -->
+        <?php endif; ?>
+    </div>
     <div class="section-header">
         <h2><i class="fas fa-user-md"></i> Gestion des Médecins</h2>
         <button type="button" class="btn btn-primary" data-target-modal="userModal" data-user-type="medecin">
@@ -331,7 +340,9 @@ exit();
                                 <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button type="submit" class="icon-btn" title="Modifier" name="modifier">
+                                <button type="button" class="icon-btn" title="Modifier" 
+                                        data-user-id="<?php echo $doctor['id_utilisateur']; ?>"
+                                        data-user-type="medecin">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <?php if($doctor['role'] === 'regular') : ?>
@@ -382,8 +393,8 @@ exit();
             </div>
         </aside>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+
+    <div class="modal fade" id="userModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -432,12 +443,79 @@ exit();
                         <div class="col-md-6 specialite-field" style="display: none;">
                             <label class="form-label">Spécialité</label>
                             <input type="text" name="specialite" class="form-control">
+                            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Modifier Utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editUserForm" method="POST" action="controll_dashboard.php" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <input type="hidden" name="action" id="formAction" value="create">
+                        <input type="hidden" name="modifier" value="1">
+                        <input type="hidden" name="user_id" id="editUserId">
+                        <input type="hidden" name="user_type" id="modalUserType">
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="nom" id="editNom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="prenom" id="editPrenom" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" id="editEmail" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" name="telephone" id="editTelephone" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Nouveau mot de passe (optionnel)</label>
+                            <input type="password" name="password" id="editPassword" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Confirmation mot de passe</label>
+                            <input type="password" name="confirm_password" id="editConfirmPassword" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Photo de profil</label>
+                            <input type="file" name="photo" class="form-control">
+                            <div class="mt-2">
+                                <small>Actuelle: <span id="currentPhoto"></span></small>
+                                <img id="currentPhotoPreview" class="img-thumbnail mt-1" style="max-width: 100px;">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 specialite-field" style="display: none;">
+                            <label class="form-label">Spécialité</label>
+                            <input type="text" name="specialite" id="editSpecialite" class="form-control">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
                 </div>
             </form>
         </div>

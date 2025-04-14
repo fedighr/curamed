@@ -14,7 +14,46 @@
   --border-radius-lg: 12px;
   --transition: all 0.3s ease;
 }
+.btn-custom {
+  background: linear-gradient(135deg, #00C6B4, #00A18E); /* Gradient from #00C6B4 to a slightly darker teal */
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 40px;
+  margin-left: 100px;
+}
 
+.btn-custom:hover {
+  background: linear-gradient(135deg, #00A18E, #00C6B4);
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+.btn-custom:active {
+  transform: scale(1); /* Remove zoom effect when clicked */
+}
+
+/* Position buttons to the right */
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.align-items-center {
+  align-items: center;
+}
 /* Base Styles */
 * {
   margin: 0;
@@ -1204,3 +1243,30 @@ a {
   min-height: 500px;
 }
 
+.modal-content {
+  border-radius: var(--border-radius-lg);
+  border: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  background: var(--primary-color);
+  color: white;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.modal-title {
+  font-weight: 600;
+}
+
+.modal-body input,
+.modal-body select {
+  border: 1px solid var(--light-gray);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+}
+
+.modal-body input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 198, 180, 0.2);
+}

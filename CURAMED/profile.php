@@ -5,8 +5,11 @@ $conn = mysqli_connect("localhost", "root", "", "curamed");
 if (!$conn) {
     die("Erreur de connexion à la base de données.");
 }
-
-$user_id = $_SESSION['user_id'] ?? null;
+if (isset($_GET['id'])) {
+  $user_id = intval($_GET['id']);
+} else {
+  $user_id = $_SESSION['user_id'] ?? null;
+} 
 
 if (!$user_id) {
     die("Utilisateur non connecté.");
@@ -52,6 +55,18 @@ mysqli_close($conn);
         <tr>
           <th>Âge</th>
           <td><?php echo htmlspecialchars($table["age"]); ?></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><?php echo htmlspecialchars($table["email"]); ?></td>
+        </tr>
+        <tr>
+          <th>Telephone</th>
+          <td><?php echo htmlspecialchars($table["telephone"]); ?></td>
+        </tr>
+        <tr>
+          <th>Type</th>
+          <td><?php echo htmlspecialchars($table["type_utilisateur"]); ?></td>
         </tr>
       </tbody>
     </table>
