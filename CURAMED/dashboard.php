@@ -51,7 +51,7 @@ exit();
     <!-- Header (Same as Homepage) -->
     <header class="header">
         <nav class="nav-container container">
-            <a href="index.php" class="logo-link">
+            <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             
@@ -77,10 +77,10 @@ exit();
                 <div class="profile-dropdown" id="profileDropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile.html" class="dropdown-item">
+                        <a href="profile_p.php" class="dropdown-item">
                             <i class="fas fa-user"></i> Mon profil
                         </a>
-                        <a href="settings.html" class="dropdown-item">
+                        <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         

@@ -22,7 +22,7 @@ session_start();
     <!-- Header -->
     <header class="header">
         <nav class="nav-container container">
-            <a href="index.php" class="logo-link">
+            <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             
@@ -48,10 +48,10 @@ session_start();
                 <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile.html" class="dropdown-item">
+                        <a href="profile_p.php" class="dropdown-item">
                             <i class="fas fa-user"></i> Mon profil
                         </a>
-                        <a href="settings.html" class="dropdown-item">
+                        <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <?php
@@ -170,12 +170,12 @@ session_start();
           <div class="carousel-track">
             <!-- Doctor Card 1 -->
             <div class="doctor-card">
-              <img src="images/doctor1.jpg" alt="Dr Sarah Dupont" class="doctor-img">
-              <h3 class="doctor-name">Dr. Sarah Dupont</h3>
+              <img src="images/marti.png" alt="Dr Sarah Dupont" class="doctor-img">
+              <h3 class="doctor-name">Dr. bakhana</h3>
               <p class="specialty">Cardiologue</p>
               <p class="reviews">⭐ 4.8 (120 avis)</p>
               <p class="location"><i class="fas fa-map-marker-alt"></i> Paris</p>
-              <button class="choose-btn">Choisir</button>
+              <button class="choose-btn" onclick="location.href='profile.php'">Choisir</button>
             </div>
             
             <!-- Doctor Card 2 -->
@@ -310,7 +310,7 @@ session_start();
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <img src="images\logo.png" alt="CuraMed" class="footer-logo">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
                     <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -359,13 +359,13 @@ session_start();
                     <a href="#">Cookies</a>
                 </div>
                 <div class="copyright">
-                    © 2023 CuraMed. Tous droits réservés.
+                    © 2025 CuraMed. Tous droits réservés.
                 </div>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <?php mysqli_close($conn); ?>
+    <script src="scripts/home.js"></script>
 </body>
 </html>
