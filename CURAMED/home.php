@@ -25,8 +25,8 @@ session_start();
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
-            
             <div class="nav-links">
+                <?php if(isset($_SESSION['user_id'])) :?>
                 <a href="doctors.html" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
@@ -48,7 +48,11 @@ session_start();
                 <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
+<<<<<<< HEAD
                         <a href="profile_p.php" class="dropdown-item">
+=======
+                        <a href="profile.php" class="dropdown-item">
+>>>>>>> db3580ef8f15685210e304cd399893e96d367b12
                             <i class="fas fa-user"></i> Mon profil
                         </a>
                         <a href="settings.php" class="dropdown-item">
@@ -65,11 +69,17 @@ session_start();
                         </a>
                     </div>
                 </div>
+                <button class="mobile-menu-btn d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <?php else : ?>
+                <div class="container mt-5 text-center">
+                    <a href="login.html" class="btn btn-custom mx-2">Connexion</a>
+                    <a href="signup.html" class="btn btn-custom mx-2">S'inscrire</a>
+                </div>
             </div>
-            <button class="mobile-menu-btn d-lg-none">
-                <i class="fas fa-bars"></i>
-            </button>
         </nav>
+        <?php endif ;?>
     </header>
 
     <!-- Hero Section -->
@@ -366,6 +376,9 @@ session_start();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
     <script src="scripts/home.js"></script>
+=======
+>>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 </body>
 </html>

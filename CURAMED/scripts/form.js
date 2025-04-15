@@ -104,6 +104,7 @@ function setError(inputElement, message) {
     if (errorDiv) {
         errorDiv.innerText = message;
     }
+    inputElement.focus();
 }
 
 function clearErrors() {

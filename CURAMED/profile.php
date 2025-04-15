@@ -1,5 +1,33 @@
 <?php
 session_start();
+<<<<<<< HEAD
+=======
+$conn = mysqli_connect("localhost", "root", "", "curamed");
+
+if (!$conn) {
+    die("Erreur de connexion à la base de données.");
+}
+if (isset($_GET['id'])) {
+  $user_id = intval($_GET['id']);
+} else {
+  $user_id = $_SESSION['user_id'] ?? null;
+} 
+
+if (!$user_id) {
+    die("Utilisateur non connecté.");
+}
+
+$req = "SELECT * FROM utilisateur WHERE id_utilisateur = $user_id";
+$res = mysqli_query($conn, $req);
+
+if ($res && mysqli_num_rows($res) > 0) {
+    $table = mysqli_fetch_assoc($res);
+} else {
+    die("Erreur lors de la récupération des données utilisateur.");
+}
+
+mysqli_close($conn);
+>>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -17,6 +45,7 @@ session_start();
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
     <script src="./scripts/home.js"></script>
 
+<<<<<<< HEAD
 </head>
 <body>
     <!-- Header identique -->
@@ -244,5 +273,40 @@ session_start();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/profile.js"></script>
+=======
+    <table class="table table-bordered table-striped bg-white shadow">
+      <tbody>
+        <tr>
+          <th>ID</th>
+          <td><?php echo htmlspecialchars($table["id_utilisateur"]); ?></td>
+        </tr>
+        <tr>
+          <th>Prénom</th>
+          <td><?php echo htmlspecialchars($table["prenom"]); ?></td>
+        </tr>
+        <tr>
+          <th>Nom</th>
+          <td><?php echo htmlspecialchars($table["nom"]); ?></td>
+        </tr>
+        <tr>
+          <th>Âge</th>
+          <td><?php echo htmlspecialchars($table["age"]); ?></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><?php echo htmlspecialchars($table["email"]); ?></td>
+        </tr>
+        <tr>
+          <th>Telephone</th>
+          <td><?php echo htmlspecialchars($table["telephone"]); ?></td>
+        </tr>
+        <tr>
+          <th>Type</th>
+          <td><?php echo htmlspecialchars($table["type_utilisateur"]); ?></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+>>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 </body>
 </html>
