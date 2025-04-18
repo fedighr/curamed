@@ -39,6 +39,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         
         fetch('signin.php', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
             body: new URLSearchParams({
                 'email': email,
                 'mdp': password

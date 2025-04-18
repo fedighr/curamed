@@ -1,0 +1,59 @@
+@startuml usecase
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Patient" as PAT
+actor "Médecin" as MED
+
+package "Cas d'utilisation Patient" {
+  usecase "Se connecter" as UC1
+  usecase "Modifier son profil" as UC2
+  usecase "Donner ses symptômes" as UC3
+  usecase "Rechercher un médecin" as UC4
+  usecase "Prendre un rendez-vous" as UC5
+  usecase "Consulter l’historique" as UC6
+  usecase "Consulter la fiche médicale" as UC7
+  usecase "Effectuer un paiement" as UC8
+}
+
+package "Cas d'utilisation Médecin" {
+  usecase "Se connecter" as UC9
+  usecase "Modifier son profil" as UC10
+  usecase "Consulter les rendez-vous" as UC11
+  usecase "Ajouter un diagnostic" as UC12
+  usecase "Consulter/Modifier la fiche médicale" as UC13
+  usecase "Envoyer une notification" as UC14
+  usecase "Mettre à jour son calendrier" as UC15
+  usecase "Consulter l’historique des consultations" as UC16
+}
+
+' Liens Patient
+PAT --> UC1
+PAT --> UC2
+PAT --> UC3
+PAT --> UC4
+PAT --> UC5
+PAT --> UC6
+PAT --> UC7
+PAT --> UC8
+
+' Liens Médecin
+MED --> UC9
+MED --> UC10
+MED --> UC11
+MED --> UC12
+MED --> UC13
+MED --> UC14
+MED --> UC15
+MED --> UC16
+
+' Relations "include" (inclusion obligatoire)
+UC5 .> UC4 : <<include>>
+UC12 .> UC13 : <<include>>
+
+' Relations "extend" (extension optionnelle)
+UC5 .> UC8 : <<extend>>
+UC12 .> UC14 : <<extend>>
+UC3 .> UC7 : <<extend>>
+
+@enduml

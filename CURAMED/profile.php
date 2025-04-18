@@ -1,7 +1,6 @@
 <?php
 session_start();
-<<<<<<< HEAD
-=======
+
 $conn = mysqli_connect("localhost", "root", "", "curamed");
 
 if (!$conn) {
@@ -27,7 +26,6 @@ if ($res && mysqli_num_rows($res) > 0) {
 }
 
 mysqli_close($conn);
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -45,7 +43,7 @@ mysqli_close($conn);
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
     <script src="./scripts/home.js"></script>
 
-<<<<<<< HEAD
+
 </head>
 <body>
     <!-- Header identique -->
@@ -108,8 +106,8 @@ mysqli_close($conn);
                 <div class="doctor-main-info">
                     <img src="images/marti.png" alt="Dr. bakhana" class="doctor-avatar">
                     <div class="doctor-meta">
-                        <h1 class="doctor-name">Dr. bakhana</h1>
-                        <p class="specialty">Cardiologue</p>
+                        <h1 class="doctor-name"><?php echo htmlspecialchars("DR ".$table["nom"]." ". $table["prenom"]);?></h1>
+                        <p class="specialty"></p>
                         <div class="rating-badge">
                             <span class="rating">4.8</span>
                             <div class="stars">
@@ -273,7 +271,7 @@ mysqli_close($conn);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/profile.js"></script>
-=======
+
     <table class="table table-bordered table-striped bg-white shadow">
       <tbody>
         <tr>
@@ -307,6 +305,5 @@ mysqli_close($conn);
       </tbody>
     </table>
   </div>
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 </body>
 </html>

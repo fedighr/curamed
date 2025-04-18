@@ -48,11 +48,11 @@ session_start();
                 <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-<<<<<<< HEAD
-                        <a href="profile_p.php" class="dropdown-item">
-=======
-                        <a href="profile.php" class="dropdown-item">
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
+                        <?php if(isset($_SESSION['type_utilisateur']) && $_SESSION['type_utilisateur']=='patient') : ?>
+                            <a href="profile_p.php" class="dropdown-item">
+                        <?php else :?>
+                            <a href="profile_d.php" class="dropdown-item">
+                        <?php endif;?>
                             <i class="fas fa-user"></i> Mon profil
                         </a>
                         <a href="settings.php" class="dropdown-item">
@@ -84,34 +84,49 @@ session_start();
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">Prenez rendez-vous avec un médecin en ligne</h1>
-                    <p class="hero-subtitle">Trouvez le spécialiste qu'il vous faut et consultez rapidement</p>
-                    
-                    <div class="search-container">
+        <form id="search" action="search.php" method="POST" enctype="multipart/form-data">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Prenez rendez-vous avec un médecin en ligne</h1>
+                        <p class="hero-subtitle">Trouvez le spécialiste qu'il vous faut et consultez rapidement</p>
+                        
+                        <div class="search-container">
                         <div class="search-input-group">
                             <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="search-input" placeholder="Spécialité, symptôme, médecin...">
+                            <input type="text" class="search-input" placeholder="Spécialité , médecin" name="cherche" id="search">
                         </div>
+
+                        <!-- Added Spécialité Dropdown Inside the Search Bar -->
+                        <div class="search-select-group">
+                        <select id="specialite" name="specialite" class="search-select">
+                            <option value="" disabled selected hidden>Spécialité</option>
+                            <option value="Cardiologie">Cardiologie</option>
+                            <option value="Dermatologie">Dermatologie</option>
+                            <option value="Pédiatrie">Pédiatrie</option>
+                            <option value="Gynécologie">Gynécologie</option>
+                            <option value="Chirurgie">Chirurgie</option>
+                        </select>
+                    </div>
+
                         <button class="search-button btn btn-primary">
                             Rechercher
                         </button>
                     </div>
-                    
-                    <div class="popular-searches">
-                        <span>Recherches populaires :</span>
-                        <a href="#">Médecin généraliste</a>
-                        <a href="#">Dermatologue</a>
-                        <a href="#">Pédiatre</a>
+                        
+                        <div class="popular-searches">
+                            <span>Recherches populaires :</span>
+                            <a href="#">Médecin généraliste</a>
+                            <a href="#">Dermatologue</a>
+                            <a href="#">Pédiatre</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <img src="images\im2.png" alt="Docteur en consultation" class="img-fluid">
                     </div>
                 </div>
-                <div class="hero-image">
-                    <img src="images\im2.png" alt="Docteur en consultation" class="img-fluid">
-                </div>
             </div>
-        </div>
+        </form>
     </section>
 
     <!-- Stats Section -->
@@ -376,9 +391,8 @@ session_start();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<<<<<<< HEAD
+
     <script src="scripts/home.js"></script>
-=======
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
+
 </body>
 </html>

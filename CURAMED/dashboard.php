@@ -53,11 +53,8 @@ if (!$conn) {
                 <div class="profile-dropdown" id="profileDropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-<<<<<<< HEAD
                         <a href="profile_p.php" class="dropdown-item">
-=======
                         <a href="profile.php" class="dropdown-item">
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
                             <i class="fas fa-user"></i> Mon profil
                         </a>
                         <a href="settings.php" class="dropdown-item">

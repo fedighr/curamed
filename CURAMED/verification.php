@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Erreur lors de la connexion : " . mysqli_connect_error());
         }
 
-        // Access session data
+
         $prenom   = mysqli_real_escape_string($conn, $_SESSION['registration_data']['prenom']);
         $nom      = mysqli_real_escape_string($conn, $_SESSION['registration_data']['nom']);
         $age      = (int) $_SESSION['registration_data']['age'];
@@ -20,12 +20,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $tel      = mysqli_real_escape_string($conn, $_SESSION['registration_data']['tel']);
         $mdp      = $_SESSION['registration_data']['mdp'];
         $userType = mysqli_real_escape_string($conn, $_SESSION['registration_data']['userType']);
+        $genre = mysqli_real_escape_string($conn, $_SESSION['registration_data']['genre']);
         $userPhoto = mysqli_real_escape_string($conn, $_SESSION['registration_data']['photo_profil']);
         $mdp_hash = password_hash($mdp, PASSWORD_DEFAULT);
 
-        // Insert into database
-        $query = "INSERT INTO utilisateur (prenom, nom, age, email, mot_de_passe, telephone, type_utilisateur,photo_profil)
-                  VALUES ('$prenom', '$nom', $age, '$email', '$mdp_hash', '$tel', '$userType','$userPhoto')";
+
+        $query = "INSERT INTO utilisateur (prenom, nom, age, email, mot_de_passe, telephone, type_utilisateur,photo_profil,genre)
+                  VALUES ('$prenom', '$nom', $age, '$email', '$mdp_hash', '$tel', '$userType','$userPhoto','$genre')";
 
         if (mysqli_query($conn, $query)) {
             echo "<script type='text/javascript'>";

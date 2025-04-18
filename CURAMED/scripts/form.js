@@ -49,6 +49,8 @@ function verif() {
     const telInput = document.getElementById("tel");
     const mdpInput = document.getElementById("mdp");
     const c_mdpInput = document.getElementById("c_mdp");
+    const hommeRadio = document.getElementById("homme");
+    const femmeRadio = document.getElementById("femme");
     const patientRadio = document.getElementById("patient");
     const medecinRadio = document.getElementById("medecin");
     const termsCheckbox = document.getElementById("terms");
@@ -81,16 +83,22 @@ function verif() {
         setError(c_mdpInput, "La confirmation ne correspond pas au mot de passe.");
         isValid = false;
     }
+    if (!hommeRadio.checked && !femmeRadio.checked) {
+        const errorContainer = document.querySelector('[name="sexe"]').closest('.input-container');
+        errorContainer.classList.add("error");
+        document.getElementById("error_sexe").innerText = "Veuillez sélectionner un sexe.";
+        isValid = false;
+    }
     if (!patientRadio.checked && !medecinRadio.checked) {
-        const errorRadio = document.getElementById("error_userType");
-        errorRadio.innerText = "Veuillez sélectionner un type d'utilisateur.";
-        errorRadio.parentElement.classList.add("error");
+        const errorContainer = document.querySelector('[name="userType"]').closest('.input-container');
+        errorContainer.classList.add("error");
+        document.getElementById("error_userType").innerText = "Veuillez sélectionner un type d'utilisateur.";
         isValid = false;
     }
     if (!termsCheckbox.checked) {
-        const errorTerms = document.getElementById("error_terms");
-        errorTerms.innerText = "Veuillez accepter les conditions d'utilisation.";
-        errorTerms.parentElement.classList.add("error");
+        const errorContainer = termsCheckbox.closest('.input-container');
+        errorContainer.classList.add("error");
+        document.getElementById("error_terms").innerText = "Veuillez accepter les conditions d'utilisation.";
         isValid = false;
     }
     
@@ -112,6 +120,16 @@ function clearErrors() {
     errorMessages.forEach(msg => msg.innerText = "");
     const errorContainers = document.querySelectorAll(".input-container.error");
     errorContainers.forEach(container => container.classList.remove("error"));
+    
+    // Clear errors for sex and user type radio buttons, and terms checkbox
+    const errorRadioSex = document.getElementById("error_sexe");
+    if (errorRadioSex) errorRadioSex.innerText = "";
+
+    const errorRadioUserType = document.getElementById("error_userType");
+    if (errorRadioUserType) errorRadioUserType.innerText = "";
+
+    const errorCheckboxTerms = document.getElementById("error_terms");
+    if (errorCheckboxTerms) errorCheckboxTerms.innerText = "";
 }
 
 function alpha(ch) {

@@ -8,25 +8,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    // Handle Profile Redirection
+
     if (isset($_POST['profile'])) {
         $user_id = intval($_POST['user_id']);
         header("Location: profile.php?id=" . $user_id);
         exit();
     }
 
-    // Handle User Modification
+
     if (isset($_POST['modifier'])) {
         $id_user = intval($_POST['user_id']);
         $user_type = $_POST['user_type'] ?? '';
 
-        // Fetch submitted data
+
         $nom = mysqli_real_escape_string($conn, $_POST['nom']);
         $prenom = mysqli_real_escape_string($conn, $_POST['prenom']);
         $email = mysqli_real_escape_string($conn, $_POST['email']);
         $telephone = mysqli_real_escape_string($conn, $_POST['telephone']);
 
-        // Check current email
         $sqlCheck = "SELECT email FROM utilisateur WHERE id_utilisateur = ?";
         $stmtCheck = mysqli_prepare($conn, $sqlCheck);
         mysqli_stmt_bind_param($stmtCheck, "i", $id_user);
@@ -34,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = mysqli_stmt_get_result($stmtCheck);
         $currentUser = $result->fetch_assoc();
 
-        // Validate email change
+ 
         if ($currentUser['email'] !== $email) {
             $sqlCheckEmail = "SELECT id_utilisateur FROM utilisateur WHERE email = ?";
             $stmtCheckEmail = mysqli_prepare($conn, $sqlCheckEmail);
@@ -49,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        // Update user
+
         $sql = "UPDATE utilisateur SET 
                 nom = ?, 
                 prenom = ?, 
@@ -140,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Handle User Deletion
+
     if (isset($_POST['supp'])) {
         $id_user = intval($_POST['user_id']);
 
