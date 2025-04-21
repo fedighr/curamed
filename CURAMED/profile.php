@@ -83,6 +83,12 @@ mysqli_close($conn);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+<<<<<<< HEAD
+=======
+    <script src="./scripts/home.js"></script>
+
+
+>>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
 </head>
 <body>
     <!-- Header -->
@@ -128,8 +134,13 @@ mysqli_close($conn);
                 <div class="doctor-main-info">
                     <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar">
                     <div class="doctor-meta">
+<<<<<<< HEAD
                         <h1 class="doctor-name">Dr. <?php echo htmlspecialchars($medecin['prenom'] . ' ' . $medecin['nom']); ?></h1>
                         <p class="specialty"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
+=======
+                        <h1 class="doctor-name"><?php echo htmlspecialchars("DR ".$table["nom"]." ". $table["prenom"]);?></h1>
+                        <p class="specialty"></p>
+>>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
                         <div class="rating-badge">
                             <span class="rating">4.8</span>
                             <div class="stars">
@@ -226,5 +237,42 @@ mysqli_close($conn);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=VOTRE_CLE_API&callback=initMap" async defer></script>
     <script src="scripts/profile.js"></script>
+<<<<<<< HEAD
+=======
+
+    <table class="table table-bordered table-striped bg-white shadow">
+      <tbody>
+        <tr>
+          <th>ID</th>
+          <td><?php echo htmlspecialchars($table["id_utilisateur"]); ?></td>
+        </tr>
+        <tr>
+          <th>Prénom</th>
+          <td><?php echo htmlspecialchars($table["prenom"]); ?></td>
+        </tr>
+        <tr>
+          <th>Nom</th>
+          <td><?php echo htmlspecialchars($table["nom"]); ?></td>
+        </tr>
+        <tr>
+          <th>Âge</th>
+          <td><?php echo htmlspecialchars($table["age"]); ?></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><?php echo htmlspecialchars($table["email"]); ?></td>
+        </tr>
+        <tr>
+          <th>Telephone</th>
+          <td><?php echo htmlspecialchars($table["telephone"]); ?></td>
+        </tr>
+        <tr>
+          <th>Type</th>
+          <td><?php echo htmlspecialchars($table["type_utilisateur"]); ?></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+>>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
 </body>
 </html>

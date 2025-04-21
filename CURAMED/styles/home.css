@@ -1792,6 +1792,7 @@ a {
   color: white;
 }
 
+<<<<<<< HEAD
 .day.disabled {
   color: var(--light-gray);
   cursor: not-allowed;
@@ -1881,6 +1882,10 @@ a {
 /* Carte médecin - Version améliorée */
 .doctor-card {
   transition: var(--transition);
+=======
+.modal-content {
+  border-radius: var(--border-radius-lg);
+>>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
   border: none;
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
@@ -1997,6 +2002,7 @@ a {
   box-shadow: var(--shadow-sm);
 }
 
+<<<<<<< HEAD
 .sort-option {
   padding: 0.5rem 1rem;
   border-radius: 50px;
@@ -2071,3 +2077,35 @@ a {
       margin: 0 0.3rem;
   }
 }
+=======
+.search-select-group {
+  width: 160px;
+}
+
+.search-select {
+  width: 100%;
+  height: 100%;
+  padding: 1rem 1rem;
+  border: 1px solid var(--light-gray);
+  border-left: none;
+  border-radius: 0;
+  font-size: 1rem;
+  border-top: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--light-gray);
+  transition: var(--transition);
+}
+
+.search-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 198, 180, 0.2);
+}
+
+.search-input {
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.search-button {
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+>>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
