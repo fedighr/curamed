@@ -83,12 +83,9 @@ mysqli_close($conn);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-<<<<<<< HEAD
-=======
     <script src="./scripts/home.js"></script>
 
 
->>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
 </head>
 <body>
     <!-- Header -->
@@ -97,8 +94,8 @@ mysqli_close($conn);
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
-            
             <div class="nav-links">
+                <?php if(isset($_SESSION['user_id'])) :?>
                 <a href="doctors.html" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
@@ -106,18 +103,54 @@ mysqli_close($conn);
                 <div class="nav-icon notifications-wrapper" title="Notifications">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">0</span>
+                    <div class="notifications-dropdown">
+                        <div class="notification-header">
+                        </div>
+                        <div class="notification-list"></div>
+                    </div>
                 </div>
-                
+                <p><?php echo $_SESSION['type'];?>
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 
                 <div class="profile-dropdown">
-                    <img src="<?php echo htmlspecialchars($_SESSION['photo'] ?? 'images/default-profile.png'); ?>" class="profile-image" alt="Profil">
+                    <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
+                    <div class="dropdown-menu">
+                        <?php if(isset($_SESSION['type']) && $_SESSION['type'] =='patient') : ?>
+                            <a href="profile_p.php" class="dropdown-item">
+                        <?php else :?>
+                            <a href="profile_d.php" class="dropdown-item">
+                        <?php endif;?>
+                            <i class="fas fa-user"></i> Mon profil
+                        </a>
+                        <a href="settings.php" class="dropdown-item">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                        <?php
+                         if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+                            <a href="dashboard.php" class="dropdown-item">
+                                <i class="fas fa-th-large"></i> Tableau de bord
+                            </a>
+                        <?php endif; ?>
+                        <a href="logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </a>
+                    </div>
+                </div>
+                <button class="mobile-menu-btn d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <?php else : ?>
+                <div class="container mt-5 text-center">
+                    <a href="login.html" class="btn btn-custom mx-2">Connexion</a>
+                    <a href="signup.html" class="btn btn-custom mx-2">S'inscrire</a>
                 </div>
             </div>
         </nav>
+        <?php endif ;?>
     </header>
+
 
     <!-- Section Profil Médecin -->
     <section class="doctor-profile">
@@ -134,13 +167,8 @@ mysqli_close($conn);
                 <div class="doctor-main-info">
                     <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar">
                     <div class="doctor-meta">
-<<<<<<< HEAD
-                        <h1 class="doctor-name">Dr. <?php echo htmlspecialchars($medecin['prenom'] . ' ' . $medecin['nom']); ?></h1>
-                        <p class="specialty"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
-=======
                         <h1 class="doctor-name"><?php echo htmlspecialchars("DR ".$table["nom"]." ". $table["prenom"]);?></h1>
                         <p class="specialty"></p>
->>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
                         <div class="rating-badge">
                             <span class="rating">4.8</span>
                             <div class="stars">
@@ -237,8 +265,6 @@ mysqli_close($conn);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=VOTRE_CLE_API&callback=initMap" async defer></script>
     <script src="scripts/profile.js"></script>
-<<<<<<< HEAD
-=======
 
     <table class="table table-bordered table-striped bg-white shadow">
       <tbody>
@@ -273,6 +299,5 @@ mysqli_close($conn);
       </tbody>
     </table>
   </div>
->>>>>>> 32e431e6cfdcf137065b54741c6d4474366a194c
 </body>
 </html>

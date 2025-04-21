@@ -40,7 +40,6 @@ session_start();
                         <div class="notification-list"></div>
                     </div>
                 </div>
-                
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
@@ -48,7 +47,7 @@ session_start();
                 <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <?php if(isset($_SESSION['type_utilisateur']) && $_SESSION['type_utilisateur']=='patient') : ?>
+                        <?php if(isset($_SESSION['type']) && $_SESSION['type'] =='patient') : ?>
                             <a href="profile_p.php" class="dropdown-item">
                         <?php else :?>
                             <a href="profile_d.php" class="dropdown-item">

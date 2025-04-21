@@ -1,18 +1,15 @@
 <?php
 session_start();
 
-$_SESSION['patient'] = [
-    'photo' => 'images/profil.jpg',
-    'nom' => 'chakroun',
-    'prenom' => 'abdelhedi',
-    'email' => 'abdelhedi.chakroun@example.com',
-    'telephone' => '97370975',
-    'adresse' => 'jawhara, 75001 sousse',
-    'naissance' => '2004-07-11',
-    'genre' => 'r3ad',
-    'groupe_sanguin' => 'A+',
-    'medecin_traitant' => 'Dr. bakhana'
-];
+$conn=mysqli_connect("localhost","root","","curamed");
+
+$sql="SELECT u.*,p.* from utilisateur u ,patient p where u.id_utilisateur=p.id_patient and id_utilisateur=". $_SESSION["user_id"];
+if(!$res=mysqli_query($conn,$sql)){
+    echo"error";
+}
+
+$table=mysqli_fetch_assoc($res);
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -85,14 +82,14 @@ $_SESSION['patient'] = [
         <div class="profile-header mb-5">
             <div class="d-flex align-items-center gap-4">
                 <div class="position-relative">
-                    <img src="<?= $_SESSION['patient']['photo'] ?>" class="profile-avatar" alt="Photo de profil">
+                    <img src="<?= $_SESSION['photo'] ?>" class="profile-avatar" alt="Photo de profil">
                     <button class="btn btn-sm btn-primary avatar-edit-btn" onclick="document.getElementById('avatarInput').click()">
                         <i class="fas fa-camera"></i>
                     </button>
                     <input type="file" id="avatarInput" hidden accept="image/*">
                 </div>
                 <div>
-                    <h1 class="profile-name"><?= $_SESSION['patient']['prenom'] ?> <?= $_SESSION['patient']['nom'] ?></h1>
+                    <h1 class="profile-name"><?= $table['prenom'] ?> <?= $table['nom'] ?></h1>
                     <p class="text-muted mb-0">Membre depuis 2020</p>
                 </div>
             </div>
@@ -109,23 +106,19 @@ $_SESSION['patient'] = [
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Prénom</label>
-                                    <input type="text" class="form-control" value="<?= $_SESSION['patient']['prenom'] ?>" disabled>
+                                    <input type="text" class="form-control" value="<?= $table['prenom'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Nom</label>
-                                    <input type="text" class="form-control" value="<?= $_SESSION['patient']['nom'] ?>" disabled>
+                                    <input type="text" class="form-control" value="<?= $table['nom'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Date de naissance</label>
-                                    <input type="date" class="form-control" value="<?= $_SESSION['patient']['naissance'] ?>" disabled>
+                                    <input type="date" class="form-control" value="<?= $table['age'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Genre</label>
-                                    <input type="text" class="form-control" value="<?= $_SESSION['patient']['genre'] ?>" disabled>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Adresse</label>
-                                    <input type="text" class="form-control" value="<?= $_SESSION['patient']['adresse'] ?>" disabled>
+                                    <input type="text" class="form-control" value="<?= $table['genre'] ?>" disabled>
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="button" id="editBtn" class="btn btn-primary">
@@ -148,7 +141,7 @@ $_SESSION['patient'] = [
                                     <i class="fas fa-tint"></i>
                                     <div>
                                         <h6>Groupe sanguin</h6>
-                                        <p><?= $_SESSION['patient']['groupe_sanguin'] ?></p>
+                                        <p><?= $table['group_sanguin'] ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -175,11 +168,11 @@ $_SESSION['patient'] = [
                         <ul class="contact-list">
                             <li>
                                 <i class="fas fa-envelope"></i>
-                                <a href="mailto:<?= $_SESSION['patient']['email'] ?>"><?= $_SESSION['patient']['email'] ?></a>
+                                <a href="mailto:<?= $table['email'] ?>"><?= $table['email'] ?></a>
                             </li>
                             <li>
                                 <i class="fas fa-phone"></i>
-                                <a href="tel:<?= $_SESSION['patient']['telephone'] ?>"><?= $_SESSION['patient']['telephone'] ?></a>
+                                <a href="tel:<?= $table['telephone'] ?>"><?= $table['telephone'] ?></a>
                             </li>
                         </ul>
                     </div>
@@ -265,5 +258,6 @@ $_SESSION['patient'] = [
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/profile_p.js"></script>
+<?php mysqli_close($conn); ?>
 </body>
 </html>
