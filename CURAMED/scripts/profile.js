@@ -1,37 +1,59 @@
-// doctor-profile.js
-document.addEventListener('DOMContentLoaded', () => {
-    // Gestion du calendrier
-    const calendarDays = document.querySelector('.days-grid');
-    const monthHeader = document.querySelector('.month-header h3');
-    const prevMonthBtn = document.querySelector('.prev-month');
-    const nextMonthBtn = document.querySelector('.next-month');
-    
-    // Gestion des créneaux horaires
-    const timeSlotsContainer = document.querySelector('.slots-grid');
-    const appointmentForm = document.querySelector('.appointment-form');
-    const selectedDateInput = document.querySelector('.selected-date');
-    const selectedTimeInput = document.querySelector('.selected-time');
-    
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
     let currentDate = new Date();
     let selectedDate = null;
     let selectedTime = null;
+    const calendarDays = document.getElementById('calendar-days');
+    const timeSlotsContainer = document.getElementById('time-slots');
+    const currentMonthElement = document.getElementById('current-month');
+    const selectedDateInput = document.getElementById('selected-date');
+    const selectedTimeInput = document.getElementById('selected-time');
+    const dateHeureInput = document.getElementById('date-heure');
+    const rdvForm = document.getElementById('rdv-form');
+
+    // Initialisation de la carte Google Maps
+    function initMap() {
+        const map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: {lat: 48.8566, lng: 2.3522} // Paris par défaut
+        });
+        
+        // Vous pouvez ajouter un marqueur avec l'adresse du médecin
+        new google.maps.Marker({
+            position: {lat: 48.8566, lng: 2.3522},
+            map: map,
+            title: "Cabinet du Dr."
+        });
+    }
 
     // Générer le calendrier
     function generateCalendar(date) {
         const year = date.getFullYear();
         const month = date.getMonth();
+        
+        // Mettre à jour le mois affiché
+        currentMonthElement.textContent = date.toLocaleDateString('fr-FR', { 
+            month: 'long', 
+            year: 'numeric' 
+        }).replace(/^\w/, c => c.toUpperCase());
+
+        // Premier et dernier jour du mois
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
-        const monthName = date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
-        
-        monthHeader.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-        
-        let daysHtml = '';
         
         // Jours du mois précédent
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         const firstWeekDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
         
+        let daysHtml = '';
+        
+        // Entêtes des jours
+        const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        dayNames.forEach(day => {
+            daysHtml += `<div class="day-header">${day}</div>`;
+        });
+
+        // Jours du mois précédent
         for(let i = firstWeekDay; i > 0; i--) {
             daysHtml += `<div class="day disabled">${prevMonthLastDay - i + 1}</div>`;
         }
@@ -39,14 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Jours du mois courant
         for(let i = 1; i <= lastDay.getDate(); i++) {
             const dayDate = new Date(year, month, i);
-            const isAvailable = Math.random() > 0.5; // Simulation de disponibilité
-            const isPast = dayDate < new Date().setHours(0,0,0,0);
+            const isPast = dayDate < new Date().setHours(0, 0, 0, 0);
             
             daysHtml += `
                 <div class="day 
-                    ${isPast ? 'disabled' : ''} 
-                    ${isAvailable && !isPast ? 'available' : ''}
-                    ${i === selectedDate?.getDate() ? 'selected' : ''}"
+                    ${isPast ? 'disabled' : ''}
+                    ${i === selectedDate?.getDate() && month === selectedDate?.getMonth() ? 'selected' : ''}"
                     data-date="${dayDate.toISOString()}">
                     ${i}
                 </div>
@@ -58,6 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Générer les créneaux horaires
     function generateTimeSlots(date) {
+        if (!date) return;
+        
         const slots = [];
         const startHour = 9;
         const endHour = 18;
@@ -66,12 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
         for(let hour = startHour; hour < endHour; hour++) {
             for(let minute = 0; minute < 60; minute += interval) {
                 const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                const isAvailable = Math.random() > 0.5; // Simulation de disponibilité
+                const slotDate = new Date(date);
+                slotDate.setHours(hour, minute);
+                
+                // Vérifier si le créneau est disponible (non pris)
+                const isAvailable = !isTimeSlotTaken(slotDate);
                 
                 if(isAvailable) {
                     slots.push(`
                         <button type="button" class="time-slot" 
-                            data-time="${time}">
+                            data-time="${time}"
+                            data-datetime="${slotDate.toISOString()}">
                             ${time}
                         </button>
                     `);
@@ -82,7 +109,24 @@ document.addEventListener('DOMContentLoaded', () => {
         timeSlotsContainer.innerHTML = slots.join('');
     }
 
-    // Gestion des clics sur les jours
+    // Vérifier si un créneau est déjà pris
+    function isTimeSlotTaken(dateTime) {
+        // Dans une vraie application, vous feriez une requête AJAX pour vérifier
+        // Pour cet exemple, on simule avec des créneaux aléatoires pris
+        return Math.random() > 0.7; // 30% de chance que le créneau soit pris
+    }
+
+    // Gestion des événements
+    document.querySelector('.prev-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        generateCalendar(currentDate);
+    });
+
+    document.querySelector('.next-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        generateCalendar(currentDate);
+    });
+
     calendarDays.addEventListener('click', (e) => {
         const day = e.target.closest('.day:not(.disabled)');
         if(!day) return;
@@ -91,75 +135,36 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedDateInput.value = selectedDate.toLocaleDateString('fr-FR');
         generateTimeSlots(selectedDate);
         
+        // Réinitialiser l'heure sélectionnée
+        selectedTime = null;
+        selectedTimeInput.value = '';
+        dateHeureInput.value = '';
+        
         document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
         day.classList.add('selected');
     });
 
-    // Gestion des clics sur les créneaux
     timeSlotsContainer.addEventListener('click', (e) => {
         const slot = e.target.closest('.time-slot');
         if(!slot) return;
 
         selectedTime = slot.dataset.time;
         selectedTimeInput.value = selectedTime;
+        dateHeureInput.value = slot.dataset.datetime;
         
         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
         slot.classList.add('selected');
     });
 
-    // Navigation calendrier
-    prevMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() - 1);
-        generateCalendar(currentDate);
-    });
-
-    nextMonthBtn.addEventListener('click', () => {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        generateCalendar(currentDate);
-    });
-
-    // Soumission du formulaire
-    appointmentForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
+    // Validation du formulaire
+    rdvForm.addEventListener('submit', (e) => {
         if(!selectedDate || !selectedTime) {
-            showAlert('Veuillez sélectionner une date et un horaire', 'error');
-            return;
+            e.preventDefault();
+            alert('Veuillez sélectionner une date et un horaire');
         }
-
-        const appointmentDate = new Date(selectedDate);
-        const [hours, minutes] = selectedTime.split(':');
-        appointmentDate.setHours(hours, minutes);
-
-        // Simulation d'envoi au backend
-        setTimeout(() => {
-            showAlert('Rendez-vous confirmé !', 'success');
-            resetForm();
-        }, 1000);
     });
-
-    // Fonctions utilitaires
-    function showAlert(message, type = 'success') {
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type}`;
-        alert.textContent = message;
-        
-        document.body.appendChild(alert);
-        
-        setTimeout(() => {
-            alert.remove();
-        }, 3000);
-    }
-
-    function resetForm() {
-        selectedDate = null;
-        selectedTime = null;
-        selectedDateInput.value = '';
-        selectedTimeInput.value = '';
-        document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
-    }
 
     // Initialisation
     generateCalendar(currentDate);
-    generateTimeSlots(new Date());
+    window.initMap = initMap;
 });

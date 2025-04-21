@@ -1,54 +1,91 @@
 <?php
 session_start();
-<<<<<<< HEAD
-=======
+
 $conn = mysqli_connect("localhost", "root", "", "curamed");
 
 if (!$conn) {
     die("Erreur de connexion à la base de données.");
 }
-if (isset($_GET['id'])) {
-  $user_id = intval($_GET['id']);
-} else {
-  $user_id = $_SESSION['user_id'] ?? null;
-} 
 
-if (!$user_id) {
-    die("Utilisateur non connecté.");
+// Récupération de l'ID du médecin
+if (isset($_GET['id'])) {
+    $medecin_id = intval($_GET['id']);
+} else {
+    die("Aucun médecin spécifié.");
 }
 
-$req = "SELECT * FROM utilisateur WHERE id_utilisateur = $user_id";
-$res = mysqli_query($conn, $req);
+// Récupération des infos du médecin
+$req_medecin = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
+                FROM utilisateur u 
+                JOIN medecin m ON u.id_utilisateur = m.id_medecin 
+                WHERE u.id_utilisateur = $medecin_id";
+$res_medecin = mysqli_query($conn, $req_medecin);
 
-if ($res && mysqli_num_rows($res) > 0) {
-    $table = mysqli_fetch_assoc($res);
+if ($res_medecin && mysqli_num_rows($res_medecin) > 0) {
+    $medecin = mysqli_fetch_assoc($res_medecin);
 } else {
-    die("Erreur lors de la récupération des données utilisateur.");
+    die("Médecin non trouvé.");
+}
+
+// Récupération des rendez-vous existants
+$rdv_existants = [];
+$req_rdv = "SELECT date_heure FROM rendez_vous WHERE id_medecin = $medecin_id AND statut = 'confirmé'";
+$res_rdv = mysqli_query($conn, $req_rdv);
+while ($row = mysqli_fetch_assoc($res_rdv)) {
+    $rdv_existants[] = $row['date_heure'];
+}
+
+// Traitement du formulaire
+$erreur = $success = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
+    if (!isset($_SESSION['user_id'])) {
+        $erreur = "Vous devez être connecté pour prendre un rendez-vous.";
+    } else {
+        $patient_id = $_SESSION['user_id'];
+        $date_heure = $_POST['date_heure'];
+        
+        $date_obj = new DateTime($date_heure);
+        $now = new DateTime();
+        
+        if ($date_obj < $now) {
+            $erreur = "Vous ne pouvez pas prendre de rendez-vous dans le passé.";
+        } elseif (in_array($date_heure, $rdv_existants)) {
+            $erreur = "Ce créneau est déjà pris, veuillez en choisir un autre.";
+        } else {
+            $insert_rdv = "INSERT INTO rendez_vous (id_patient, id_medecin, date_heure, statut) 
+                          VALUES ($patient_id, $medecin_id, '$date_heure', 'en attente')";
+            
+            if (mysqli_query($conn, $insert_rdv)) {
+                $success = "Votre rendez-vous a été pris avec succès!";
+                
+                // Ajouter une notification
+                $message_notif = "Nouveau RDV avec Dr. " . $medecin['nom'] . " le " . $date_obj->format('d/m/Y à H:i');
+                $insert_notif = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut) 
+                                VALUES ($patient_id, '$message_notif', NOW(), 'email', 'envoyé')";
+                mysqli_query($conn, $insert_notif);
+            } else {
+                $erreur = "Erreur lors de la prise de rendez-vous: " . mysqli_error($conn);
+            }
+        }
+    }
 }
 
 mysqli_close($conn);
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CuraMed - Prendre rendez-vous en ligne</title>
+    <title>CuraMed - Dr. <?php echo htmlspecialchars($medecin['nom']); ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-    <script src="./scripts/home.js"></script>
-
-<<<<<<< HEAD
 </head>
 <body>
-    <!-- Header identique -->
+    <!-- Header -->
     <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -63,11 +100,6 @@ mysqli_close($conn);
                 <div class="nav-icon notifications-wrapper" title="Notifications">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">0</span>
-                    <div class="notifications-dropdown">
-                        <div class="notification-header">
-                        </div>
-                        <div class="notification-list"></div>
-                    </div>
                 </div>
                 
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
@@ -75,41 +107,29 @@ mysqli_close($conn);
                 </a>
                 
                 <div class="profile-dropdown">
-                    <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
-                    <div class="dropdown-menu">
-                        <a href="profile_p.php" class="dropdown-item">
-                            <i class="fas fa-user"></i> Mon profil
-                        </a>
-                        <a href="settings.html" class="dropdown-item">
-                            <i class="fas fa-cog"></i> Paramètres
-                        </a>
-                        <?php
-                         if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
-                            <a href="dashboard.php" class="dropdown-item">
-                                <i class="fas fa-th-large"></i> Tableau de bord
-                            </a>
-                        <?php endif; ?>
-                        <a href="logout.php" class="dropdown-item">
-                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
-                        </a>
-                    </div>
+                    <img src="<?php echo htmlspecialchars($_SESSION['photo'] ?? 'images/default-profile.png'); ?>" class="profile-image" alt="Profil">
                 </div>
             </div>
-            <button class="mobile-menu-btn d-lg-none">
-                <i class="fas fa-bars"></i>
-            </button>
         </nav>
     </header>
 
     <!-- Section Profil Médecin -->
     <section class="doctor-profile">
         <div class="container">
+            <?php if ($erreur): ?>
+                <div class="alert alert-danger"><?php echo $erreur; ?></div>
+            <?php endif; ?>
+            
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?php echo $success; ?></div>
+            <?php endif; ?>
+
             <div class="profile-header">
                 <div class="doctor-main-info">
-                    <img src="images/marti.png" alt="Dr. bakhana" class="doctor-avatar">
+                    <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar">
                     <div class="doctor-meta">
-                        <h1 class="doctor-name">Dr. bakhana</h1>
-                        <p class="specialty">Cardiologue</p>
+                        <h1 class="doctor-name">Dr. <?php echo htmlspecialchars($medecin['prenom'] . ' ' . $medecin['nom']); ?></h1>
+                        <p class="specialty"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
                         <div class="rating-badge">
                             <span class="rating">4.8</span>
                             <div class="stars">
@@ -127,143 +147,75 @@ mysqli_close($conn);
                     <div class="contact-card">
                         <h3>Coordonnées</h3>
                         <ul class="contact-list">
-                            <li><i class="fas fa-map-marker-alt"></i> 15 Rue de la Paix, 75002 Paris</li>
-                            <li><i class="fas fa-phone"></i> 01 23 45 67 89</li>
-                            <li><i class="fas fa-envelope"></i> contact@sarahdupont.com</li>
+                            <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($medecin['adresse_cabinet']); ?></li>
+                            <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($medecin['telephone']); ?></li>
+                            <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($medecin['email']); ?></li>
                         </ul>
-                        <div class="social-links">
-                            <a href="#"><i class="fab fa-linkedin"></i></a>
-                            <a href="#"><i class="fab fa-doctolib"></i></a>
-                            <a href="#"><i class="fas fa-globe"></i></a>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Horaires de consultation -->
+            <!-- Prise de rendez-vous -->
             <div class="consultation-section">
                 <h2 class="section-title">Prendre rendez-vous</h2>
                 
                 <div class="availability-container">
-                    <!-- Sélecteur de date -->
+                    <!-- Calendrier -->
                     <div class="date-picker">
                         <div class="month-header">
                             <button class="nav-btn prev-month"><i class="fas fa-chevron-left"></i></button>
-                            <h3>Septembre 2023</h3>
+                            <h3 id="current-month">Chargement...</h3>
                             <button class="nav-btn next-month"><i class="fas fa-chevron-right"></i></button>
                         </div>
-                        <div class="days-grid">
-                            <!-- Généré dynamiquement en JS -->
+                        <div class="days-grid" id="calendar-days">
+                            <!-- Généré par JS -->
                         </div>
                     </div>
                     
                     <!-- Créneaux horaires -->
                     <div class="time-slots">
                         <h4>Créneaux disponibles</h4>
-                        <div class="slots-grid">
-                            <button class="time-slot">09:00</button>
-                            <button class="time-slot">09:30</button>
-                            <button class="time-slot">10:00</button>
-                            <button class="time-slot">10:30</button>
-                            <button class="time-slot">11:00</button>
-                            <!-- Plus de créneaux... -->
+                        <div class="slots-grid" id="time-slots">
+                            <!-- Généré par JS -->
                         </div>
                     </div>
                 </div>
                 
-                <!-- Formulaire de rendez-vous -->
-                <form class="appointment-form">
+                <!-- Formulaire de confirmation -->
+                <form class="appointment-form" method="POST" id="rdv-form">
                     <h3>Confirmation du rendez-vous</h3>
                     <div class="form-group">
                         <label>Date sélectionnée :</label>
-                        <input type="text" class="selected-date" readonly>
+                        <input type="text" class="selected-date" id="selected-date" readonly>
                     </div>
                     <div class="form-group">
                         <label>Heure sélectionnée :</label>
-                        <input type="text" class="selected-time" readonly>
+                        <input type="text" class="selected-time" id="selected-time" readonly>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-confirm">Confirmer le rendez-vous</button>
+                    <input type="hidden" name="date_heure" id="date-heure">
+                    <button type="submit" class="btn btn-primary btn-confirm" name="prendre_rdv">Confirmer le rendez-vous</button>
                 </form>
             </div>
 
-            <!-- Section Informations complémentaires -->
+            <!-- Informations complémentaires -->
             <div class="doctor-details">
                 <div class="about-section">
                     <h2>À propos</h2>
-                    <p>Docteur en cardiologie avec plus de 15 ans d'expérience. Spécialisée dans les troubles du rythme cardiaque et la prévention cardiovasculaire.</p>
-                    <div class="qualifications">
-                        <h3>Formations & Certifications</h3>
-                        <ul>
-                            <li>Diplôme de Cardiologie - Université Paris Descartes</li>
-                            <li>Certificat de Rythmologie - Collège Français de Cardiologie</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="location-map">
-                    <h2>Localisation</h2>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.8583700792875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1623258137807!5m2!1sfr!2sfr" 
-                            class="map-iframe" 
-                            allowfullscreen="" 
-                            loading="lazy"></iframe>
+                    <p><?php echo htmlspecialchars($medecin['experience']); ?></p>
                 </div>
                 
+                <div class="location-map">
+                    <h2>Localisation</h2>
+                    <div id="map" style="height: 400px; width: 100%;"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer identique -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <img src="images\logo3.png" alt="CuraMed" class="footer-logo">
-                    <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Patients</h4>
-                    <ul>
-                        <li><a href="#">Trouver un médecin</a></li>
-                        <li><a href="#">Consultation en ligne</a></li>
-                        <li><a href="#">Fonctionnalités</a></li>
-                        <li><a href="#">Tarifs</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Professionnels</h4>
-                    <ul>
-                        <li><a href="#">Solutions pour médecins</a></li>
-                        <li><a href="#">Tarifs</a></li>
-                        <li><a href="#">Témoignages</a></li>
-                        <li><a href="#">Nous rejoindre</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-col">
-                    <h4>Entreprise</h4>
-                    <ul>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Carrières</a></li>
-                        <li><a href="#">Presse</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            
             <div class="footer-bottom">
-                <div class="footer-links">
-                    <a href="#">Mentions légales</a>
-                    <a href="#">Politique de confidentialité</a>
-                    <a href="#">Conditions générales</a>
-                    <a href="#">Cookies</a>
-                </div>
                 <div class="copyright">
                     © 2025 CuraMed. Tous droits réservés.
                 </div>
@@ -272,41 +224,7 @@ mysqli_close($conn);
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=VOTRE_CLE_API&callback=initMap" async defer></script>
     <script src="scripts/profile.js"></script>
-=======
-    <table class="table table-bordered table-striped bg-white shadow">
-      <tbody>
-        <tr>
-          <th>ID</th>
-          <td><?php echo htmlspecialchars($table["id_utilisateur"]); ?></td>
-        </tr>
-        <tr>
-          <th>Prénom</th>
-          <td><?php echo htmlspecialchars($table["prenom"]); ?></td>
-        </tr>
-        <tr>
-          <th>Nom</th>
-          <td><?php echo htmlspecialchars($table["nom"]); ?></td>
-        </tr>
-        <tr>
-          <th>Âge</th>
-          <td><?php echo htmlspecialchars($table["age"]); ?></td>
-        </tr>
-        <tr>
-          <th>Email</th>
-          <td><?php echo htmlspecialchars($table["email"]); ?></td>
-        </tr>
-        <tr>
-          <th>Telephone</th>
-          <td><?php echo htmlspecialchars($table["telephone"]); ?></td>
-        </tr>
-        <tr>
-          <th>Type</th>
-          <td><?php echo htmlspecialchars($table["type_utilisateur"]); ?></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
->>>>>>> db3580ef8f15685210e304cd399893e96d367b12
 </body>
 </html>

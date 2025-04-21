@@ -1,6 +1,6 @@
 <?php
 session_start();
-// Données du patient (simulées pour l'exemple)
+
 $_SESSION['patient'] = [
     'photo' => 'images/profil.jpg',
     'nom' => 'chakroun',

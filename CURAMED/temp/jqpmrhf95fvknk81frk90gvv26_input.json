@@ -1,0 +1,24 @@
+{
+    "query": "",
+    "specialty": "",
+    "doctors": [
+        {
+            "id_utilisateur": "45",
+            "nom": "chakroun",
+            "prenom": "abdelhedi",
+            "photo_profil": "user_photos\/67fc0889aa0c5_228-2284388_naruto-vs-sasuke_edited.jpg",
+            "specialite": "Pédiatrie",
+            "adresse": "fsdfsdf",
+            "experience": ""
+        },
+        {
+            "id_utilisateur": "47",
+            "nom": "chakroun",
+            "prenom": "hedi",
+            "photo_profil": "user_photos\/67fc0ba192ea3_482169339_659727429834874_4692588891653887067_n.jpg",
+            "specialite": "dqsdqsd",
+            "adresse": "",
+            "experience": ""
+        }
+    ]
+}

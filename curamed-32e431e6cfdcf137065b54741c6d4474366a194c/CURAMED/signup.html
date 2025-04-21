@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CuraMed - Inscription</title>
+  <link rel="stylesheet" href="styles\main.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+  <script src="scripts\form.js"></script>
+  <script src="scripts\app.js"></script>
+</head>
+<body>
+  <div class="nav-overlay" onclick="toggleMenu()"></div>
+  <header>
+    <div class="d-flex align-items-center">
+      <div class="menu-btn me-3" onclick="toggleMenu()" aria-label="Menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <a href="home.php" class="logo-link">
+        <img src="images/logo.png" class="img-fluid" alt="CuraMed">
+      </a>
+    </div>
+    <nav>
+      <a href="login.html" class="btn btn-success">
+        <i class="fas fa-sign-in-alt me-2"></i>Connexion
+      </a>
+    </nav>
+  </header>
+
+  <div class="side-nav">
+    <span class="close-btn" onclick="toggleMenu()">×</span>
+    <a href="index.html"><i class="fas fa-home me-2"></i>Accueil</a>
+    <a href="#recherche"><i class="fas fa-search me-2"></i>Rechercher</a>
+    <a href="#aide"><i class="fas fa-question-circle me-2"></i>Aide</a>
+  </div>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <h1><i class="fas fa-user-plus me-2"></i>Inscription</h1>
+      <p class="auth-subtitle">Créez votre compte</p>
+      
+      
+      <form class="auth-form" id="signupForm" method="POST" enctype="multipart/form-data" novalidate action="signup.php">
+        <div class="form-row">
+          <div class="form-group col-md-6 input-container">
+            <label for="prenom"><i class="fas fa-user me-2"></i>Prénom</label>
+            <input type="text" id="prenom" placeholder="Prénom" name="prenom">
+            <div id="error_prenom" class="error-message"></div>
+          </div>
+          <div class="form-group col-md-6 input-container">
+            <label for="nom"><i class="fas fa-user me-2"></i>Nom</label>
+            <input type="text" id="nom" placeholder="Nom" name="nom">
+            <div id="error_nom" class="error-message"></div>
+          </div>
+        </div>
+
+        <div class="form-group input-container" style="width: 100%;">
+          <label for="age"><i class="fas fa-birthday-cake me-2"></i>Âge</label>
+          <input type="number" id="age" placeholder="Âge" name="age">
+          <div id="error_age" class="error-message"></div>
+        </div>
+        
+        <div class="form-group input-container">
+          <label for="email"><i class="fas fa-envelope me-2"></i>Email</label>
+          <input type="email" id="email" placeholder="votre@email.com" name="email">
+          <div id="error_email" class="error-message"></div>
+        </div>
+        
+        <div class="form-group input-container">
+          <label for="tel"><i class="fas fa-phone me-2"></i>Téléphone</label>
+          <input type="tel" id="tel" placeholder="+216 00000000" name="tel">
+          <div id="error_tel" class="error-message"></div>
+        </div>
+        
+        <div class="form-group input-container">
+          <label for="mdp"><i class="fas fa-lock me-2"></i>Mot de passe</label>
+          <input type="password" id="mdp" placeholder="••••••••" name="mdp">
+          <small class="form-text">Minimum 8 caractères avec chiffres et lettres</small>
+          <div id="error_mdp" class="error-message"></div>
+        </div>
+        
+        <div class="form-group input-container">
+          <label for="c_mdp"><i class="fas fa-lock me-2"></i>Confirmer le mot de passe</label>
+          <input type="password" id="c_mdp" placeholder="••••••••">
+          <div id="error_c_mdp" class="error-message"></div>
+        </div>
+
+        <div>
+          <label for="photo"><i class="fas fa-camera me-2"></i>Photo de Profil</label>
+          <input type="file" id="photo" name="photo" accept="image/*">
+          <div id="error_photo" class="error-message"></div>
+      </div>
+        
+      <div class="form-group input-container">
+        <label>Vous êtes :</label>
+        <div class="form-check form-check-inline me-3">
+          <input type="radio" id="homme" name="sexe" value="homme" class="form-check-input">
+          <label for="homme" class="form-check-label"><i class="fas fa-mars me-2"></i>Homme</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="radio" id="femme" name="sexe" value="femme" class="form-check-input">
+          <label for="femme" class="form-check-label"><i class="fas fa-venus me-2"></i>Femme</label>
+        </div>
+        <div id="error_sexe" class="error-message"></div>
+      </div>
+
+        <div class="form-group input-container">
+          <label>Vous êtes :</label>
+          <div class="form-check form-check-inline me-3">
+            <input type="radio" id="patient" name="userType" value="patient" class="form-check-input">
+            <label for="patient" class="form-check-label"><i class="fas fa-user me-2"></i>Patient</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" id="medecin" name="userType" value="medecin" class="form-check-input">
+            <label for="medecin" class="form-check-label"><i class="fas fa-user-md me-2"></i>Médecin</label>
+          </div>
+          <div id="error_userType" class="error-message"></div>
+        </div>
+        
+        
+        <div class="form-check form-check-inline input-container">
+          <input type="checkbox" id="terms" class="form-check-input">
+          <label for="terms" class="form-check-label ms-2">
+            J'accepte les <a href="#terms">conditions d'utilisation</a> et la <a href="#privacy">politique de confidentialité</a>
+          </label>
+          <div id="error_terms" class="error-message"></div>
+        </div>
+        
+        <button type="submit" class="btn btn-success btn-auth">
+          <i class="fas fa-user-plus me-2"></i>S'inscrire
+        </button>
+        
+        <p class="auth-redirect">
+          Déjà inscrit ? <a href="login.html">Connectez-vous</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>© 2025 CuraMed. Tous droits réservés.</p>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

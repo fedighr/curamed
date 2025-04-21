@@ -11,9 +11,9 @@ if (!$conn) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = mysqli_real_escape_string($conn, $_POST["email"]);
-    $password = $_POST["mdp"]; 
+    $password = mysqli_real_escape_string($conn, $_POST["mdp"]);
 
-    $sql = "SELECT * FROM utilisateur WHERE email = ?";
+    $sql = "SELECT id_utilisateur,email,mot_de_passe,photo_profil,role FROM utilisateur WHERE email = ?";
     $stmt = mysqli_prepare($conn, $sql);
 
     if ($stmt === false) {
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['photo'] = $user['photo_profil'];
             $_SESSION['role'] = $user['role'];
 
-            // Send a successful response
+
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Mot de passe incorrect.']);

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Anatomie Interactive Médicale</title>
+    <style>
+        :root {
+            --primary-color: #2b5876;
+            --highlight-color: #c44569;
+            --body-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to right, #ebedee, #f8f9fa);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .human-body-container {
+            position: relative;
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        .body-area {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .body-area:hover {
+            opacity: 1;
+            filter: drop-shadow(0 0 8px var(--highlight-color));
+        }
+
+        .selected-area {
+            animation: pulse 1s infinite;
+            opacity: 1 !important;
+        }
+
+        .anatomy-legend {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 250px;
+        }
+
+        @keyframes pulse {
+            0% { filter: drop-shadow(0 0 5px var(--highlight-color)); }
+            50% { filter: drop-shadow(0 0 15px var(--highlight-color)); }
+            100% { filter: drop-shadow(0 0 5px var(--highlight-color)); }
+        }
+
+        .medical-info {
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anatomie Humaine Interactive</h1>
+        
+        <div class="human-body-container">
+            <!-- Illustration vectorielle réaliste (source: OpenClipart modifiée) -->
+            <svg viewBox="0 0 1024 2048" xmlns="http://www.w3.org/2000/svg">
+                <!-- Système musculaire -->
+                <g id="muscular-system">
+                    <path class="body-area" id="head" d="M512 50c-80 0-145 65-145 145v80c0 80 65 145 145 145s145-65 145-145v-80c0-80-65-145-145-145z" fill="#f0d6b5"/>
+                    <path class="body-area" id="neck" d="M480 320h64v80h-64z" fill="#f0d6b5"/>
+                    <path class="body-area" id="chest" d="M384 400h256v300H384z" fill="#f0d6b5"/>
+                    <path class="body-area" id="abdomen" d="M400 700h224v200H400z" fill="#f0d6b5"/>
+                    <path class="body-area" id="left-arm" d="M200 400h184v300H200z" fill="#f0d6b5"/>
+                    <path class="body-area" id="right-arm" d="M640 400h184v300H640z" fill="#f0d6b5"/>
+                    <path class="body-area" id="left-leg" d="M400 900h112v500H400z" fill="#f0d6b5"/>
+                    <path class="body-area" id="right-leg" d="M512 900h112v500H512z" fill="#f0d6b5"/>
+                    <!-- Détails anatomiques -->
+                    <path class="body-area" id="heart" d="M480 500c40-40 80-60 120-60s80 20 120 60" fill="none" stroke="#c44569" stroke-width="5" style="display: none"/>
+                </g>
+            </svg>
+
+            <div class="anatomy-legend">
+                <h3>Organes & Systèmes</h3>
+                <ul id="medical-legend">
+                    <li data-part="head">Cerveau</li>
+                    <li data-part="neck">Thyroïde</li>
+                    <li data-part="chest">Cœur</li>
+                    <li data-part="abdomen">Estomac</li>
+                    <li data-part="left-arm">Bras gauche</li>
+                    <li data-part="right-arm">Bras droit</li>
+                    <li data-part="left-leg">Jambe gauche</li>
+                    <li data-part="right-leg">Jambe droite</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="medical-info">
+            <h3>Informations Médicales</h3>
+            <div id="medical-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // Base de connaissances médicales étendue
+        const medicalDB = {
+            'head': {
+                symptoms: ['Migraine', 'Vertiges', 'Troubles visuels'],
+                conditions: ['Encéphalite', 'AVC', 'Tumeur cérébrale'],
+                advice: 'Consultez un neurologue'
+            },
+            'neck': {
+                symptoms: ['Douleur cervicale', 'Difficulté à avaler', 'Gonflement'],
+                conditions: ['Thyroïdite', 'Arthrose cervicale', 'Lymphadénite'],
+                advice: 'Échographie recommandée'
+            },
+            'chest': {
+                symptoms: ['Douleur thoracique', 'Palpitations', 'Essoufflement'],
+                conditions: ['Infarctus', 'Pneumonie', 'Embolie pulmonaire'],
+                advice: 'Appelez le 15 urgemment'
+            },
+            'abdomen': {
+                symptoms: ['Douleurs abdominales', 'Nausées', 'Ballonnements'],
+                conditions: ['Appendicite', 'Ulcère gastrique', 'Hépatite'],
+                advice: 'Scanner abdominal recommandé'
+            }
+        };
+
+        // Gestion des interactions
+        document.querySelectorAll('.body-area').forEach(area => {
+            area.addEventListener('click', function() {
+                const partId = this.id;
+                const isSelected = this.classList.contains('selected-area');
+                
+                // Réinitialiser la sélection
+                document.querySelectorAll('.selected-area').forEach(el => 
+                    el.classList.remove('selected-area'));
+                
+                // Afficher/masquer les détails
+                if(!isSelected) {
+                    this.classList.add('selected-area');
+                    showMedicalDetails(partId);
+                } else {
+                    document.getElementById('medical-details').innerHTML = '';
+                }
+            });
+        });
+
+        function showMedicalDetails(partId) {
+            const details = medicalDB[partId];
+            const detailsHTML = `
+                <h4>Symptômes courants :</h4>
+                <ul>${details.symptoms.map(s => `<li>${s}</li>`).join('')}</ul>
+                <h4>Pathologies possibles :</h4>
+                <ul>${details.conditions.map(c => `<li>${c}</li>`).join('')}</ul>
+                <div class="alert">${details.advice}</div>
+            `;
+            document.getElementById('medical-details').innerHTML = detailsHTML;
+        }
+
+        // Mode expert (double-clic)
+        document.getElementById('muscular-system').addEventListener('dblclick', function() {
+            this.querySelectorAll('[id]').forEach(part => {
+                part.style.display = part.style.display === 'none' ? 'block' : 'none';
+            });
+            document.getElementById('heart').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
