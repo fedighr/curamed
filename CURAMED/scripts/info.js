@@ -63,7 +63,13 @@ function verif() {
 
         const experienceInput = document.getElementById('experience');
         if (!experienceInput.value) {
-            setError(experienceInput, "Veuillez donner votre expérience.");
+            setError(experienceInput, "Veui llez donner votre expérience.");
+            isValid = false;
+        }
+
+        const villeInput = document.getElementById('ville');
+        if (!villeInput.value) {
+            setError(villeInput, "Veuillez sélectionner une Ville.");
             isValid = false;
         }
 

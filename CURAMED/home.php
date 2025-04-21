@@ -27,7 +27,7 @@ session_start();
             </a>
             <div class="nav-links">
                 <?php if(isset($_SESSION['user_id'])) :?>
-                <a href="doctors.html" class="nav-icon" title="Médecins">
+                <a href="search.php" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
                 
@@ -390,8 +390,6 @@ session_start();
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="scripts/home.js"></script>
 
 </body>
 </html>

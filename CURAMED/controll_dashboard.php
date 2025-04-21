@@ -11,7 +11,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['profile'])) {
         $user_id = intval($_POST['user_id']);
-        header("Location: profile.php?id=" . $user_id);
+        $sql = "SELECT 1 from utilisateur where type_utilisateur='patient' and id_utilisateur=".$user_id;
+        $res=mysqli_query($conn,$sql);
+        if(mysqli_num_rows($res)>0){
+            header("Location: profile_p.php?id=" . $user_id);
+        }
+        else{
+            header("Location: profile_d.php?id=" . $user_id);
+        }
+        
         exit();
     }
 

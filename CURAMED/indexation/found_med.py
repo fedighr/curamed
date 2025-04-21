@@ -43,12 +43,12 @@ def process_search(input_file, output_file):
                 if sc > 0.1:
                     d = doctors[i]
                     results.append({
-                        "id":         d["id_utilisateur"],
-                        "name":       f"{d['prenom']} {d['nom']}",
-                        "specialty":  d["specialite"],
-                        "address":    d["adresse"],
+                        "id_utilisateur": d["id_utilisateur"],
+                        "nom":       f"{d['prenom']} {d['nom']}",
+                        "specialite":  d["specialite"],
+                        "adresse":    d["adresse"],
                         "experience": d["experience"],
-                        "photo":      d["photo_profil"],
+                        "photo_profil": d["photo_profil"],
                         "score":      float(sc)
                     })
 

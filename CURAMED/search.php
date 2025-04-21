@@ -15,15 +15,22 @@ $sql = "
         m.specialite, m.adresse_cabinet AS adresse, m.experience
     FROM utilisateur u
     JOIN medecin m ON u.id_utilisateur = m.id_medecin
+    WHERE 1=1
 ";
+
+if (!empty($_POST['specialite'])) {
+  $specialty = mysqli_real_escape_string($conn, $_POST['specialite']);
+  $sql .= " AND m.specialite = '$specialty'";
+}
+
 $res = mysqli_query($conn, $sql);
 if (!$res) {
     die('Query failed: ' . mysqli_error($conn));
 }
-$doctors = mysqli_fetch_all($res, MYSQLI_ASSOC);
+$results = mysqli_fetch_all($res, MYSQLI_ASSOC);
 mysqli_free_result($res);
 
-
+if(!empty($_POST['cherche'])){
 $tempDir = __DIR__ . '/temp';
 if (!is_dir($tempDir)) {
     mkdir($tempDir, 0755, true);
@@ -36,7 +43,7 @@ $outputFile = "$tempDir/{$sessionId}_output.json";
 $inputData = [
     'query'     => $_POST['cherche'] ?? '',
     'specialty' => $_POST['specialite'] ?? '',
-    'doctors'   => $doctors
+    'doctors'   => $results
 ];
 file_put_contents($inputFile, json_encode($inputData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
@@ -62,6 +69,7 @@ $results = json_decode(file_get_contents($outputFile), true) ?: [];
 unlink($inputFile);
 unlink($outputFile);
 mysqli_close($conn);
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -142,47 +150,84 @@ mysqli_close($conn);
         <?php endif ;?>
     </header>
 
-<div class="container dashboard-main">
-    <!-- Filters Sidebar -->
-    <aside class="sidebar">
-      <div class="filter-card">
-        <h3 class="section-subtitle">Filtrer les résultats</h3>
-        
-        <div class="filter-group">
-          <input type="text" class="search-input" placeholder="Nom du médecin..." value="<?= htmlspecialchars($_POST['search'] ?? '') ?>">
-        </div>
-
-        <div class="filter-group">
-          <h4 class="filter-title">Spécialité</h4>
-          <select class="search-select">
-            <option value="">Toutes les spécialités</option>
-            <!-- Add PHP loop for specialties -->
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <h4 class="filter-title">Localisation</h4>
-          <div class="location-filters">
-            <select class="search-select">
-              <option value="">Toute la Tunisie</option>
-              <!-- Add PHP loop for locations -->
-            </select>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <h4 class="filter-title">Options</h4>
-          <div class="filter-option">
-            <input type="checkbox" id="cnam">
-            <label for="cnam">Conventionné CNAM</label>
-          </div>
-          <div class="filter-option">
-            <input type="checkbox" id="domicile">
-            <label for="domicile">Visite à domicile</label>
-          </div>
+    <div class="container dashboard-main" id="filtre">
+  <!-- Left Filters -->
+  <aside class="search-sidebar">
+    <div class="filter-card">
+      <h3 class="filter-main-title">Filtrer par</h3>
+      
+      <!-- Search Input -->
+      <div class="filter-group">
+        <div class="search-input-group"><i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" placeholder="Nom du professionnel" value="<?= htmlspecialchars($_POST['search'] ?? '') ?>">
+          <button class="btn btn-primary">OK</button>
         </div>
       </div>
-    </aside>
+
+      <!-- Specialty Filters -->
+      <div class="filter-section">
+        <details open>
+          <summary class="filter-section-title">Gastro-entérologue</summary>
+          <div class="filter-options">
+            <div class="dropdown-filter">
+              <i class="fas fa-chevron-down"></i>
+              <span>Tunisie</span>
+            </div>
+            <div class="dropdown-filter">
+              <i class="fas fa-chevron-down"></i>
+              <span>Ville</span>
+            </div>
+            <div class="dropdown-filter">
+              <i class="fas fa-chevron-down"></i>
+              <span>Motif de consultation</span>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Convention Filters -->
+      <div class="filter-section">
+        <div class="filter-options">
+          <label class="checkbox-option">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Conventionné avec la CNAM
+          </label>
+          <label class="checkbox-option">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Conventionné avec CARTE Assurances
+          </label>
+          <label class="checkbox-option">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Visite à domicile
+          </label>
+        </div>
+      </div>
+
+      <!-- Location Filters -->
+      <div class="filter-section">
+        <h4 class="location-title">Gafsa</h4>
+        <div class="location-options">
+          <span class="location-tag">Tazeur</span>
+          <span class="location-tag">Monastir</span>
+          <span class="location-tag">Mannouba</span>
+          <span class="location-tag">Siliana</span>
+          <span class="location-tag">Beja</span>
+          <span class="location-tag">Kasserine</span>
+          <span class="location-tag">Tunis</span>
+          <span class="location-tag">Gafsa</span>
+        </div>
+        
+        <h4 class="location-title">Ariana</h4>
+        <div class="location-options">
+          <span class="location-tag">Boij Louzir</span>
+          <a href="#" class="see-more">⋯ Voir Plus</a>
+        </div>
+      </div>
+    </div>
+  </aside>
 
     <!-- Main Results -->
     <main class="main-content">
@@ -195,18 +240,19 @@ mysqli_close($conn);
           <div class="doctor-card animate-slideup">
             <div class="doctor-header">
               <div class="doctor-avatar-container">
-                <?php if ($doc['photo']): ?>
-                <img src="<?= htmlspecialchars($doc['photo']) ?>" class="doctor-avatar" alt="Photo du médecin">
+                <?php if ($doc['photo_profil']): ?>
+                <img src="<?= htmlspecialchars($doc['photo_profil']) ?>" class="doctor-avatar" alt="Photo du médecin">
                 <?php endif; ?>
-                <div class="relevance-badge"><?= round($doc['score'] * 100) ?>%</div>
+                <?php if(isset($doc['score'])) { ?>
+                <div class="relevance-badge"><?= round($doc['score'] * 100) ?>%</div><?php } ?>
               </div>
               
               <div class="doctor-meta">
-                <h2 class="doctor-name">Dr. <?= htmlspecialchars($doc['name']) ?></h2>
-                <div class="doctor-specialty"><?= htmlspecialchars($doc['specialty']) ?></div>
+                <h2 class="doctor-name">Dr. <?= htmlspecialchars($doc['nom']) ?></h2>
+                <div class="doctor-specialty"><?= htmlspecialchars($doc['specialite']) ?></div>
                 <div class="doctor-location">
                   <i class="fas fa-map-marker-alt"></i>
-                  <?= htmlspecialchars($doc['address']) ?>
+                  <?= htmlspecialchars($doc['adresse']) ?>
                 </div>
               </div>
             </div>
@@ -239,5 +285,71 @@ mysqli_close($conn);
       <?php endif; ?>
     </main>
   </div>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.doctor-card').forEach((card, i) => {
+    setTimeout(() => card.classList.add('animate-slideup'), i * 100);
+  });
+});
+</script>
+</style>
+<footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
+                    <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Patients</h4>
+                    <ul>
+                        <li><a href="#">Trouver un médecin</a></li>
+                        <li><a href="#">Consultation en ligne</a></li>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Professionnels</h4>
+                    <ul>
+                        <li><a href="#">Solutions pour médecins</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Témoignages</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Cookies</a>
+                </div>
+                <div class="copyright">
+                    © 2025 CuraMed. Tous droits réservés.
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
