@@ -1838,3 +1838,167 @@ a {
 .search-button {
   border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
+
+.sidebar {
+  position: sticky;
+  top: 120px;
+  height: fit-content;
+}
+
+.filter-card {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.results-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.doctor-card {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.doctor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.doctor-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.doctor-avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.doctor-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--border-radius-lg);
+  object-fit: cover;
+  border: 2px solid var(--primary-color);
+}
+
+.relevance-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.doctor-name {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.doctor-specialty {
+  color: var(--primary-color);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.doctor-location {
+  color: var(--gray-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.doctor-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid var(--light-gray);
+  padding-top: 1.5rem;
+}
+
+.detail-item {
+  text-align: center;
+}
+
+.detail-label {
+  font-size: 0.9rem;
+  color: var(--gray-color);
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+.availability-status {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.available {
+  color: #00C6B4;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  grid-column: span 3;
+  justify-content: flex-end;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.animate-slideup {
+  animation: slideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .doctor-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+}
