@@ -23,49 +23,91 @@ document.addEventListener("DOMContentLoaded", () => {
     const track = document.querySelector(".carousel-track");
     const prevBtn = document.querySelector(".prev-btn");
     const nextBtn = document.querySelector(".next-btn");
+    const cards = document.querySelectorAll(".doctor-card");
+    
+    // Variables avec gestion des erreurs
+    if (!track || !prevBtn || !nextBtn || cards.length === 0) {
+        console.error("Éléments du carrousel introuvables");
+        return;
+    }
 
-    let cardWidth = document.querySelector(".doctor-card").offsetWidth + 16;
+    let cardWidth = cards[0].offsetWidth + 16;
     let scrollPosition = 0;
+    let autoScrollInterval;
+    const scrollDuration = 3000; // 3 secondes
 
-    // Défilement manuel avec les boutons
-    nextBtn.addEventListener("click", () => {
-      scrollNext();
+    // Fonctions améliorées
+    const scrollToPosition = (position) => {
+        track.style.scrollBehavior = 'smooth';
+        track.scrollLeft = position;
+    };
+
+    const scrollNext = () => {
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        scrollPosition = Math.min(scrollPosition + cardWidth, maxScroll);
+        scrollToPosition(scrollPosition);
+        
+        // Réinitialiser si fin atteinte
+        if (scrollPosition >= maxScroll) {
+            setTimeout(() => {
+                scrollPosition = 0;
+                track.style.scrollBehavior = 'auto';
+                track.scrollLeft = 0;
+            }, 3000);
+        }
+    };
+
+    const scrollPrev = () => {
+        scrollPosition = Math.max(scrollPosition - cardWidth, 0);
+        scrollToPosition(scrollPosition);
+    };
+
+    // Gestion des événements
+    const setupEventListeners = () => {
+        nextBtn.addEventListener("click", () => {
+            clearInterval(autoScrollInterval);
+            scrollNext();
+            startAutoScroll();
+        });
+
+        prevBtn.addEventListener("click", () => {
+            clearInterval(autoScrollInterval);
+            scrollPrev();
+            startAutoScroll();
+        });
+
+        // Pause au survol
+        track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+        track.addEventListener('mouseleave', startAutoScroll);
+    };
+
+    const startAutoScroll = () => {
+        clearInterval(autoScrollInterval); // Nettoyer avant de redémarrer
+        autoScrollInterval = setInterval(scrollNext, scrollDuration);
+    };
+
+    // Initialisation
+    const initCarousel = () => {
+        cardWidth = cards[0].offsetWidth + 16;
+        setupEventListeners();
+        startAutoScroll();
+    };
+
+    // Redimensionnement optimisé
+    const resizeObserver = new ResizeObserver(() => {
+        cardWidth = cards[0].offsetWidth + 16;
     });
+    resizeObserver.observe(track);
 
-    prevBtn.addEventListener("click", () => {
-      scrollPrev();
+    // Démarrer le carrousel
+    initCarousel();
+
+    // Nettoyage
+    window.addEventListener('beforeunload', () => {
+        clearInterval(autoScrollInterval);
+        resizeObserver.disconnect();
     });
-
-    function scrollNext() {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (scrollPosition + cardWidth < maxScroll) {
-        scrollPosition += cardWidth;
-      } else {
-        scrollPosition = 0; // Retour au début
-      }
-      track.scrollTo({ left: scrollPosition, behavior: "smooth" });
-    }
-
-    function scrollPrev() {
-      if (scrollPosition - cardWidth > 0) {
-        scrollPosition -= cardWidth;
-      } else {
-        scrollPosition = 0;
-      }
-      track.scrollTo({ left: scrollPosition, behavior: "smooth" });
-    }
-
-    // Autoplay toutes les 3 secondes
-    const autoScroll = setInterval(() => {
-      scrollNext();
-    }, 3000);
-
-    // Recalcule la largeur d’une carte si la fenêtre change
-    window.addEventListener("resize", () => {
-      cardWidth = document.querySelector(".doctor-card").offsetWidth + 16;
-    });
-  });
-
+});
   document.addEventListener('DOMContentLoaded', () => {
     // Gestion du dropdown profil
     const profileDropdown = document.querySelector('.profile-dropdown');
