@@ -1,5 +1,7 @@
 <?php
 session_start();
+$conn=mysqli_connect("localhost","root","","curamed");
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -184,79 +186,54 @@ session_start();
     </section>
 
     <section class="doctors-carousel-section">
-      <div class="doctors-carousel-container">
-        <h2 class="carousel-title">Rencontrez nos spécialistes</h2>
-        <p class="carousel-subtitle">Des professionnels de santé qualifiés près de chez vous</p>
+  <div class="doctors-carousel-container">
+    <h2 class="carousel-title">Rencontrez nos spécialistes</h2>
+    <p class="carousel-subtitle">Des professionnels de santé qualifiés près de chez vous</p>
+    
+    <div class="carousel-container">
+      <button class="carousel-btn prev-btn">&#10094;</button>
+      
+      <div class="carousel-track">
+        <?php
+        // Connexion à la base de données
         
-        <div class="carousel-container">
-          <button class="carousel-btn prev-btn">&#10094;</button>
+        try {
+            // Requête pour récupérer les médecins avec leurs informations
+            $sql = "SELECT u.*, m.specialite, m.adresse_cabinet 
+                    FROM utilisateur u
+                    JOIN medecin m ON u.id_utilisateur = m.id_medecin
+                    WHERE u.type_utilisateur = 'medecin' limit 8";
+            
+            $res=mysqli_query($conn,$sql);
           
-          <div class="carousel-track">
-            <!-- Doctor Card 1 -->
-            <div class="doctor-card">
-              <img src="images/marti.png" alt="Dr Sarah Dupont" class="doctor-img">
-              <h3 class="doctor-name">Dr. bakhana</h3>
-              <p class="specialty">Cardiologue</p>
-              <p class="reviews">⭐ 4.8 (120 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Paris</p>
-              <button class="choose-btn" onclick="location.href='profile.php'">Choisir</button>
-            </div>
-            
-            <!-- Doctor Card 2 -->
-            <div class="doctor-card">
-              <img src="images/doctor2.jpg" alt="Dr Jean Martin" class="doctor-img">
-              <h3 class="doctor-name">Dr. Jean Martin</h3>
-              <p class="specialty">Dermatologue</p>
-              <p class="reviews">⭐ 4.5 (89 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Lyon</p>
-              <button class="choose-btn">Choisir</button>
-            </div>
-            
-            <!-- Doctor Card 3 -->
-            <div class="doctor-card">
-              <img src="images/doctor3.jpg" alt="Dr Clara Lefevre" class="doctor-img">
-              <h3 class="doctor-name">Dr. Clara Lefevre</h3>
-              <p class="specialty">Pédiatre</p>
-              <p class="reviews">⭐ 4.9 (200 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Marseille</p>
-              <button class="choose-btn">Choisir</button>
-            </div>
-            
-            <!-- Doctor Card 4 -->
-            <div class="doctor-card">
-              <img src="images/doctor4.jpg" alt="Dr Lucas Morel" class="doctor-img">
-              <h3 class="doctor-name">Dr. Lucas Morel</h3>
-              <p class="specialty">Généraliste</p>
-              <p class="reviews">⭐ 4.7 (150 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Toulouse</p>
-              <button class="choose-btn">Choisir</button>
-            </div>
-            
-            <!-- Doctor Card 5 -->
-            <div class="doctor-card">
-              <img src="images/doctor5.jpg" alt="Dr Aline Petit" class="doctor-img">
-              <h3 class="doctor-name">Dr. Aline Petit</h3>
-              <p class="specialty">Ophtalmologue</p>
-              <p class="reviews">⭐ 4.6 (98 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Nice</p>
-              <button class="choose-btn">Choisir</button>
-            </div>
-            
-            <!-- Doctor Card 6 -->
-            <div class="doctor-card">
-              <img src="images/doctor6.jpg" alt="Dr David Chevalier" class="doctor-img">
-              <h3 class="doctor-name">Dr. David Chevalier</h3>
-              <p class="specialty">ORL</p>
-              <p class="reviews">⭐ 4.4 (110 avis)</p>
-              <p class="location"><i class="fas fa-map-marker-alt"></i> Bordeaux</p>
-              <button class="choose-btn">Choisir</button>
-            </div>
-          </div>
-          
-          <button class="carousel-btn next-btn">&#10095;</button>
-        </div>
+
+               
+        ?>
+                <!-- Carte Médecin Dynamique -->
+                 <?php 
+                 while(  $doctor=mysqli_fetch_assoc($res)){ ?>
+                <div class="doctor-card">
+                    <img src="<?= htmlspecialchars($doctor['photo_profil']) ?>" 
+                         alt="Dr <?= htmlspecialchars($doctor['nom']) ?>" 
+                         class="doctor-img">
+                    <h3 class="doctor-name">Dr. <?= htmlspecialchars($doctor['prenom'] . ' ' . htmlspecialchars($doctor['nom'])) ?></h3>
+                    <p class="specialty"><?= htmlspecialchars($doctor['specialite']) ?></p>
+                    <p class="location"><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($doctor['adresse_cabinet']) ?></p>
+                    <button class="choose-btn" onclick="location.href='profile.php?id=<?= $doctor['id_utilisateur'] ?>'">Choisir</button>
+                </div>
+                <?php }?>
+        <?php
+            }
+         catch (PDOException $e) {
+            echo "Erreur de base de données : " . $e->getMessage();
+         }
+        ?>
       </div>
-    </section>
+      
+      <button class="carousel-btn next-btn">&#10095;</button>
+    </div>
+  </div>
+</section>
 
     <!-- Features Section -->
     <section class="features-section">
@@ -391,7 +368,6 @@ session_start();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="scripts/home.js"></script>
 
 </body>
 </html>
