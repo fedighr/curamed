@@ -53,11 +53,10 @@ if (!$conn) {
                 <div class="profile-dropdown" id="profileDropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile_p.php" class="dropdown-item">
                         <a href="profile.php" class="dropdown-item">
                             <i class="fas fa-user"></i> Mon profil
                         </a>
-                        <a href="settings.php" class="dropdown-item">
+                        <a href="settings.html" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         
@@ -222,7 +221,8 @@ if (!$conn) {
                                             <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button type="button" class="icon-btn" title="Modifier" 
+                                            <button type="button" class="icon-btn edit-btn" title="Modifier" 
+                                                    data-target-modal="editUserModal" 
                                                     data-user-id="<?php echo $user['id_utilisateur']; ?>"
                                                     data-user-type="patient">
                                                 <i class="fas fa-edit"></i>
@@ -341,7 +341,8 @@ if (!$conn) {
                                 <button type="submit" class="icon-btn" title="Voir le profil" name="profile">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button type="button" class="icon-btn" title="Modifier" 
+                                <button type="button" class="icon-btn edit-btn" title="Modifier" 
+                                        data-target-modal="editUserModal" 
                                         data-user-id="<?php echo $doctor['id_utilisateur']; ?>"
                                         data-user-type="medecin">
                                     <i class="fas fa-edit"></i>
@@ -396,132 +397,115 @@ if (!$conn) {
     </main>
 
     <div class="modal fade" id="userModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Nouvel Utilisateur</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userModalLabel">Nouvel Utilisateur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="userForm" enctype="multipart/form-data" action="controll_dashboard.php" method="POST">
+        <div class="modal-body">
+          <div class="row g-3">
+            <input type="hidden" name="user_type" id="modalUserType">
+            <div class="col-md-6">
+              <label class="form-label">Nom</label>
+              <input type="text" name="nom" class="form-control" required>
             </div>
-            <form id="userForm" enctype="multipart/form-data" action="controll_dashboard.php" method="POST">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <input type="hidden" name="user_type" id="modalUserType">
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Nom</label>
-                            <input type="text" name="nom" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Prénom</label>
-                            <input type="text" name="prenom" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Téléphone</label>
-                            <input type="tel" name="telephone" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Mot de passe</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Confirmation</label>
-                            <input type="password" name="confirm_password" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Photo de profil</label>
-                            <input type="file" name="photo" class="form-control">
-                        </div>
-
-                        <div class="col-md-6 specialite-field" style="display: none;">
-                            <label class="form-label">Spécialité</label>
-                            <input type="text" name="specialite" class="form-control">
-                            </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
-                </div>
-            </form>
+            <div class="col-md-6">
+              <label class="form-label">Prénom</label>
+              <input type="text" name="prenom" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Téléphone</label>
+              <input type="tel" name="telephone" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mot de passe</label>
+              <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirmation</label>
+              <input type="password" name="confirm_password" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Photo de profil</label>
+              <input type="file" name="photo" class="form-control">
+            </div>
+            <div class="col-md-6 specialite-field" style="display: none;">
+              <label class="form-label">Spécialité</label>
+              <input type="text" name="specialite" class="form-control">
+            </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
-<div class="modal fade" id="editUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Modifier Utilisateur</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier l'utilisateur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editUserForm" enctype="multipart/form-data" action="controll_dashboard.php" method="POST">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="user_id" id="editUserId">
+        <input type="hidden" name="user_type" id="editUserType">
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nom</label>
+              <input type="text" name="nom" id="editNom" class="form-control" required>
             </div>
-            <form id="editUserForm" method="POST" action="controll_dashboard.php" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <input type="hidden" name="action" id="formAction" value="create">
-                        <input type="hidden" name="modifier" value="1">
-                        <input type="hidden" name="user_id" id="editUserId">
-                        <input type="hidden" name="user_type" id="modalUserType">
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Nom</label>
-                            <input type="text" name="nom" id="editNom" class="form-control" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Prénom</label>
-                            <input type="text" name="prenom" id="editPrenom" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" id="editEmail" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Téléphone</label>
-                            <input type="tel" name="telephone" id="editTelephone" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Nouveau mot de passe (optionnel)</label>
-                            <input type="password" name="password" id="editPassword" class="form-control">
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Confirmation mot de passe</label>
-                            <input type="password" name="confirm_password" id="editConfirmPassword" class="form-control">
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label">Photo de profil</label>
-                            <input type="file" name="photo" class="form-control">
-                            <div class="mt-2">
-                                <small>Actuelle: <span id="currentPhoto"></span></small>
-                                <img id="currentPhotoPreview" class="img-thumbnail mt-1" style="max-width: 100px;">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 specialite-field" style="display: none;">
-                            <label class="form-label">Spécialité</label>
-                            <input type="text" name="specialite" id="editSpecialite" class="form-control">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-                </div>
-            </form>
+            <div class="col-md-6">
+              <label class="form-label">Prénom</label>
+              <input type="text" name="prenom" id="editPrenom" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" id="editEmail" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Téléphone</label>
+              <input type="tel" name="telephone" id="editTelephone" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nouveau mot de passe (laisser vide si inchangé)</label>
+              <input type="password" name="password" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirmation</label>
+              <input type="password" name="confirm_password" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Photo de profil</label>
+              <input type="file" name="photo" class="form-control">
+            </div>
+            <div class="col-md-6 specialite-edit-field" style="display: none;">
+              <label class="form-label">Spécialité</label>
+              <input type="text" name="specialite" id="editSpecialite" class="form-control">
+            </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
+
 <?php mysqli_close($conn); ?>
 </body>
 </html>

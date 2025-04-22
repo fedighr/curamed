@@ -185,8 +185,8 @@ $conn=mysqli_connect("localhost","root","","curamed");
         </div>
     </section>
 
-    <section class="doctors1-carousel-section">
-  <div class="doctors1-carousel-container">
+    <section class="doctors-carousel-section">
+  <div class="doctors-carousel-container">
     <h2 class="carousel-title">Rencontrez nos spécialistes</h2>
     <p class="carousel-subtitle">Des professionnels de santé qualifiés près de chez vous</p>
     
@@ -215,8 +215,8 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 <div class="doctor1-card">
                     <img src="<?= htmlspecialchars($doctor['photo_profil']) ?>" 
                          alt="Dr <?= htmlspecialchars($doctor['nom']) ?>" 
-                         class="doctor1-img">
-                    <h3 class="doctor1-name">Dr. <?= htmlspecialchars($doctor['prenom'] . ' ' . htmlspecialchars($doctor['nom'])) ?></h3>
+                         class="doctor-img">
+                    <h3 class="doctor-name">Dr. <?= htmlspecialchars($doctor['prenom'] . ' ' . htmlspecialchars($doctor['nom'])) ?></h3>
                     <p class="specialty"><?= htmlspecialchars($doctor['specialite']) ?></p>
                     <p class="location"><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($doctor['adresse_cabinet']) ?></p>
                     <button class="choose-btn" onclick="location.href='profile.php?id=<?= $doctor['id_utilisateur'] ?>'">Choisir</button>
@@ -367,6 +367,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>

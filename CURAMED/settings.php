@@ -29,7 +29,7 @@ $_SESSION['patient'] = [
     <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
-                <img src="images/logo.png" alt="CuraMed" class="logo-img">
+                <img src="images/untitled-1.png" alt="CuraMed" class="logo-img">
             </a>
             
             <div class="nav-links">
@@ -241,22 +241,22 @@ $_SESSION['patient'] = [
                             <div class="mb-4">
                                 <h5 class="mb-3"><i class="fas fa-moon me-2"></i>Thème</h5>
                                 <div class="theme-selector">
-                                    <input type="radio" name="theme" id="lightTheme" value="light" <?= $_SESSION['patient']['theme'] === 'light' ? 'checked' : '' ?>>
+                                    <input type="radio" name="theme" id="lightTheme" value="light">
                                     <label for="lightTheme" class="theme-option">
                                         <i class="fas fa-sun"></i>
-                                        <span>Clair</span>
+                                        <button id="theme-toggle" class="btn btn-outline-primary">Claire</button>
                                     </label>
                                     
-                                    <input type="radio" name="theme" id="darkTheme" value="dark" <?= $_SESSION['patient']['theme'] === 'dark' ? 'checked' : '' ?>>
+                                    <input type="radio" name="theme" id="darkTheme" value="dark" >
                                     <label for="darkTheme" class="theme-option">
                                         <i class="fas fa-moon"></i>
-                                        <span>Sombre</span>
+                                        <button id="theme-toggle" class="btn btn-outline-primary">Dark Mode</button>
                                     </label>
                                     
                                     <input type="radio" name="theme" id="systemTheme" value="system">
                                     <label for="systemTheme" class="theme-option">
                                         <i class="fas fa-desktop"></i>
-                                        <span>Système</span>
+                                        <button id="theme-toggle" class="btn btn-outline-primary">System</button>
                                     </label>
                                 </div>
                             </div>

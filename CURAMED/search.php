@@ -2,7 +2,6 @@
 session_start();
 header('Content-Type: text/html; charset=utf-8');
 
-
 $conn = mysqli_connect('localhost', 'root', '', 'curamed');
 if (!$conn) {
     die('Connection failed: ' . mysqli_connect_error());
@@ -23,6 +22,15 @@ if (!empty($_POST['specialite'])) {
   $sql .= " AND m.specialite = '$specialty'";
 }
 
+if(!empty($_POST["ville"])){
+  $ville = mysqli_real_escape_string($conn, $_POST['ville']);
+  $sql .= " AND m.ville = '$ville'";
+}
+
+if(!empty($_POST["genre"])){
+  $genre = mysqli_real_escape_string($conn, $_POST['genre']);
+  $sql .= " AND u.genre = '$genre'";
+}
 $res = mysqli_query($conn, $sql);
 if (!$res) {
     die('Query failed: ' . mysqli_error($conn));
@@ -151,85 +159,86 @@ mysqli_close($conn);
     </header>
 
     <div class="container dashboard-main" id="filtre">
-  <!-- Left Filters -->
+
   <aside class="search-sidebar">
-    <div class="filter-card">
-      <h3 class="filter-main-title">Filtrer par</h3>
-      
-      <!-- Search Input -->
-      <div class="filter-group">
-        <div class="search-input-group"><i class="fas fa-search search-icon"></i>
-          <input type="text" class="search-input" placeholder="Nom du professionnel" value="<?= htmlspecialchars($_POST['search'] ?? '') ?>">
-          <button class="btn btn-primary">OK</button>
-        </div>
-      </div>
+  <form id="filter_form" method="POST">
+  <div class="filter-card">
 
-      <!-- Specialty Filters -->
-      <div class="filter-section">
-        <details open>
-          <summary class="filter-section-title">Gastro-entérologue</summary>
-          <div class="filter-options">
-            <div class="dropdown-filter">
-              <i class="fas fa-chevron-down"></i>
-              <span>Tunisie</span>
-            </div>
-            <div class="dropdown-filter">
-              <i class="fas fa-chevron-down"></i>
-              <span>Ville</span>
-            </div>
-            <div class="dropdown-filter">
-              <i class="fas fa-chevron-down"></i>
-              <span>Motif de consultation</span>
-            </div>
-          </div>
-        </details>
-      </div>
-
-      <!-- Convention Filters -->
-      <div class="filter-section">
-        <div class="filter-options">
-          <label class="checkbox-option">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            Conventionné avec la CNAM
-          </label>
-          <label class="checkbox-option">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            Conventionné avec CARTE Assurances
-          </label>
-          <label class="checkbox-option">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            Visite à domicile
-          </label>
-        </div>
-      </div>
-
-      <!-- Location Filters -->
-      <div class="filter-section">
-        <h4 class="location-title">Gafsa</h4>
-        <div class="location-options">
-          <span class="location-tag">Tazeur</span>
-          <span class="location-tag">Monastir</span>
-          <span class="location-tag">Mannouba</span>
-          <span class="location-tag">Siliana</span>
-          <span class="location-tag">Beja</span>
-          <span class="location-tag">Kasserine</span>
-          <span class="location-tag">Tunis</span>
-          <span class="location-tag">Gafsa</span>
-        </div>
-        
-        <h4 class="location-title">Ariana</h4>
-        <div class="location-options">
-          <span class="location-tag">Boij Louzir</span>
-          <a href="#" class="see-more">⋯ Voir Plus</a>
-        </div>
-      </div>
+  <div class="filter-group">
+    <div class="search-input-group">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-input" placeholder="Nom du professionnel" name="cherche">
+      <button class="btn btn-primary">OK</button>
     </div>
-  </aside>
+  </div>
 
-    <!-- Main Results -->
+
+  <div class="filter-group">
+  <label for="specialty-input">Spécialité</label>
+  <select name="specialite" id="specialty-input" class="form-select">
+  <option value="" disabled selected hidden>Specialité</option>
+    <option value="Cardiologie">Cardiologie</option>
+    <option value="Dermatologie">Dermatologie</option>
+    <option value="Pédiatrie">Pédiatrie</option>
+    <option value="Neurologie">Neurologie</option>
+    <option value="Orthopédie">Orthopédie</option>
+    <option value="Gastro-entérologie">Gastro-entérologie</option>
+    <option value="Endocrinologie">Endocrinologie</option>
+    <option value="Pneumologie">Pneumologie</option>
+    <option value="Psychiatrie">Psychiatrie</option>
+    <option value="Urologie">Urologie</option>
+  </select>
+</div>
+
+<div class="filter-group">
+  <label for="ville-input">Ville</label>
+  <select name="ville" id="ville-input" class="form-select">
+  <option value="" disabled selected hidden>Ville</option>
+    <option value="Tunis">Tunis</option>
+    <option value="Ariana">Ariana</option>
+    <option value="Ben Arous">Ben Arous</option>
+    <option value="Manouba">Manouba</option>
+    <option value="Nabeul">Nabeul</option>
+    <option value="Zaghouan">Zaghouan</option>
+    <option value="Bizerte">Bizerte</option>
+    <option value="Béja">Béja</option>
+    <option value="Jendouba">Jendouba</option>
+    <option value="Le Kef">Le Kef</option>
+    <option value="Siliana">Siliana</option>
+    <option value="Kairouan">Kairouan</option>
+    <option value="Kasserine">Kasserine</option>
+    <option value="Sidi Bouzid">Sidi Bouzid</option>
+    <option value="Sousse">Sousse</option>
+    <option value="Monastir">Monastir</option>
+    <option value="Mahdia">Mahdia</option>
+    <option value="Sfax">Sfax</option>
+    <option value="Gafsa">Gafsa</option>
+    <option value="Tozeur">Tozeur</option>
+    <option value="Kebili">Kebili</option>
+    <option value="Gabès">Gabès</option>
+    <option value="Médenine">Médenine</option>
+    <option value="Tataouine">Tataouine</option>
+  </select>
+</div>
+
+<div class="filter-group">
+  <label for="genre-input">Genre</label>
+  <select name="genre" id="genre-input" class="form-select">
+  <option value="" disabled selected hidden>Genre</option>
+    <option value="Homme">Homme</option>
+    <option value="Femme">Femme</option>
+  </select>
+</div>
+
+
+  <button type="submit" class="btn btn-primary filter-submit-btn" id="applyFilters">
+    Appliquer les filtres
+  </button>
+</div>
+</form>
+</aside>
+
+
     <main class="main-content">
       <h1 class="section-title">Résultats de recherche</h1>
       <p class="section-subtitle"><?= count($results) ?> médecins trouvés</p>
@@ -269,8 +278,7 @@ mysqli_close($conn);
               </div>
 
               <div class="action-buttons">
-                <a href="#" class="btn btn-primary">Voir le profil</a>
-                <a href="#" class="btn btn-outline-primary">Prendre RDV</a>
+              <a href="profile.php?id=<?= $doc['id_utilisateur'] ?>" class="btn btn-outline-primary">Prendre RDV</a>
               </div>
             </div>
           </div>
@@ -349,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     © 2025 CuraMed. Tous droits réservés.
                 </div>
             </div>
+
         </div>
     </footer>
 </body>

@@ -121,3 +121,19 @@ document.addEventListener('click', (e) => {
         dropdownMenu.classList.remove('show');
     }
 });
+// Apply theme on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+  });
+  
+  // Toggle and store theme
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("dark-theme");
+  
+    // Save the current theme
+    const isDark = document.body.classList.contains("dark-theme");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
