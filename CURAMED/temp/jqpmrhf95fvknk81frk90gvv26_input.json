@@ -1,0 +1,51 @@
+{
+    "query": "chakroun",
+    "specialty": "",
+    "doctors": [
+        {
+            "id_utilisateur": "55",
+            "nom": "ghribi",
+            "prenom": "fedi",
+            "photo_profil": "user_photos\/67fc77f789a4a_454664533_2095442917572594_3886860493663609370_n.jpg",
+            "specialite": "Chirurgie",
+            "adresse": "dsqdqsd",
+            "experience": "qsdsqdqsdqsd"
+        },
+        {
+            "id_utilisateur": "68",
+            "nom": "dsqdqsd",
+            "prenom": "fedi",
+            "photo_profil": "user_photos\/67fca78f22f12_fethi-bouhaouchine-cimaXI8UarY-unsplash.jpg",
+            "specialite": "Dermatologie",
+            "adresse": "",
+            "experience": ""
+        },
+        {
+            "id_utilisateur": "69",
+            "nom": "ghribi",
+            "prenom": "feras",
+            "photo_profil": "user_photos\/67fca93fbef0c_fethi-bouhaouchine-cimaXI8UarY-unsplash.jpg",
+            "specialite": "chdujdjfjf",
+            "adresse": "eegetgeg",
+            "experience": "nayeka"
+        },
+        {
+            "id_utilisateur": "72",
+            "nom": "chakroun",
+            "prenom": "hedi",
+            "photo_profil": "user_photos\/68066c4ee230d_228-2284388_naruto-vs-sasuke_edited.jpg",
+            "specialite": "gfhg",
+            "adresse": "",
+            "experience": ""
+        },
+        {
+            "id_utilisateur": "73",
+            "nom": "fazezrg",
+            "prenom": "hnthng",
+            "photo_profil": "user_photos\/6806785eac5e0_back_med1.avif",
+            "specialite": "dqsdqsd",
+            "adresse": "",
+            "experience": ""
+        }
+    ]
+}

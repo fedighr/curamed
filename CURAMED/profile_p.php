@@ -3,7 +3,10 @@ session_start();
 
 $conn=mysqli_connect("localhost","root","","curamed");
 
-$sql="SELECT u.*,p.* from utilisateur u ,patient p where u.id_utilisateur=p.id_patient and id_utilisateur=". $_SESSION["user_id"];
+$sql="SSELECT u.*, p.specialite, m.adresse_cabinet, m.experience 
+                FROM utilisateur u 
+                JOIN medecin m ON u.id_utilisateur = m.id_medecin 
+                WHERE u.id_utilisateur = ".$comm ;
 if(!$res=mysqli_query($conn,$sql)){
     echo"error";
 }

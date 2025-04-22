@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const track = document.querySelector(".carousel-track");
     const prevBtn = document.querySelector(".prev-btn");
     const nextBtn = document.querySelector(".next-btn");
-    const cards = document.querySelectorAll(".doctor-card");
+    const cards = document.querySelectorAll(".doctor1-card");
     
     // Variables avec gestion des erreurs
     if (!track || !prevBtn || !nextBtn || cards.length === 0) {
