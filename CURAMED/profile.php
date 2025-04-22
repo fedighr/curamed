@@ -17,7 +17,7 @@ if (isset($_GET['id'])) {
 $req_medecin = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
                 FROM utilisateur u 
                 JOIN medecin m ON u.id_utilisateur = m.id_medecin 
-                WHERE u.id_utilisateur = $medecin_id";
+                WHERE u.id_utilisateur = ".$medecin_id;
 $res_medecin = mysqli_query($conn, $req_medecin);
 
 if ($res_medecin && mysqli_num_rows($res_medecin) > 0) {
@@ -82,20 +82,21 @@ mysqli_close($conn);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-    <script src="./scripts/home.js"></script>
-
+    <script src="scripts/profile.js"></script>
+    <script src="scripts/home.js"></script>
 
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
+    <!-- Header (inchangé) -->
+   <!-- Header -->
+   <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
             <div class="nav-links">
                 <?php if(isset($_SESSION['user_id'])) :?>
-                <a href="doctors.html" class="nav-icon" title="Médecins">
+                <a href="search.php" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
                 
@@ -108,7 +109,6 @@ mysqli_close($conn);
                         <div class="notification-list"></div>
                     </div>
                 </div>
-                <p><?php echo $_SESSION['type'];?>
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
@@ -150,110 +150,148 @@ mysqli_close($conn);
         <?php endif ;?>
     </header>
 
+    <!-- Section Profil Médecin (modifiée) -->
+<section class="doctor-profile-section5">
+    <div class="doctor-container5">
+        <?php if ($erreur): ?>
+            <div class="alert alert-danger5"><?php echo $erreur; ?></div>
+        <?php endif; ?>
+        
+        <?php if ($success): ?>
+            <div class="alert alert-success5"><?php echo $success; ?></div>
+        <?php endif; ?>
 
-    <!-- Section Profil Médecin -->
-    <section class="doctor-profile">
-        <div class="container">
-            <?php if ($erreur): ?>
-                <div class="alert alert-danger"><?php echo $erreur; ?></div>
+        <div class="doctor-header5">
+    <div class="doctor-main-info5">
+        <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar-img5">
+        <div class="doctor-meta-info5">
+            <h1 class="doctor-full-name5"><?php echo htmlspecialchars("DR ".$medecin["nom"]." ". $medecin["prenom"]);?></h1>
+            <?php if (!empty($medecin['specialite'])): ?>
+                <p class="doctor-specialty5"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
             <?php endif; ?>
-            
-            <?php if ($success): ?>
-                <div class="alert alert-success"><?php echo $success; ?></div>
-            <?php endif; ?>
-
-            <div class="profile-header">
-                <div class="doctor-main-info">
-                    <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar">
-                    <div class="doctor-meta">
-                        <h1 class="doctor-name"><?php echo htmlspecialchars("DR ".$table["nom"]." ". $table["prenom"]);?></h1>
-                        <p class="specialty"></p>
-                        <div class="rating-badge">
-                            <span class="rating">4.8</span>
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                            </div>
-                            <span class="reviews-count">(120 avis)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="doctor-contact">
-                    <div class="contact-card">
-                        <h3>Coordonnées</h3>
-                        <ul class="contact-list">
-                            <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($medecin['adresse_cabinet']); ?></li>
-                            <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($medecin['telephone']); ?></li>
-                            <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($medecin['email']); ?></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Prise de rendez-vous -->
-            <div class="consultation-section">
-                <h2 class="section-title">Prendre rendez-vous</h2>
-                
-                <div class="availability-container">
-                    <!-- Calendrier -->
-                    <div class="date-picker">
-                        <div class="month-header">
-                            <button class="nav-btn prev-month"><i class="fas fa-chevron-left"></i></button>
-                            <h3 id="current-month">Chargement...</h3>
-                            <button class="nav-btn next-month"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="days-grid" id="calendar-days">
-                            <!-- Généré par JS -->
-                        </div>
-                    </div>
-                    
-                    <!-- Créneaux horaires -->
-                    <div class="time-slots">
-                        <h4>Créneaux disponibles</h4>
-                        <div class="slots-grid" id="time-slots">
-                            <!-- Généré par JS -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Formulaire de confirmation -->
-                <form class="appointment-form" method="POST" id="rdv-form">
-                    <h3>Confirmation du rendez-vous</h3>
-                    <div class="form-group">
-                        <label>Date sélectionnée :</label>
-                        <input type="text" class="selected-date" id="selected-date" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Heure sélectionnée :</label>
-                        <input type="text" class="selected-time" id="selected-time" readonly>
-                    </div>
-                    <input type="hidden" name="date_heure" id="date-heure">
-                    <button type="submit" class="btn btn-primary btn-confirm" name="prendre_rdv">Confirmer le rendez-vous</button>
-                </form>
-            </div>
-
-            <!-- Informations complémentaires -->
-            <div class="doctor-details">
-                <div class="about-section">
-                    <h2>À propos</h2>
-                    <p><?php echo htmlspecialchars($medecin['experience']); ?></p>
-                </div>
-                
-                <div class="location-map">
-                    <h2>Localisation</h2>
-                    <div id="map" style="height: 400px; width: 100%;"></div>
+        </div>
+    </div>
+            <div class="doctor-contact-box5">
+                <div class="doctor-contact-card5">
+                    <h3>Coordonnées</h3>
+                    <ul class="doctor-contact-list5">
+                        <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($medecin['adresse_cabinet']); ?></li>
+                        <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($medecin['telephone']); ?></li>
+                        <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($medecin['email']); ?></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Footer -->
+        <!-- Prise de rendez-vous -->
+        <div class="appointment-section5">
+            <h2 class="appointment-title5">Prendre rendez-vous</h2>
+            
+            <div class="appointment-availability5">
+                <!-- Calendrier -->
+                <div class="appointment-calendar5">
+                    <div class="calendar-header5">
+                        <button class="calendar-nav5 prev5"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calendar-current-month5">Chargement...</h3>
+                        <button class="calendar-nav5 next5"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-days5" id="calendar-days5">
+                        <!-- Généré par JS -->
+                    </div>
+                </div>
+                
+                <!-- Créneaux horaires -->
+                <div class="appointment-time-slots5">
+                    <h4>Créneaux disponibles</h4>
+                    <div class="time-slots-grid5" id="time-slots15">
+                        <!-- Généré par JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulaire de confirmation -->
+            <form class="appointment-form5" method="POST" id="rdv-form5">
+                <h3>Confirmation du rendez-vous</h3>
+                <div class="form-group5">
+                    <label>Date sélectionnée :</label>
+                    <input type="text" class="form-selected-date5" id="selected-date5" readonly>
+                </div>
+                <div class="form-group5">
+                    <label>Heure sélectionnée :</label>
+                    <input type="text" class="form-selected-time5" id="selected-time5" readonly>
+                </div>
+                <input type="hidden" name="date_heure" id="date-heure5">
+                <button type="submit" class="btn btn-primary btn-confirm-appointment5" name="prendre_rdv">Confirmer le rendez-vous</button>
+            </form>
+        </div>
+
+        <!-- Informations complémentaires -->
+      
+            <div class="doctor-about5">
+                <h2>Experience</h2>
+                <p><?php echo htmlspecialchars($medecin['experience']); ?></p>
+            </div>
+            
+    
+
+        </div>
+    </div>
+</section>
+
+
+    <!-- Footer (inchangé) -->
     <footer class="footer">
         <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
+                    <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Patients</h4>
+                    <ul>
+                        <li><a href="#">Trouver un médecin</a></li>
+                        <li><a href="#">Consultation en ligne</a></li>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Professionnels</h4>
+                    <ul>
+                        <li><a href="#">Solutions pour médecins</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Témoignages</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
             <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Cookies</a>
+                </div>
                 <div class="copyright">
                     © 2025 CuraMed. Tous droits réservés.
                 </div>
@@ -263,40 +301,9 @@ mysqli_close($conn);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=VOTRE_CLE_API&callback=initMap" async defer></script>
-    <script src="scripts/profile.js"></script>
+    
 
-    <table class="table table-bordered table-striped bg-white shadow">
-      <tbody>
-        <tr>
-          <th>ID</th>
-          <td><?php echo htmlspecialchars($table["id_utilisateur"]); ?></td>
-        </tr>
-        <tr>
-          <th>Prénom</th>
-          <td><?php echo htmlspecialchars($table["prenom"]); ?></td>
-        </tr>
-        <tr>
-          <th>Nom</th>
-          <td><?php echo htmlspecialchars($table["nom"]); ?></td>
-        </tr>
-        <tr>
-          <th>Âge</th>
-          <td><?php echo htmlspecialchars($table["age"]); ?></td>
-        </tr>
-        <tr>
-          <th>Email</th>
-          <td><?php echo htmlspecialchars($table["email"]); ?></td>
-        </tr>
-        <tr>
-          <th>Telephone</th>
-          <td><?php echo htmlspecialchars($table["telephone"]); ?></td>
-        </tr>
-        <tr>
-          <th>Type</th>
-          <td><?php echo htmlspecialchars($table["type_utilisateur"]); ?></td>
-        </tr>
-      </tbody>
-    </table>
+   
   </div>
 </body>
 </html>
