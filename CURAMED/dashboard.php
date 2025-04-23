@@ -21,18 +21,19 @@ if (!$conn) {
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/dashboard.js"></script>
+    <script src="scripts/home.js"></script>
 
 </head>
 <body>
 
-    <header class="header">
+<header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
-            
             <div class="nav-links">
-                <a href="doctors.html" class="nav-icon" title="Médecins">
+                <?php if(isset($_SESSION['user_id'])) :?>
+                <a href="search.php" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
                 
@@ -45,31 +46,45 @@ if (!$conn) {
                         <div class="notification-list"></div>
                     </div>
                 </div>
-                
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 
-                <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile.php" class="dropdown-item">
+                        <?php if(isset($_SESSION['type']) && $_SESSION['type'] =='patient') : ?>
+                            <a href="profile_p.php" class="dropdown-item">
+                        <?php else :?>
+                            <a href="profile_d.php" class="dropdown-item">
+                        <?php endif;?>
                             <i class="fas fa-user"></i> Mon profil
                         </a>
-                        <a href="settings.html" class="dropdown-item">
+                        <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
-                        
+                        <?php
+                         if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+                            <a href="dashboard.php" class="dropdown-item">
+                                <i class="fas fa-th-large"></i> Tableau de bord
+                            </a>
+                        <?php endif; ?>
                         <a href="logout.php" class="dropdown-item">
                             <i class="fas fa-sign-out-alt"></i> Se déconnecter
                         </a>
                     </div>
                 </div>
+                <button class="mobile-menu-btn d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <?php else : ?>
+                <div class="container mt-5 text-center">
+                    <a href="login.html" class="btn btn-custom mx-2">Connexion</a>
+                    <a href="signup.html" class="btn btn-custom mx-2">S'inscrire</a>
+                </div>
             </div>
-            <button class="mobile-menu-btn d-lg-none">
-                <i class="fas fa-bars"></i>
-            </button>
         </nav>
+        <?php endif ;?>
     </header>
 
     <!-- Dashboard Main Content -->
@@ -286,7 +301,7 @@ if (!$conn) {
         <table class="hover-table">
         <thead>
                 <tr>
-                    <th>Médecin</th>
+                    <th >Médecin</th>
                     <th>Rôle</th>
                     <th>Spécialité</th>
                     <th>Contact</th>
@@ -498,8 +513,8 @@ if (!$conn) {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" name="modifier" class="btn btn-primary">Enregistrer</button>
         </div>
       </form>
     </div>

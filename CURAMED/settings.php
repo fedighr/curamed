@@ -33,7 +33,7 @@ $_SESSION['patient'] = [
             </a>
             
             <div class="nav-links">
-                <a href="doctors.html" class="nav-icon" title="Médecins">
+                <a href="search.php" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
                 

@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $experience = $_POST["experience"];
                     $ville = $_POST["ville"];
                     $query = "INSERT INTO medecin 
-                          VALUES ('$id', '$spec', '$adresse', '$experience','$ville';)";
+                          VALUES ('$id', '$spec', '$adresse', '$experience','$ville');";
 
                 }
 

@@ -2,11 +2,17 @@
 session_start();
 
 $conn=mysqli_connect("localhost","root","","curamed");
+if(isset($_GET['id'])){
+    $id=$_GET['id'];
+}
+else{
+    $id=$_SESSION['user_id'];
+}
 
-$sql="SSELECT u.*, p.specialite, m.adresse_cabinet, m.experience 
+$sql="SELECT u.*, p.group_sanguin , p.poids,p.taille,p.maladies_chroniques
                 FROM utilisateur u 
-                JOIN medecin m ON u.id_utilisateur = m.id_medecin 
-                WHERE u.id_utilisateur = ".$comm ;
+                JOIN patient p ON u.id_utilisateur = p.id_patient 
+                WHERE u.id_utilisateur = ".$id ;
 if(!$res=mysqli_query($conn,$sql)){
     echo"error";
 }
@@ -25,6 +31,7 @@ $table=mysqli_fetch_assoc($res);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+    <script src="scripts/home.js"></script>
 </head>
 <body>
 <body>
@@ -34,9 +41,9 @@ $table=mysqli_fetch_assoc($res);
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
             </a>
-            
             <div class="nav-links">
-                <a href="doctors.html" class="nav-icon" title="Médecins">
+                <?php if(isset($_SESSION['user_id'])) :?>
+                <a href="search.php" class="nav-icon" title="Médecins">
                     <i class="fas fa-user-md"></i>
                 </a>
                 
@@ -49,7 +56,6 @@ $table=mysqli_fetch_assoc($res);
                         <div class="notification-list"></div>
                     </div>
                 </div>
-                
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
@@ -57,7 +63,11 @@ $table=mysqli_fetch_assoc($res);
                 <div class="profile-dropdown">
                     <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
                     <div class="dropdown-menu">
-                        <a href="profile_p.php" class="dropdown-item">
+                        <?php if(isset($_SESSION['type']) && $_SESSION['type'] =='patient') : ?>
+                            <a href="profile_p.php" class="dropdown-item">
+                        <?php else :?>
+                            <a href="profile_d.php" class="dropdown-item">
+                        <?php endif;?>
                             <i class="fas fa-user"></i> Mon profil
                         </a>
                         <a href="settings.php" class="dropdown-item">
@@ -74,18 +84,24 @@ $table=mysqli_fetch_assoc($res);
                         </a>
                     </div>
                 </div>
+                <button class="mobile-menu-btn d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <?php else : ?>
+                <div class="container mt-5 text-center">
+                    <a href="login.html" class="btn btn-custom mx-2">Connexion</a>
+                    <a href="signup.html" class="btn btn-custom mx-2">S'inscrire</a>
+                </div>
             </div>
-            <button class="mobile-menu-btn d-lg-none">
-                <i class="fas fa-bars"></i>
-            </button>
         </nav>
+        <?php endif ;?>
     </header>
 
     <main class="profile-main container">
         <div class="profile-header mb-5">
             <div class="d-flex align-items-center gap-4">
                 <div class="position-relative">
-                    <img src="<?= $_SESSION['photo'] ?>" class="profile-avatar" alt="Photo de profil">
+                    <img src="<?= $table['photo_profil'] ?>" class="profile-avatar" alt="Photo de profil">
                     <button class="btn btn-sm btn-primary avatar-edit-btn" onclick="document.getElementById('avatarInput').click()">
                         <i class="fas fa-camera"></i>
                     </button>
@@ -109,19 +125,19 @@ $table=mysqli_fetch_assoc($res);
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Prénom</label>
-                                    <input type="text" class="form-control" value="<?= $table['prenom'] ?>" disabled>
+                                    <input type="text" class="form-control" name="prenom" value="<?= $table['prenom'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Nom</label>
-                                    <input type="text" class="form-control" value="<?= $table['nom'] ?>" disabled>
+                                    <input type="text" class="form-control" name="nom" value="<?= $table['nom'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Date de naissance</label>
-                                    <input type="date" class="form-control" value="<?= $table['age'] ?>" disabled>
+                                    <label class="form-label">Age</label>
+                                    <input type="number" class="form-control" name="age" value="<?= $table['age'] ?>" disabled>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Genre</label>
-                                    <input type="text" class="form-control" value="<?= $table['genre'] ?>" disabled>
+                                    <input type="text" class="form-control" name="genre" value="<?= $table['genre'] ?>" disabled>
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="button" id="editBtn" class="btn btn-primary">

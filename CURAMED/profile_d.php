@@ -1,8 +1,13 @@
 <?php
 session_start();
 $conn=mysqli_connect("localhost","root","","curamed");
-// Données simulées du médecin
-$id=$_SESSION['user_id'];
+if(isset($_GET['id'])){
+    $id=$_GET['id'];
+}
+else{
+    $id=$_SESSION['user_id'];
+}
+
 $req_rdv = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
                 FROM utilisateur u 
                 JOIN medecin m ON u.id_utilisateur = m.id_medecin 
@@ -22,11 +27,10 @@ $doctorInfo= mysqli_fetch_assoc($res_rdv);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-    <script> src="scripts/profile_d.js"></script>
-    <script> src="scripts/home.js"></script>
+    <script src="scripts/profile_d.js"></script>
+    <script src="scripts/home.js"></script>
 </head>
 <body>
-   <!-- Header -->
    <!-- Header -->
    <header class="header">
         <nav class="nav-container container">

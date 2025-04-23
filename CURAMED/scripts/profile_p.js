@@ -156,3 +156,19 @@ document.addEventListener('click', (e) => {
         dropdownMenu.classList.remove('show');
     }
 });
+let isEditing = false;
+
+function toggleEdit() {
+    const inputs = document.querySelectorAll('input[type="text"]');
+    const button = document.getElementById('editBtn');
+
+    if (!isEditing) {
+        inputs.forEach(input => input.disabled = false);
+        button.textContent = "Enregistrer";
+        isEditing = true;
+    } else {
+        // Soumettre le formulaire
+        button.textContent = "Enregistrement...";
+        document.querySelector('form').submit(); // Envoie vers controll_dashboard.php
+    }
+}

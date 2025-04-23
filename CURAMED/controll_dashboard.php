@@ -12,7 +12,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_type = isset($_POST['user_type']) ? $_POST['user_type'] : '';
 
     if (isset($_POST['profile'])) {
-        header('Location: profile.html');
+        $user_id = intval($_POST['user_id']);
+        $sql = "SELECT 1 from utilisateur where type_utilisateur='patient' and id_utilisateur=".$user_id;
+        $res=mysqli_query($conn,$sql);
+        if(mysqli_num_rows($res)>0){
+            header("Location: profile_p.php?id=" . $user_id);
+        }
+        else{
+            header("Location: profile_d.php?id=" . $user_id);
+        }
+        
         exit();
     }
 
@@ -20,13 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $userId = intval($_POST['user_id']);
         $userType = $_POST['user_type'];
     
-    // Basic fields
-    $nom = mysqli_real_escape_string($conn, $_POST['nom']);
-    $prenom = mysqli_real_escape_string($conn, $_POST['prenom']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $telephone = mysqli_real_escape_string($conn, $_POST['telephone']);
+        $nom = mysqli_real_escape_string($conn, $_POST['nom']);
+        $prenom = mysqli_real_escape_string($conn, $_POST['prenom']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $telephone = mysqli_real_escape_string($conn, $_POST['telephone']);
 
-    // Build update query
+
     $updateFields = [
         "nom = '$nom'",
         "prenom = '$prenom'",
@@ -34,7 +42,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         "telephone = '$telephone'"
     ];
 
-    // Handle password update
     if (!empty($_POST['password'])) {
         if ($_POST['password'] === $_POST['confirm_password']) {
             $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -46,14 +53,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Handle file upload
+
     if (!empty($_FILES['photo']['name'])) {
         $photo_name = $_FILES['photo']['name'];
         $photo_tmp = $_FILES['photo']['tmp_name'];
         $photo_folder = "user_photos/" . uniqid() . "_" . basename($photo_name);
         
         if (move_uploaded_file($photo_tmp, $photo_folder)) {
-            // Delete old photo
+
             $sql = "SELECT photo_profil FROM utilisateur WHERE id_utilisateur = $userId";
             $result = mysqli_query($conn, $sql);
             $oldPhoto = mysqli_fetch_assoc($result)['photo_profil'];
@@ -64,11 +71,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Update user
+
     $sql = "UPDATE utilisateur SET " . implode(', ', $updateFields) . " WHERE id_utilisateur = $userId";
     
     if (mysqli_query($conn, $sql)) {
-        // Update specialité for doctors
+
         if ($userType === 'medecin') {
             $specialite = mysqli_real_escape_string($conn, $_POST['specialite']);
             $sql = "UPDATE medecin SET specialite = '$specialite' WHERE id_medecin = $userId";
@@ -139,7 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if($id_user === $_SESSION['user_id']){
             session_unset();
             session_destroy();
-            header('Location: index.php');
+            header('Location: home.php');
         }
         else{
             header('Location: dashboard.php');
