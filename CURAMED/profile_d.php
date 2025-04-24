@@ -1,38 +1,66 @@
 <?php
 session_start();
-$conn=mysqli_connect("localhost","root","","curamed");
-if(isset($_GET['id'])){
-    $id=$_GET['id'];
-}
-else{
-    $id=$_SESSION['user_id'];
+$conn = mysqli_connect("localhost","root","","curamed");
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 
-$req_rdv = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
-                FROM utilisateur u 
-                JOIN medecin m ON u.id_utilisateur = m.id_medecin 
-                WHERE u.id_utilisateur = ".$id ;
-$res_rdv = mysqli_query($conn, $req_rdv);
-$doctorInfo= mysqli_fetch_assoc($res_rdv);
+$id = $_SESSION['user_id'];
+$req = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience,m.ville
+        FROM utilisateur u
+        JOIN medecin m ON u.id_utilisateur = m.id_medecin
+        WHERE u.id_utilisateur = $id";
+$res = mysqli_query($conn, $req);
+$doctorInfo = mysqli_fetch_assoc($res);
 
+
+$jours = [1=>'Lundi',2=>'Mardi',3=>'Mercredi',4=>'Jeudi',5=>'Vendredi',6=>'Samedi',7=>'Dimanche'];
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    mysqli_query($conn, "DELETE FROM calendrier_medecin WHERE id_medecin = $id");
+    foreach ($jours as $i => $j) {
+        if (isset($_POST['off'][$i])) continue;
+        $hd = $_POST['debut'][$i] ?? '';
+        $pd = $_POST['pause_debut'][$i] ?? '';
+        $pe = $_POST['pause_fin'][$i] ?? '';
+        $hf = $_POST['fin'][$i] ?? '';
+        if ($hd && $hf) {
+            $hdi = mysqli_real_escape_string($conn, $hd);
+            $pdi = mysqli_real_escape_string($conn, $pd);
+            $pei = mysqli_real_escape_string($conn, $pe);
+            $hfi = mysqli_real_escape_string($conn, $hf);
+            mysqli_query($conn, "INSERT INTO calendrier_medecin
+                (id_medecin,jour,heure_debut,pause_debut,pause_fin,heure_fin)
+                VALUES
+                ($id,'$j','$hdi','$pdi','$pei','$hfi')");
+        }
+    }
+    $message = "Calendrier mis à jour.";
+}
+
+$template = [];
+$res_tpl = mysqli_query($conn, "SELECT jour,heure_debut,pause_debut,pause_fin,heure_fin
+    FROM calendrier_medecin WHERE id_medecin = $id");
+while ($r = mysqli_fetch_assoc($res_tpl)) {
+    $template[$r['jour']] = $r;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CuraMed - Profil Médecin</title>
+    <title>CuraMed - Mon Profil</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-    <script src="scripts/profile_d.js"></script>
-    <script src="scripts/home.js"></script>
+    <script src="./scripts/home.js"></script>
 </head>
 <body>
-   <!-- Header -->
-   <header class="header">
+
+<header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
@@ -93,270 +121,240 @@ $doctorInfo= mysqli_fetch_assoc($res_rdv);
         <?php endif ;?>
     </header>
 
-    <main class="doctor-main container">
-    <div class="doctor-header mb-5">
+<main class="profile-main container">
+    <div class="profile-header mb-5">
         <div class="d-flex align-items-center gap-4">
-            <img src="<?= htmlspecialchars($doctorInfo['photo_profil'] ?? 'images/default-doctor.jpg') ?>" class="doctor-avatar rounded-circle" alt="Photo du médecin" style="width: 120px; height: 120px; object-fit: cover;">
+            <div class="position-relative">
+                <img src="<?= htmlspecialchars($doctorInfo['photo_profil'] ?? 'images/default-doctor.jpg') ?>" 
+                     class="profile-avatar" alt="Photo de profil">
+            </div>
             <div>
-                <h1 class="doctor-name">Dr. <?= htmlspecialchars($doctorInfo['prenom']) ?> <?= htmlspecialchars($doctorInfo['nom']) ?></h1>
-                <div class="doctor-specialty badge bg-primary"><?= htmlspecialchars($doctorInfo['specialite']) ?></div>
-                <div class="doctor-experience text-muted mt-2">
-                    <i class="fas fa-award"></i> <?= htmlspecialchars($doctorInfo['experience']) ?> d'expérience
-                </div>
-                <div class="doctor-address mt-2">
-                    <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($doctorInfo['adresse_cabinet']) ?>
-                </div>
+                <h1 class="profile-name">Dr. <?= htmlspecialchars($doctorInfo['prenom']) ?> <?= htmlspecialchars($doctorInfo['nom']) ?></h1>
+                <p class="text-muted mb-1 d-flex align-items-center">
+                <i class="fas fa-user-md me-2 text-primary"></i><?= $doctorInfo['specialite'] ?>
+                </p>
+                <p class="text-muted mb-1 d-flex align-items-center">
+                <i class="fas fa-map-marker-alt me-2 text-danger"></i><?= $doctorInfo['ville'] ?>
+                </p>
+                <p class="text-muted mb-0 d-flex align-items-center">
+                <i class="fas fa-clinic-medical me-2 text-success"></i><?= $doctorInfo['adresse_cabinet'] ?>
+                </p>
             </div>
         </div>
     </div>
 
     <div class="row g-4">
-        <!-- Colonne gauche - Informations et agenda -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Agenda</h3>
-                </div>
-                <div class="card-body">
-                    <div class="calendar-tools mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <button class="btn btn-outline-primary" id="prevWeek"><i class="fas fa-chevron-left"></i></button>
-                                <button class="btn btn-outline-primary" id="nextWeek"><i class="fas fa-chevron-right"></i></button>
-                                <button class="btn btn-outline-primary" id="currentWeekBtn">Cette semaine</button>
-                            </div>
-                            <span id="currentWeekRange" class="fw-bold"></span>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
-                                <i class="fas fa-plus me-2"></i>Nouveau RDV
-                            </button>
-                        </div>
+        <!-- Left Column -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form id="profileForm" action="ton_traitement.php" method="POST">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Informations personnelles</h3>
                     </div>
-                    
-                    <div class="calendar-container">
-                        <div class="calendar-header d-flex">
-                            <?php 
-                            $days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-                            foreach ($days as $day): ?>
-                                <div class="calendar-day-header flex-grow-1 text-center py-2 fw-bold"><?= $day ?></div>
-                            <?php endforeach; ?>
-                        </div>
-                        <div class="calendar-grid" id="calendar">
-                            <!-- Calendar will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-users me-2"></i>Patients récents</h3>
-                </div>
-                <div class="card-body">
-                    <div class="patients-search mb-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="patientSearch" placeholder="Rechercher un patient...">
-                            <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="patients-list">
-                        <?php if (empty($patients)): ?>
-                            <div class="text-center py-4 text-muted">
-                                Aucun patient trouvé
-                            </div>
-                        <?php else: ?>
-                            <?php foreach ($patients as $patient): ?>
-                                <div class="patient-item border-bottom py-3">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div class="d-flex align-items-center">
-                                            <img src="<?= htmlspecialchars($patient['photo_profil'] ?? 'images/default-patient.jpg') ?>" 
-                                                 class="rounded-circle me-3" 
-                                                 width="50" 
-                                                 height="50" 
-                                                 alt="Photo patient"
-                                                 style="object-fit: cover;">
-                                            <div class="patient-info">
-                                                <h5 class="mb-1"><?= htmlspecialchars($patient['prenom']) ?> <?= htmlspecialchars($patient['nom']) ?></h5>
-                                                <div class="patient-meta">
-                                                    <span class="badge bg-primary"><?= $patient['appointment_count'] ?> RDV</span>
-                                                    <span class="text-muted ms-2">Dernière visite: <?= date('d/m/Y', strtotime($patient['last_visit'])) ?></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="patient-actions">
-                                            <button class="btn btn-sm btn-outline-primary view-patient" data-id="<?= $patient['id_utilisateur'] ?>">
-                                                <i class="fas fa-eye"></i> Dossier
-                                            </button>
-                                        </div>
-                                    </div>
+                    <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" name="prenom" value="<?= $doctorInfo['prenom'] ?>" disabled>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" class="form-control" name="nom" value="<?= $doctorInfo['nom'] ?>" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" class="form-control" name="age" value="<?= $doctorInfo['age'] ?>" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Genre</label>
+                                    <input type="text" class="form-control" name="genre" value="<?= $doctorInfo['genre'] ?>" disabled>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="button" id="editBtn" class="btn btn-primary">
+                                    <i class="fas fa-edit me-2"></i>Modifier
+                                    </button>
+                                </div>
+                            </div>
                     </div>
                 </div>
+                </form>
+
+
+            <div class="card shadow-sm mt-4" id="planning">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Mon planning</h3>
+                </div>
+                <div class="card-body">
+            <?php if ($message): ?>
+                <div class="alert alert-success d-flex align-items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    <?= htmlspecialchars($message) ?>
+                </div>
+            <?php endif; ?>
+
+            
+            <form method="post">
+                <div class="table-responsive">
+                    <table class="table calendar-table">
+                        <thead>
+                            <tr>
+                                <th>Jour</th>
+                                <th>Off</th>
+                                <th>Début</th>
+                                <th>Pause début</th>
+                                <th>Pause fin</th>
+                                <th>Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($jours as $i => $j): 
+                                $r = $template[$j] ?? [];
+                                $off = !isset($template[$j]);
+                            ?>
+                            <tr>
+                                <td class="weekday-label"><?= $j ?></td>
+                                <td class="text-center">
+                                    <input type="checkbox" 
+                                        name="off[<?= $i ?>]" 
+                                        class="off-checkbox" 
+                                        <?= $off ? 'checked' : '' ?>>
+                                </td>
+                                <td><input type="time" 
+                                        name="debut[<?= $i ?>]" 
+                                        value="<?= htmlspecialchars($r['heure_debut'] ?? '') ?>" 
+                                        class="time-input"></td>
+                                <td><input type="time" 
+                                        name="pause_debut[<?= $i ?>]" 
+                                        value="<?= htmlspecialchars($r['pause_debut'] ?? '') ?>" 
+                                        class="time-input"></td>
+                                <td><input type="time" 
+                                        name="pause_fin[<?= $i ?>]" 
+                                        value="<?= htmlspecialchars($r['pause_fin'] ?? '') ?>" 
+                                        class="time-input"></td>
+                                <td><input type="time" 
+                                        name="fin[<?= $i ?>]" 
+                                        value="<?= htmlspecialchars($r['heure_fin'] ?? '') ?>" 
+                                        class="time-input"></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+        
+        <button class="save-btn">
+            <i class="fas fa-save"></i>
+            Sauvegarder les modifications
+        </button>
+    </form>
+</div>
             </div>
         </div>
 
-        <!-- Colonne droite - Statistiques et actions rapides -->
+
         <div class="col-lg-4">
+
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-chart-line me-2"></i>Statistiques</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-address-book me-2"></i>Contact</h3>
                 </div>
                 <div class="card-body">
-                    <div class="stats-grid row">
-                        <div class="stat-item col-6 text-center py-3">
-                            <i class="fas fa-calendar-check fa-2x mb-2 text-primary"></i>
-                            <div class="stat-value"><?= $doctorStats['total_appointments'] ?? 0 ?></div>
-                            <div class="stat-label">RDV cette semaine</div>
-                        </div>
-                        <div class="stat-item col-6 text-center py-3">
-                            <i class="fas fa-user-clock fa-2x mb-2 text-primary"></i>
-                            <div class="stat-value"><?= round(($doctorStats['avg_duration'] ?? 30) / 60, 2) ?>h</div>
-                            <div class="stat-label">Temps moyen/RDV</div>
-                        </div>
-                    </div>
+                    <ul class="contact-list">
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:<?= $doctorInfo['email'] ?>"><?= $doctorInfo['email'] ?></a>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:<?= $doctorInfo['telephone'] ?>"><?= $doctorInfo['telephone'] ?></a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-bolt me-2"></i>Actions rapides</h3>
-                </div>
-                <div class="card-body">
-                    <div class="quick-actions">
-                        <button class="btn btn-action btn-light w-100 mb-3 p-3 rounded-3">
-                            <i class="fas fa-file-prescription fa-2x mb-2 text-primary"></i>
-                            <span class="d-block">Rédiger ordonnance</span>
-                        </button>
-                        <button class="btn btn-action btn-light w-100 mb-3 p-3 rounded-3">
-                            <i class="fas fa-comment-medical fa-2x mb-2 text-primary"></i>
-                            <span class="d-block">Envoyer message</span>
-                        </button>
-                        <button class="btn btn-action btn-light w-100 p-3 rounded-3">
-                            <i class="fas fa-file-medical fa-2x mb-2 text-primary"></i>
-                            <span class="d-block">Ajouter au dossier</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
 
             <div class="card shadow-sm mt-4">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0"><i class="fas fa-clock me-2"></i>Prochains RDV</h3>
+                    <h3 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Rendez-vous</h3>
                 </div>
                 <div class="card-body">
-                    <?php if (empty($appointments)): ?>
-                        <div class="text-center py-2 text-muted">
-                            Aucun rendez-vous à venir
-                        </div>
-                    <?php else: ?>
-                        <ul class="list-group">
-                            <?php foreach ($appointments as $appointment): ?>
-                                <li class="list-group-item border-0 py-2 px-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong><?= htmlspecialchars($appointment['patient_prenom']) ?> <?= htmlspecialchars($appointment['patient_nom']) ?></strong>
-                                            <div class="text-muted small">
-                                                <?= date('d/m/Y H:i', strtotime($appointment['date_heure'])) ?>
-                                            </div>
-                                        </div>
-                                        <span class="badge bg-info">
-                                            <?= date('H:i', strtotime($appointment['date_heure'])) ?>
-                                        </span>
+                    <div class="emergency-contacts">
+
+                        <div class="emergency-contact mb-3">
+                            <div class="view-mode">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>Dr. Bakhana</h6>
+                                        <p class="text-muted mb-0">Contact principal - 06 12 34 56 78</p>
                                     </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nouveau RDV -->
-    <div class="modal fade" id="addAppointmentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-calendar-plus me-2"></i>Nouveau rendez-vous</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="appointmentForm" action="save_appointment.php" method="POST">
-                        <input type="hidden" name="doctor_id" value="<?= $doctorId ?>">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Patient</label>
-                                <select class="form-select" name="patient_id" required>
-                                    <option value="">Sélectionner un patient</option>
-                                    <?php foreach ($patients as $patient): ?>
-                                        <option value="<?= $patient['id_utilisateur'] ?>">
-                                            <?= htmlspecialchars($patient['prenom']) ?> <?= htmlspecialchars($patient['nom']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Type de consultation</label>
-                                <select class="form-select" name="consultation_type" required>
-                                    <option value="standard">Consultation standard</option>
-                                    <option value="followup">Suivi de traitement</option>
-                                    <option value="emergency">Urgence</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date et heure</label>
-                                <input type="datetime-local" class="form-control" name="appointment_datetime" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Durée</label>
-                                <select class="form-select" name="duration" required>
-                                    <option value="15">15 min</option>
-                                    <option value="30" selected>30 min</option>
-                                    <option value="45">45 min</option>
-                                    <option value="60">1 heure</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Notes</label>
-                                <textarea class="form-control" name="notes" rows="3"></textarea>
+                                    <button class="btn btn-sm btn-outline-primary edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" form="appointmentForm" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                    <button id="addContactBtn" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-2"></i>Ajouter un contact
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </main>
 
-    <footer class="footer">
+<footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <img src="images/logo3.png" alt="CuraMed" class="footer-logo">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
                     <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
+                
                 <div class="footer-col">
                     <h4>Patients</h4>
                     <ul>
                         <li><a href="#">Trouver un médecin</a></li>
                         <li><a href="#">Consultation en ligne</a></li>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
                     </ul>
                 </div>
+                
+                <div class="footer-col">
+                    <h4>Professionnels</h4>
+                    <ul>
+                        <li><a href="#">Solutions pour médecins</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Témoignages</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                    </ul>
+                </div>
+                
                 <div class="footer-col">
                     <h4>Entreprise</h4>
                     <ul>
                         <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
                         <li><a href="#">Contact</a></li>
                     </ul>
                 </div>
             </div>
+            
             <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Cookies</a>
+                </div>
                 <div class="copyright">
                     © 2025 CuraMed. Tous droits réservés.
                 </div>
@@ -364,8 +362,39 @@ $doctorInfo= mysqli_fetch_assoc($res_rdv);
         </div>
     </footer>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/profile_d.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const tpl = <?= json_encode($tpl_js) ?>;
+const labels = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+let currentDate = new Date();
+function getWeekNumber(d){
+    const date=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate()+4-(date.getDay()||7));
+    const yearStart=new Date(date.getFullYear(),0,1);
+    return Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+function updateCalendar(){
+    const cal=document.getElementById('calendar'); cal.innerHTML='';
+    const day=currentDate.getDay()||7;
+    const monday=new Date(currentDate);
+    monday.setDate(currentDate.getDate()-day+1);
+    for(let i=0;i<7;i++){
+        const d=new Date(monday);
+        d.setDate(monday.getDate()+i);
+        const dow=labels[d.getDay()];
+        const slot=tpl.find(r=>r.jour===dow);
+        let hours='Le médecin ne travaille pas';
+        if(slot){ hours=`${slot.heure_debut.slice(0,5)}–${slot.pause_debut.slice(0,5)}<br>${slot.pause_fin.slice(0,5)}–${slot.heure_fin.slice(0,5)}`; }
+        cal.innerHTML+=`<div class="calendar-cell"><div class="calendar-day-header">${d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'})}</div><div class="hours">${hours}</div></div>`;
+    }
+    document.getElementById('currentWeekRange').textContent=`Semaine ${getWeekNumber(currentDate)} – ${currentDate.getFullYear()}`;
+}
+document.getElementById('prevWeek').onclick=()=>{currentDate.setDate(currentDate.getDate()-7);updateCalendar();};
+document.getElementById('nextWeek').onclick=()=>{currentDate.setDate(currentDate.getDate()+7);updateCalendar();};
+document.getElementById('currentWeekBtn').onclick=()=>{currentDate=new Date();updateCalendar();};
+document.addEventListener('DOMContentLoaded',updateCalendar);
+</script>
 </body>
 </html>

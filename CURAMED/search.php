@@ -179,14 +179,14 @@ mysqli_close($conn);
   <option value="" disabled selected hidden>Specialité</option>
     <option value="Cardiologie">Cardiologie</option>
     <option value="Dermatologie">Dermatologie</option>
-    <option value="Pédiatrie">Pédiatrie</option>
-    <option value="Neurologie">Neurologie</option>
-    <option value="Orthopédie">Orthopédie</option>
+    <option value="Pédiatrie">Psychiatrie</option>
+    <option value="Gynécologie">Orthopédie</option>
+    <option value="Médecine Générale">Médecine Générale</option>
     <option value="Gastro-entérologie">Gastro-entérologie</option>
-    <option value="Endocrinologie">Endocrinologie</option>
+    <option value="Neurologie">Neurologie</option>
     <option value="Pneumologie">Pneumologie</option>
-    <option value="Psychiatrie">Psychiatrie</option>
-    <option value="Urologie">Urologie</option>
+    <option value="Rhumatologie">Rhumatologie</option>
+    <option value="Ophtalmologie">Ophtalmologie</option>
   </select>
 </div>
 

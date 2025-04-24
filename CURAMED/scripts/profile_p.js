@@ -156,19 +156,29 @@ document.addEventListener('click', (e) => {
         dropdownMenu.classList.remove('show');
     }
 });
-let isEditing = false;
-
-function toggleEdit() {
-    const inputs = document.querySelectorAll('input[type="text"]');
-    const button = document.getElementById('editBtn');
-
-    if (!isEditing) {
-        inputs.forEach(input => input.disabled = false);
-        button.textContent = "Enregistrer";
-        isEditing = true;
-    } else {
-        // Soumettre le formulaire
-        button.textContent = "Enregistrement...";
-        document.querySelector('form').submit(); // Envoie vers controll_dashboard.php
-    }
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const form   = document.getElementById('profileForm');
+    const editBtn = document.getElementById('editBtn');
+    if (!form || !editBtn) return;
+  
+    // on sélectionne tous les inputs du formulaire
+    const inputs = form.querySelectorAll('input');
+    let isEditing = false;
+  
+    editBtn.addEventListener('click', () => {
+      isEditing = !isEditing;
+  
+      // active / désactive les champs
+      inputs.forEach(i => i.disabled = !isEditing);
+  
+      // change le texte et l'icône du bouton
+      editBtn.innerHTML = isEditing
+        ? '<i class="fas fa-save me-2"></i>Enregistrer'
+        : '<i class="fas fa-edit me-2"></i>Modifier';
+  
+      // si on passe de "Enregistrer" à "Modifier", on envoie le formulaire
+      if (!isEditing) {
+        form.submit();
+      }
+    });
+  });

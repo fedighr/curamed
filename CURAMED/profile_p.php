@@ -32,8 +32,8 @@ $table=mysqli_fetch_assoc($res);
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
     <script src="scripts/home.js"></script>
+    <script src="scripts/profile_p.js" defer></script>
 </head>
-<body>
 <body>
     <!-- Header -->
     <header class="header">
@@ -116,12 +116,12 @@ $table=mysqli_fetch_assoc($res);
 
         <div class="row g-4">
             <div class="col-lg-8">
+                <form id="profileForm" action="ton_traitement.php" method="POST">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Informations personnelles</h3>
                     </div>
                     <div class="card-body">
-                        <form id="profileForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Prénom</label>
@@ -141,13 +141,13 @@ $table=mysqli_fetch_assoc($res);
                                 </div>
                                 <div class="col-12 text-end">
                                     <button type="button" id="editBtn" class="btn btn-primary">
-                                        <i class="fas fa-edit me-2"></i>Modifier
+                                    <i class="fas fa-edit me-2"></i>Modifier
                                     </button>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
+                </form>
 
                 <div class="card shadow-sm mt-4">
                     <div class="card-header bg-primary text-white">
@@ -168,8 +168,26 @@ $table=mysqli_fetch_assoc($res);
                                 <div class="medical-info-card">
                                     <i class="fas fa-user-md"></i>
                                     <div>
-                                        <h6>Médecin traitant</h6>
-                                        <p><?= $_SESSION['patient']['medecin_traitant'] ?></p>
+                                        <h6>Taille</h6>
+                                        <p><?= $table['taille'] ?>CM</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="medical-info-card">
+                                    <i class="fas fa-user-md"></i>
+                                    <div>
+                                        <h6>Poids</h6>
+                                        <p><?= $table['poids'] ?>KG</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="medical-info-card">
+                                    <i class="fas fa-user-md"></i>
+                                    <div>
+                                        <h6>Maladies chroniques</h6>
+                                        <p><?php if(empty($table['maladies_chroniques'])){echo "no maladies chronique";} else{$table['maladies_chroniques'];}?></p>
                                     </div>
                                 </div>
                             </div>

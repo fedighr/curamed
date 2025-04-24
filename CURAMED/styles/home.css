@@ -2349,3 +2349,114 @@ a {
     font-size: 1.5rem;
   }
 }
+
+.calendar-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 99%;
+}
+
+.calendar-table thead {
+  background: var(--primary-color);
+  color: white;
+}
+
+.calendar-table th {
+  font-weight: 500;
+  padding: 1rem;
+  text-align: center;
+}
+
+.calendar-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.calendar-table tr:last-child td {
+  border-bottom: none;
+}
+
+.time-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: 100%;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.time-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 198, 180, 0.2);
+  outline: none;
+}
+
+.off-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-title {
+  font-size: 1.25rem;
+  color: var(--secondary-color);
+  margin: 0;
+}
+
+.save-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 198, 180, 0.3);
+}
+
+.weekday-label {
+  font-weight: 500;
+  color: var(--secondary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-table {
+      font-size: 0.9rem;
+  }
+  
+  .time-input {
+      padding: 0.4rem;
+  }
+  
+  .calendar-table th,
+  .calendar-table td {
+      padding: 0.6rem;
+  }
+  
+  .save-btn {
+      width: 100%;
+      justify-content: center;
+  }
+}
+
+#planning{
+  overflow: auto;
+}

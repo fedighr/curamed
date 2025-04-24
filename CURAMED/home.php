@@ -83,7 +83,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
         <?php endif ;?>
     </header>
 
-    <!-- Hero Section -->
+
     <section class="hero">
         <form id="search" action="search.php" method="POST" enctype="multipart/form-data">
             <div class="container">
@@ -98,15 +98,20 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <input type="text" class="search-input" placeholder="Spécialité , médecin" name="cherche" id="search">
                         </div>
 
-                        <!-- Added Spécialité Dropdown Inside the Search Bar -->
+
                         <div class="search-select-group">
                         <select id="specialite" name="specialite" class="search-select">
                             <option value="" disabled selected hidden>Spécialité</option>
                             <option value="Cardiologie">Cardiologie</option>
                             <option value="Dermatologie">Dermatologie</option>
-                            <option value="Pédiatrie">Pédiatrie</option>
-                            <option value="Gynécologie">Gynécologie</option>
-                            <option value="Chirurgie">Chirurgie</option>
+                            <option value="Pédiatrie">Psychiatrie</option>
+                            <option value="Gynécologie">Orthopédie</option>
+                            <option value="Médecine Générale">Médecine Générale</option>
+                            <option value="Gastro-entérologie">Gastro-entérologie</option>
+                            <option value="Neurologie">Neurologie</option>
+                            <option value="Pneumologie">Pneumologie</option>
+                            <option value="Rhumatologie">Rhumatologie</option>
+                            <option value="Ophtalmologie">Ophtalmologie</option>
                         </select>
                     </div>
 
@@ -130,7 +135,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
         </form>
     </section>
 
-    <!-- Stats Section -->
+
     <section class="stats-section">
         <div class="container">
             <div class="stats-grid">
@@ -150,7 +155,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
         </div>
     </section>
 
-    <!-- How It Works Section -->
+
     <section class="steps-section">
         <div class="container">
             <h2 class="section-title">Comment ça marche</h2>
@@ -195,10 +200,10 @@ $conn=mysqli_connect("localhost","root","","curamed");
       
       <div class="carousel-track">
         <?php
-        // Connexion à la base de données
+
         
         try {
-            // Requête pour récupérer les médecins avec leurs informations
+
             $sql = "SELECT u.*, m.specialite, m.adresse_cabinet 
                     FROM utilisateur u
                     JOIN medecin m ON u.id_utilisateur = m.id_medecin
@@ -209,7 +214,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
 
                
         ?>
-                <!-- Carte Médecin Dynamique -->
+
                  <?php 
                  while(  $doctor=mysqli_fetch_assoc($res)){ ?>
                 <div class="doctor1-card">
@@ -235,7 +240,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
   </div>
 </section>
 
-    <!-- Features Section -->
+
     <section class="features-section">
         <div class="container">
             <div class="features-grid">
@@ -264,7 +269,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
         </div>
     </section>
 
-    <!-- Testimonials -->
+
     <section class="testimonials-section">
         <div class="container">
             <h2 class="section-title">Ce que disent nos patients</h2>
@@ -290,12 +295,12 @@ $conn=mysqli_connect("localhost","root","","curamed");
                     </div>
                 </div>
                 
-                <!-- More testimonials would go here -->
+
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
+
     <section class="cta-section">
         <div class="container">
             <div class="cta-content">
@@ -306,7 +311,6 @@ $conn=mysqli_connect("localhost","root","","curamed");
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
