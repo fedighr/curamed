@@ -21,7 +21,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
 
 </head>
 <body>
-    <!-- Header -->
+
     <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -35,11 +35,27 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 
                 <div class="nav-icon notifications-wrapper" title="Notifications">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">0</span>
+                    <span class="notification-badge"><?php
+                        $user_id = intval($_SESSION['user_id']);
+                        $sql = "SELECT count(*) as nb FROM notification WHERE id_utilisateur = $user_id";
+                        $res = mysqli_query($conn, $sql);
+                        $row = mysqli_fetch_assoc($res);
+                        echo($row['nb']);
+                    ?></span>
                     <div class="notifications-dropdown">
                         <div class="notification-header">
                         </div>
                         <div class="notification-list"></div>
+                        <?php
+                            $sql = "SELECT message FROM notification WHERE id_utilisateur = $user_id";
+                            $res = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($res)) {
+                                ?>
+                                <p><?php echo htmlspecialchars($row['message']); ?></p>
+                                <?php
+                            }
+                            ?>
                     </div>
                 </div>
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">

@@ -7,13 +7,13 @@ if (!$conn) {
     die("Erreur de connexion à la base de données.");
 }
 
-
 if (isset($_GET['id'])) {
     $medecin_id = intval($_GET['id']);
 } else {
     die("Aucun médecin spécifié.");
 }
 
+// Fetch doctor information
 $req_medecin = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
                 FROM utilisateur u 
                 JOIN medecin m ON u.id_utilisateur = m.id_medecin 
@@ -26,15 +26,15 @@ if ($res_medecin && mysqli_num_rows($res_medecin) > 0) {
     die("Médecin non trouvé.");
 }
 
-
+// Get ALL existing appointments (including pending ones)
 $rdv_existants = [];
-$req_rdv = "SELECT date_heure FROM rendez_vous WHERE id_medecin = $medecin_id AND statut = 'confirmé'";
+$req_rdv = "SELECT DATE_FORMAT(date_heure, '%Y-%m-%d %H:%i') as dt FROM rendez_vous WHERE id_medecin = $medecin_id";
 $res_rdv = mysqli_query($conn, $req_rdv);
 while ($row = mysqli_fetch_assoc($res_rdv)) {
-    $rdv_existants[] = $row['date_heure'];
+    $rdv_existants[] = $row['dt'];
 }
 
-
+// Handle form submission
 $erreur = $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
     if (!isset($_SESSION['user_id'])) {
@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         $patient_id = $_SESSION['user_id'];
         $date_heure = $_POST['date_heure'];
         
+        // Validate datetime
         $date_obj = new DateTime($date_heure);
         $now = new DateTime();
         
@@ -51,13 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         } elseif (in_array($date_heure, $rdv_existants)) {
             $erreur = "Ce créneau est déjà pris, veuillez en choisir un autre.";
         } else {
+            // Insert new appointment
             $insert_rdv = "INSERT INTO rendez_vous (id_patient, id_medecin, date_heure, statut) 
                           VALUES ($patient_id, $medecin_id, '$date_heure', 'en attente')";
             
             if (mysqli_query($conn, $insert_rdv)) {
                 $success = "Votre rendez-vous a été pris avec succès!";
                 
-                // Ajouter une notification
+                // Update cached appointments
+                $rdv_existants[] = $date_heure;
+                
+                // Send notification
                 $message_notif = "Nouveau RDV avec Dr. " . $medecin['nom'] . " le " . $date_obj->format('d/m/Y à H:i');
                 $insert_notif = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut) 
                                 VALUES ($patient_id, '$message_notif', NOW(), 'email', 'envoyé')";
@@ -68,6 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         }
     }
 }
+
+// Date handling
+$selectedDate = $_GET['date'] ?? date('Y-m-d');
+$dayOfWeek = date('N', strtotime($selectedDate));
+$jours = [1=>'Lundi',2=>'Mardi',3=>'Mercredi',4=>'Jeudi',5=>'Vendredi',6=>'Samedi',7=>'Dimanche'];
+
+// Get doctor's schedule
+$scheduleQuery = "SELECT * FROM calendrier_medecin 
+                 WHERE id_medecin = $medecin_id 
+                 AND jour = '".$jours[$dayOfWeek]."'";
+$scheduleResult = mysqli_query($conn, $scheduleQuery);
+$schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
 
 mysqli_close($conn);
 ?>
@@ -82,14 +99,11 @@ mysqli_close($conn);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
-    <script src="scripts/profile.js"></script>
-    <script src="scripts/home.js"></script>
-
+    <script src="./scripts/home.js"></script>
+    <script src="./scripts/profile.js"></script>
 </head>
 <body>
-    <!-- Header (inchangé) -->
-   <!-- Header -->
-   <header class="header">
+    <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
@@ -150,96 +164,122 @@ mysqli_close($conn);
         <?php endif ;?>
     </header>
 
-    <!-- Section Profil Médecin (modifiée) -->
-<section class="doctor-profile-section5">
-    <div class="doctor-container5">
-        <?php if ($erreur): ?>
-            <div class="alert alert-danger5"><?php echo $erreur; ?></div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="alert alert-success5"><?php echo $success; ?></div>
-        <?php endif; ?>
-
-        <div class="doctor-header5">
-    <div class="doctor-main-info5">
-        <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar-img5">
-        <div class="doctor-meta-info5">
-            <h1 class="doctor-full-name5"><?php echo htmlspecialchars("DR ".$medecin["nom"]." ". $medecin["prenom"]);?></h1>
-            <?php if (!empty($medecin['specialite'])): ?>
-                <p class="doctor-specialty5"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
+    <section class="doctor-profile-section5">
+        <div class="doctor-container5">
+            <?php if ($erreur): ?>
+                <div class="alert alert-danger5"><?php echo $erreur; ?></div>
             <?php endif; ?>
-        </div>
-    </div>
-            <div class="doctor-contact-box5">
-                <div class="doctor-contact-card5">
-                    <h3>Coordonnées</h3>
-                    <ul class="doctor-contact-list5">
-                        <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($medecin['adresse_cabinet']); ?></li>
-                        <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($medecin['telephone']); ?></li>
-                        <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($medecin['email']); ?></li>
-                    </ul>
+            
+            <?php if ($success): ?>
+                <div class="alert alert-success5"><?php echo $success; ?></div>
+            <?php endif; ?>
+
+            <div class="doctor-header5">
+                <div class="doctor-main-info5">
+                    <img src="<?php echo htmlspecialchars($medecin['photo_profil'] ?: 'images/default-doctor.png'); ?>" alt="Dr. <?php echo htmlspecialchars($medecin['nom']); ?>" class="doctor-avatar-img5">
+                    <div class="doctor-meta-info5">
+                        <h1 class="doctor-full-name5"><?php echo htmlspecialchars("DR ".$medecin["nom"]." ". $medecin["prenom"]);?></h1>
+                        <?php if (!empty($medecin['specialite'])): ?>
+                            <p class="doctor-specialty5"><?php echo htmlspecialchars($medecin['specialite']); ?></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="doctor-contact-box5">
+                    <div class="doctor-contact-card5">
+                        <h3>Coordonnées</h3>
+                        <ul class="doctor-contact-list5">
+                            <li><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($medecin['adresse_cabinet']); ?></li>
+                            <li><i class="fas fa-phone"></i> <?php echo htmlspecialchars($medecin['telephone']); ?></li>
+                            <li><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($medecin['email']); ?></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Prise de rendez-vous -->
-        <div class="appointment-section5">
-            <h2 class="appointment-title5">Prendre rendez-vous</h2>
-            
-            <div class="appointment-availability5">
-                <!-- Calendrier -->
-                <div class="appointment-calendar5">
-                    <div class="calendar-header5">
-                        <button class="calendar-nav5 prev5"><i class="fas fa-chevron-left"></i></button>
-                        <h3 id="calendar-current-month5">Chargement...</h3>
-                        <button class="calendar-nav5 next5"><i class="fas fa-chevron-right"></i></button>
+            <div class="appointment-section5">
+                <h2 class="appointment-title5">Prendre rendez-vous</h2>
+                
+                <div class="appointment-availability5">
+                    <div class="appointment-calendar5">
+                        <div class="calendar-header5">
+                            <input type="date" id="appointment-date" 
+                                   class="form-control"
+                                   min="<?= date('Y-m-d') ?>" 
+                                   value="<?= $selectedDate ?>"
+                                   onchange="updateTimeSlots(this.value)">
+                        </div>
                     </div>
-                    <div class="calendar-days5" id="calendar-days5">
-                        <!-- Généré par JS -->
+                    
+                    <div class="appointment-time-slots5">
+                        <h4>Créneaux disponibles</h4>
+                        <div class="time-slots-grid5" id="time-slots15">
+                        <?php 
+                            if ($schedule): 
+                                $start = strtotime($schedule['heure_debut']);
+                                $end = strtotime($schedule['heure_fin']);
+                                $pauseStart = strtotime($schedule['pause_debut']);
+                                $pauseEnd = strtotime($schedule['pause_fin']);
+                                
+                                $current = $start;
+                                $availableSlots = 0;
+                                
+                                while ($current < $end):
+                                    if ($current >= $pauseStart && $current < $pauseEnd) {
+                                        $current = strtotime('+30 minutes', $current);
+                                        continue;
+                                    }
+                                    
+                                    $time = date('H:i', $current);
+                                    $datetime = date('Y-m-d H:i', strtotime($selectedDate . ' ' . $time));
+                                    
+                                    if (!in_array($datetime, $rdv_existants)):
+                                        $availableSlots++;
+                            ?>
+                                        <div class="time-slot" 
+                                            data-time="<?= $time ?>" 
+                                            onclick="selectTime(this)">
+                                            <?= $time ?>
+                                        </div>
+                            <?php 
+                                    endif;
+                                    $current = strtotime('+30 minutes', $current);
+                                endwhile;
+                                
+                                if ($availableSlots === 0): ?>
+                                    <div class="alert alert-info">
+                                        Tous les créneaux sont réservés pour cette journée
+                                    </div>
+                            <?php 
+                                endif;
+                            else: ?>
+                                <div class="alert alert-info">
+                                    Aucun horaire disponible pour cette journée
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Créneaux horaires -->
-                <div class="appointment-time-slots5">
-                    <h4>Créneaux disponibles</h4>
-                    <div class="time-slots-grid5" id="time-slots15">
-                        <!-- Généré par JS -->
+                <form class="appointment-form5" method="POST" id="rdv-form5">
+                    <h3>Confirmation du rendez-vous</h3>
+                    <div class="form-group5">
+                        <label>Date sélectionnée :</label>
+                        <input type="text" class="form-selected-date5" 
+                               id="selected-date" value="<?= $selectedDate ?>" readonly>
                     </div>
-                </div>
+                    <div class="form-group5">
+                        <label>Heure sélectionnée :</label>
+                        <input type="text" class="form-selected-time5" 
+                               id="selected-time" readonly>
+                    </div>
+                    <input type="hidden" name="date_heure" id="date-heure5">
+                    <button type="submit" class="btn btn-primary btn-confirm-appointment5" 
+                            name="prendre_rdv">Confirmer le rendez-vous</button>
+                </form>
             </div>
-            
-            <!-- Formulaire de confirmation -->
-            <form class="appointment-form5" method="POST" id="rdv-form5">
-                <h3>Confirmation du rendez-vous</h3>
-                <div class="form-group5">
-                    <label>Date sélectionnée :</label>
-                    <input type="text" class="form-selected-date5" id="selected-date5" readonly>
-                </div>
-                <div class="form-group5">
-                    <label>Heure sélectionnée :</label>
-                    <input type="text" class="form-selected-time5" id="selected-time5" readonly>
-                </div>
-                <input type="hidden" name="date_heure" id="date-heure5">
-                <button type="submit" class="btn btn-primary btn-confirm-appointment5" name="prendre_rdv">Confirmer le rendez-vous</button>
-            </form>
         </div>
+    </section>
 
-        <!-- Informations complémentaires -->
-      
-            <div class="doctor-about5">
-                <h2>Experience</h2>
-                <p><?php echo htmlspecialchars($medecin['experience']); ?></p>
-            </div>
-            
-    
-
-        </div>
-    </div>
-</section>
-
-
-    <!-- Footer (inchangé) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
@@ -300,10 +340,22 @@ mysqli_close($conn);
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=VOTRE_CLE_API&callback=initMap" async defer></script>
-    
+    <script>
+    function updateTimeSlots(date) {
+        window.location.href = `?id=<?= $medecin_id ?>&date=${date}`;
+    }
 
-   
-  </div>
+    function selectTime(element) {
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        
+        const date = document.getElementById('selected-date').value;
+        const time = element.getAttribute('data-time');
+        document.getElementById('selected-time').value = time;
+        document.getElementById('date-heure5').value = `${date} ${time}:00`;
+    }
+    </script>
 </body>
 </html>

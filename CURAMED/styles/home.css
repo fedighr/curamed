@@ -2460,3 +2460,59 @@ a {
 #planning{
   overflow: auto;
 }
+.time-select {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  width: 100%;
+  text-align: center;
+}
+
+.time-slot-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.time-slot {
+  padding: 0.8rem;
+  border: 1px solid #00C6B4;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.time-slot.booked {
+  background-color: #f8f9fa;
+  border-color: #e0e0e0;
+  color: #6c757d;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.time-slot.booked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #6c757d;
+  transform: rotate(-15deg);
+}
+
+.time-slot.selected {
+  background-color: #00C6B4;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 198, 180, 0.2);
+}
+.no-arrow {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none !important; 
+  padding-right: 1rem;
+}

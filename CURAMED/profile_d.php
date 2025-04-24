@@ -5,7 +5,12 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$id = $_SESSION['user_id'];
+if(isset($_GET['id'])){
+    $id=$_GET['id'];
+}
+else{
+    $id=$_SESSION['user_id'];
+}
 $req = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience,m.ville
         FROM utilisateur u
         JOIN medecin m ON u.id_utilisateur = m.id_medecin
@@ -195,58 +200,97 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
 
             
             <form method="post">
-                <div class="table-responsive">
-                    <table class="table calendar-table">
-                        <thead>
-                            <tr>
-                                <th>Jour</th>
-                                <th>Off</th>
-                                <th>Début</th>
-                                <th>Pause début</th>
-                                <th>Pause fin</th>
-                                <th>Fin</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($jours as $i => $j): 
-                                $r = $template[$j] ?? [];
-                                $off = !isset($template[$j]);
-                            ?>
-                            <tr>
-                                <td class="weekday-label"><?= $j ?></td>
-                                <td class="text-center">
-                                    <input type="checkbox" 
-                                        name="off[<?= $i ?>]" 
-                                        class="off-checkbox" 
-                                        <?= $off ? 'checked' : '' ?>>
-                                </td>
-                                <td><input type="time" 
-                                        name="debut[<?= $i ?>]" 
-                                        value="<?= htmlspecialchars($r['heure_debut'] ?? '') ?>" 
-                                        class="time-input"></td>
-                                <td><input type="time" 
-                                        name="pause_debut[<?= $i ?>]" 
-                                        value="<?= htmlspecialchars($r['pause_debut'] ?? '') ?>" 
-                                        class="time-input"></td>
-                                <td><input type="time" 
-                                        name="pause_fin[<?= $i ?>]" 
-                                        value="<?= htmlspecialchars($r['pause_fin'] ?? '') ?>" 
-                                        class="time-input"></td>
-                                <td><input type="time" 
-                                        name="fin[<?= $i ?>]" 
-                                        value="<?= htmlspecialchars($r['heure_fin'] ?? '') ?>" 
-                                        class="time-input"></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-        
-        <button class="save-btn">
-            <i class="fas fa-save"></i>
-            Sauvegarder les modifications
-        </button>
-    </form>
+                    <div class="table-responsive">
+                        <table class="table calendar-table">
+                            <thead>
+                                <tr>
+                                    <th>Jour</th>
+                                    <th>Off</th>
+                                    <th>Début</th>
+                                    <th>Pause début</th>
+                                    <th>Pause fin</th>
+                                    <th>Fin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($jours as $i => $j): 
+                                    $r = $template[$j] ?? [];
+                                    $off = !isset($template[$j]);
+                                ?>
+                                <tr>
+                                    <td class="weekday-label"><?= $j ?></td>
+                                    <td class="text-center">
+                                        <input type="checkbox" 
+                                            name="off[<?= $i ?>]" 
+                                            class="off-checkbox" 
+                                            <?= $off ? 'checked' : '' ?>>
+                                    </td>
+                                    <td>
+                                        <select name="debut[<?= $i ?>]" class="form-select time-select no-arrow">
+                                            <?php 
+                                            $start_time = strtotime('08:00');
+                                            $end_time = strtotime('18:00');
+                                            while ($start_time <= $end_time) {
+                                                $time = date('H:i', $start_time);
+                                                $selected = ($time == ($r['heure_debut'] ?? '')) ? 'selected' : '';
+                                                echo "<option value='$time' $selected>$time</option>";
+                                                $start_time = strtotime('+30 minutes', $start_time);
+                                            }
+                                            ?>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="pause_debut[<?= $i ?>]" class="form-select time-select no-arrow">
+                                            <?php 
+                                            $start_time = strtotime('08:00');
+                                            $end_time = strtotime('18:00');
+                                            while ($start_time <= $end_time) {
+                                                $time = date('H:i', $start_time);
+                                                $selected = ($time == ($r['pause_debut'] ?? '')) ? 'selected' : '';
+                                                echo "<option value='$time' $selected>$time</option>";
+                                                $start_time = strtotime('+30 minutes', $start_time);
+                                            }
+                                            ?>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="pause_fin[<?= $i ?>]" class="form-select time-select no-arrow">
+                                            <?php 
+                                            $start_time = strtotime('08:00');
+                                            $end_time = strtotime('18:00');
+                                            while ($start_time <= $end_time) {
+                                                $time = date('H:i', $start_time);
+                                                $selected = ($time == ($r['pause_fin'] ?? '')) ? 'selected' : '';
+                                                echo "<option value='$time' $selected>$time</option>";
+                                                $start_time = strtotime('+30 minutes', $start_time);
+                                            }
+                                            ?>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="fin[<?= $i ?>]" class="form-select time-select no-arrow">
+                                            <?php 
+                                            $start_time = strtotime('08:00');
+                                            $end_time = strtotime('18:00');
+                                            while ($start_time <= $end_time) {
+                                                $time = date('H:i', $start_time);
+                                                $selected = ($time == ($r['heure_fin'] ?? '')) ? 'selected' : '';
+                                                echo "<option value='$time' $selected>$time</option>";
+                                                $start_time = strtotime('+30 minutes', $start_time);
+                                            }
+                                            ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="save-btn">
+                        <i class="fas fa-save"></i>
+                        Sauvegarder les modifications
+                    </button>
+                </form>
 </div>
             </div>
         </div>
