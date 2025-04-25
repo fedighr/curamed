@@ -34,30 +34,56 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 </a>
                 
                 <div class="nav-icon notifications-wrapper" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge"><?php
-                        $user_id = intval($_SESSION['user_id']);
-                        $sql = "SELECT count(*) as nb FROM notification WHERE id_utilisateur = $user_id";
-                        $res = mysqli_query($conn, $sql);
-                        $row = mysqli_fetch_assoc($res);
-                        echo($row['nb']);
-                    ?></span>
-                    <div class="notifications-dropdown">
-                        <div class="notification-header">
-                        </div>
-                        <div class="notification-list"></div>
-                        <?php
-                            $sql = "SELECT message FROM notification WHERE id_utilisateur = $user_id";
-                            $res = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($res)) {
-                                ?>
-                                <p><?php echo htmlspecialchars($row['message']); ?></p>
-                                <?php
-                            }
-                            ?>
-                    </div>
+    <i class="fas fa-bell"></i>
+    <?php
+    $conn = mysqli_connect("localhost", "root", "", "curamed");
+    $user_id = intval($_SESSION['user_id'] ?? 0);
+    
+    // Notification badge
+    $stmt = mysqli_prepare($conn, 
+        "SELECT COUNT(*) as nb FROM notification WHERE id_utilisateur = ?");
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
+    ?>
+    <span class="notification-badge"><?= htmlspecialchars($row['nb']) ?></span>
+    
+            <div class="notifications-dropdown">
+                <div class="notification-header">
+                    <h5>Notifications</h5>
                 </div>
+                <div class="notification-list">
+                    <?php
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT id_rdv, message FROM notification 
+                        WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    
+                    while ($row = mysqli_fetch_assoc($result)) :
+                    ?>
+                    <div class="notification-item">
+                        <form method="POST" action="confirmation.php">
+                            <input type="hidden" name="id_rdv" 
+                                value="<?= htmlspecialchars($row['id_rdv']) ?>">
+                            <p><?= htmlspecialchars($row['message']) ?></p>
+                            <div class="action-buttons">
+                                <button type="submit" name="accepter" 
+                                        class="icon-btn fas fa-check text-success" 
+                                        title="Accepter"></button>
+                                <button type="submit" name="refuser" 
+                                        class="icon-btn fas fa-times text-danger" 
+                                        title="Refuser"></button>
+                            </div>
+                        </form>
+                    </div>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+        </div>
+        <?php mysqli_close($conn); ?>
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
