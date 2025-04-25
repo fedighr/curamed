@@ -11,12 +11,13 @@ $conn = mysqli_connect("localhost", "root", "", "curamed");
 if (!$conn) {
     die("Erreur de connexion à la base de données.");
 }
-
+$_SESSION['id_medecin'] = '';
 if (isset($_GET['id'])) {
     $medecin_id = intval($_GET['id']);
 } else {
     die("Aucun médecin spécifié.");
 }
+
 
 
 $req_medecin = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
@@ -29,6 +30,11 @@ if ($res_medecin && mysqli_num_rows($res_medecin) > 0) {
     $medecin = mysqli_fetch_assoc($res_medecin);
 } else {
     die("Médecin non trouvé.");
+}
+function isTimeInPast($date, $time) {
+    $currentDateTime = new DateTime();
+    $slotDateTime = new DateTime($date . ' ' . $time);
+    return $slotDateTime < $currentDateTime;
 }
 
 $rdv_existants = [];
@@ -50,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         
         $date_obj = new DateTime($date_heure);
         $now = new DateTime();
+        if (!$schedule) {
+            $erreur = "Ce médecin n'a pas défini ses horaires de disponibilité.";}
         
         if ($date_obj < $now) {
             $erreur = "Vous ne pouvez pas prendre de rendez-vous dans le passé.";
@@ -98,7 +106,7 @@ $scheduleQuery = "SELECT * FROM calendrier_medecin
 $scheduleResult = mysqli_query($conn, $scheduleQuery);
 $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
 
-mysqli_close($conn);
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -211,16 +219,16 @@ mysqli_close($conn);
                 <h2 class="appointment-title5">Prendre rendez-vous</h2>
                 
                 <div class="appointment-availability5">
-                    <div class="appointment-calendar5">
-                        <div class="calendar-header5">
-                            <input type="date" id="appointment-date" 
-                                   class="form-control"
-                                   min="<?= date('Y-m-d') ?>" 
-                                   value="<?= $selectedDate ?>"
-                                   onchange="updateTimeSlots(this.value)">
-                        </div>
+                <div class="appointment-calendar5">
+                    <div class="calendar-header5">
+                        <input type="date" id="appointment-date" 
+                            class="form-control"
+                            min="<?= date('Y-m-d') ?>" 
+                            value="<?= $selectedDate ?>"
+                            onchange="updateTimeSlots(this.value)">
                     </div>
-                    
+                </div>
+                                    
                     <div class="appointment-time-slots5">
                         <h4>Créneaux disponibles</h4>
                         <div class="time-slots-grid5" id="time-slots15">
@@ -243,6 +251,12 @@ mysqli_close($conn);
                                     $time = date('H:i', $current);
                                     $datetime = date('Y-m-d H:i', strtotime($selectedDate . ' ' . $time));
                                     
+                                    // Skip if time is in the past for today
+                                    if ($selectedDate == date('Y-m-d') && isTimeInPast($selectedDate, $time)) {
+                                        $current = strtotime('+30 minutes', $current);
+                                        continue;
+                                    }
+                                    
                                     if (!in_array($datetime, $rdv_existants)):
                                         $availableSlots++;
                             ?>
@@ -258,7 +272,9 @@ mysqli_close($conn);
                                 
                                 if ($availableSlots === 0): ?>
                                     <div class="alert alert-info">
-                                        Tous les créneaux sont réservés pour cette journée
+                                        <?= ($selectedDate == date('Y-m-d')) ? 
+                                            "Tous les créneaux disponibles pour aujourd'hui sont passés ou réservés" : 
+                                            "Tous les créneaux sont réservés pour cette journée" ?>
                                     </div>
                             <?php 
                                 endif;
@@ -370,3 +386,4 @@ mysqli_close($conn);
     </script>
 </body>
 </html>
+<?php mysqli_close($conn);?>

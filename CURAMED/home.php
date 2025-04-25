@@ -34,20 +34,19 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 </a>
                 
                 <div class="nav-icon notifications-wrapper" title="Notifications">
-    <i class="fas fa-bell"></i>
-    <?php
-    $conn = mysqli_connect("localhost", "root", "", "curamed");
-    $user_id = intval($_SESSION['user_id'] ?? 0);
-    
-    // Notification badge
-    $stmt = mysqli_prepare($conn, 
-        "SELECT COUNT(*) as nb FROM notification WHERE id_utilisateur = ?");
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $row = mysqli_fetch_assoc($result);
-    ?>
-    <span class="notification-badge"><?= htmlspecialchars($row['nb']) ?></span>
+                    <i class="fas fa-bell"></i>
+                    <?php
+                    $conn = mysqli_connect("localhost", "root", "", "curamed");
+                    $user_id = intval($_SESSION['user_id'] ?? 0);
+                    
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT COUNT(*) as nb FROM notification WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    $row = mysqli_fetch_assoc($result);
+                    ?>
+                    <span class="notification-badge"><?= htmlspecialchars($row['nb']) ?></span>
     
             <div class="notifications-dropdown">
                 <div class="notification-header">
@@ -83,7 +82,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 </div>
             </div>
         </div>
-        <?php mysqli_close($conn); ?>
+
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
@@ -260,7 +259,6 @@ $conn=mysqli_connect("localhost","root","","curamed");
 
                
         ?>
-
                  <?php 
                  while(  $doctor=mysqli_fetch_assoc($res)){ ?>
                 <div class="doctor1-card">
@@ -420,3 +418,4 @@ $conn=mysqli_connect("localhost","root","","curamed");
 
 </body>
 </html>
+<?php mysqli_close($conn); ?>
