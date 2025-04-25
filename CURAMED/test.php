@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 $conn = new mysqli("localhost", "root", "", "curamed");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -67,11 +67,103 @@ if (!empty($symptomCounts)) {
 
 <!DOCTYPE html>
 <html>
+<html lang="fr">
 <head>
-    <title>Symptom Checker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuraMed</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/home.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
+    <script src="./scripts/test.js"></script>
+    <script src="./scripts/home.js"></script>
+
 </head>
 <body>
-    <h1>Symptom Questions</h1>
+     <header class="header">
+        <nav class="nav-container container">
+            <a href="home.php" class="logo-link">
+                <img src="images/logo.png" alt="CuraMed" class="logo-img">
+            </a>
+            <div class="nav-links">
+                <?php if(isset($_SESSION['user_id'])) :?>
+                <a href="search.php" class="nav-icon" title="Médecins">
+                    <i class="fas fa-user-md"></i>
+                </a>
+                
+                <div class="nav-icon notifications-wrapper" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"><?php
+                        $user_id = intval($_SESSION['user_id']);
+                        $sql = "SELECT count(*) as nb FROM notification WHERE id_utilisateur = $user_id";
+                        $res = mysqli_query($conn, $sql);
+                        $row = mysqli_fetch_assoc($res);
+                        echo($row['nb']);
+                    ?></span>
+                    <div class="notifications-dropdown">
+                        <div class="notification-header">
+                        </div>
+                        <div class="notification-list"></div>
+                        <?php
+                            $sql = "SELECT message FROM notification WHERE id_utilisateur = $user_id";
+                            $res = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($res)) {
+                                ?>
+                                <p><?php echo htmlspecialchars($row['message']); ?></p>
+                                <?php
+                            }
+                            ?>
+                    </div>
+                </div>
+                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                    <i class="fas fa-calendar-alt"></i>
+                </a>
+                
+                <div class="profile-dropdown">
+                    <img src="<?php echo ($_SESSION['photo']); ?>" class="profile-image" alt="">
+                    <div class="dropdown-menu">
+                        <?php if(isset($_SESSION['type']) && $_SESSION['type'] =='patient') : ?>
+                            <a href="profile_p.php" class="dropdown-item">
+                        <?php else :?>
+                            <a href="profile_d.php" class="dropdown-item">
+                        <?php endif;?>
+                            <i class="fas fa-user"></i> Mon profil
+                        </a>
+                        <a href="settings.php" class="dropdown-item">
+                            <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                        <?php
+                         if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+                            <a href="dashboard.php" class="dropdown-item">
+                                <i class="fas fa-th-large"></i> Tableau de bord
+                            </a>
+                        <?php endif; ?>
+                        <a href="logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </a>
+                    </div>
+                </div>
+                <button class="mobile-menu-btn d-lg-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <?php else : ?>
+                <div class="container mt-5 text-center">
+                    <a href="login.html" class="btn btn-custom mx-2">Connexion</a>
+                    <a href="signup.html" class="btn btn-custom mx-2">S'inscrire</a>
+                </div>
+            </div>
+        </nav>
+        <?php endif ;?>
+    </header>
+    <section class="hero3"><h1>hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh</h1></section>
+  <section class="hero2">
+    <h1>Symptomes Questions</h1>
 
     <?php if ($showResults || empty($diseases)): ?>
         <?php if (!empty($results)): ?>
@@ -88,9 +180,9 @@ if (!empty($symptomCounts)) {
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p>Vous ette en bon santé rabbi yberek</p>
+            <p>Vous étes en bonne santé rabbi yberek</p>
         <?php endif; ?>
-        <a href="test.php">Start Over</a>
+        <a href="test.php">Recommencer</a>
 
     <?php elseif ($nextSymptom): ?>
         <?php
@@ -105,26 +197,88 @@ if (!empty($symptomCounts)) {
             <input type="hidden" name="diseases" value="<?= htmlspecialchars(json_encode($diseases)) ?>">
             <input type="hidden" name="asked" value="<?= htmlspecialchars(json_encode($asked)) ?>">
             
-            <button type="submit" name="answer" value="yes">Yes</button>
-            <button type="submit" name="answer" value="no">No</button>
+            <button type="submit" name="answer" value="yes">Oui</button>
+            <button type="submit" name="answer" value="no">Non</button>
         </form>
-        <p>Remaining possible diseases: <?= count($diseases)?></p>
+        
 
     <?php else: ?>
         <ul>
             <?php foreach ($diseases as $disease): ?>
-                <li>Disease ID: <?php $res=mysqli_query($conn,"SELECT nom,specialite from maladies where id_maladie=".$disease['id']);
+                <li>Votre maladie peut étre <?php $res=mysqli_query($conn,"SELECT nom,specialite from maladies where id_maladie=".$disease['id']);
                         $row=mysqli_fetch_assoc($res);
-                        echo $disease['id'];
+                        
                         echo"  ";
                         echo $row['nom'];
-                        echo"  ";
-                        echo $row['specialite'];?></li>
+                        echo"  Donc vas visiter un ";
+                        echo $row['specialite'];  echo "."?></li>
             <?php endforeach; ?>
         </ul>
-        <a href="test.php">Start Over</a>
+        
+        <button onclick="window.location.href='seach.php'">Médecins</button>
+        <a href="test.php">Recommencer</a>
     <?php endif; ?>
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
+                    <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Patients</h4>
+                    <ul>
+                        <li><a href="#">Trouver un médecin</a></li>
+                        <li><a href="#">Consultation en ligne</a></li>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Professionnels</h4>
+                    <ul>
+                        <li><a href="#">Solutions pour médecins</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Témoignages</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Entreprise</h4>
+                    <ul>
+                        <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Cookies</a>
+                </div>
+                <div class="copyright">
+                    © 2025 CuraMed. Tous droits réservés.
+                </div>
+            </div>
+        </div>
+    </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 <?php $conn->close(); ?>

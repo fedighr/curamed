@@ -135,13 +135,14 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             Rechercher
                         </button>
                     </div>
-                        
+                  
                         <div class="popular-searches">
                             <span>Recherches populaires :</span>
                             <a href="#">Médecin généraliste</a>
                             <a href="#">Dermatologue</a>
                             <a href="#">Pédiatre</a>
                         </div>
+                        
                     </div>
                     <div class="hero-image">
                         <img src="images\im2.png" alt="Docteur en consultation" class="img-fluid">
@@ -149,6 +150,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 </div>
             </div>
         </form>
+        <li>Esseyer notre nouveau modéle Ai pour assurer votre chemin vers le bon médecin :  </li>
+        <button class="btn3" onclick="window.location.href='test.php'">Click ici</button>
+        
     </section>
 
 

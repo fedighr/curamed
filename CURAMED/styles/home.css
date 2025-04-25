@@ -67,6 +67,7 @@ body {
   line-height: 1.6;
   background-color: var(--light-color);
   overflow-x: hidden;
+ 
 }
 
 .container {
@@ -345,6 +346,29 @@ a {
   margin-bottom: 1.5rem;
   color: var(--secondary-color);
   line-height: 1.2;
+}
+.hero {
+  text-align: center; /* Centre le contenu horizontalement */
+  padding: 2rem; /* Optionnel, pour l'espace autour */
+}
+
+.hero .btn3 {
+  padding: 0.8rem 2.5rem;
+  border: none;
+  border-radius: 50px; /* Plus doux et élégant */
+  font-weight: 600;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  min-width: 140px;
+  background: var(--primary-color);
+  color: var(--white);
+  display: inline-block; /* Permet le centrage */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Effet de profondeur */
+}
+
+.hero .btn3:hover {
+  background: var(--primary-color-dark); /* À définir dans tes variables */
+  transform: translateY(-2px);
 }
 
 .hero-subtitle {
@@ -2515,4 +2539,160 @@ a {
   -moz-appearance: none;
   background-image: none !important; 
   padding-right: 1rem;
+}
+/* Hero2 - Symptom Checker */
+.hero2 {
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  
+}
+
+.hero2 h1 {
+  color: var(--secondary-color);
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.hero2 h1::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--primary-color);
+}
+
+/* Results Section */
+.hero2 ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero2 li {
+  background: var(--light-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+  transition: var(--transition);
+}
+
+.hero2 li:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Question Form */
+.hero2 form {
+  background: var(--light-color);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin: 3rem auto; /* Centrage horizontal */
+    max-width: 600px; /* Largeur maximale pour le formulaire */
+    text-align: center; /* Centrage du contenu */
+}
+
+.hero2 h3 {
+  color: var(--secondary-color);
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Answer Buttons */
+.hero2 button {
+  padding: 0.8rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: var(--transition);
+  cursor: pointer;
+  min-width: 120px; /* Largeur minimale */
+}
+
+.hero2 button[value="yes"] {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.hero2 button[value="no"] {
+  background: var(--light-gray);
+  color: var(--secondary-color);
+}
+
+.hero2 button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Progress Text */
+.hero2 p {
+  text-align: center;
+  color: var(--gray-color);
+  margin-top: 1.5rem;
+}
+
+/* Start Over Link */
+.hero2 a {
+  display: inline-block;
+  margin: 2rem auto 0;
+  padding: 0.8rem 2rem;
+  background: var(--light-color);
+  color: var(--dark-color);
+  border-radius: 50px;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.hero2 a:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+.hero2 button {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+
+/* Health Message */
+.hero2 > p {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+  background: rgba(0, 198, 180, 0.1);
+  border-radius: var(--border-radius);
+  color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero2 {
+      margin: 2rem auto;
+      padding: 1.5rem;
+  }
+  
+  .hero2 h1 {
+      font-size: 2rem;
+  }
+  
+  .hero2 button {
+      width: 100%;
+      margin: 0.5rem 0;
+  }
+  
+  .hero2 form {
+      padding: 1.5rem;
+  }
 }
