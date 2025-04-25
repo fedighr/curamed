@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+require 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $conn = mysqli_connect("localhost", "root", "", "curamed");
 
 if (!$conn) {
@@ -13,7 +18,7 @@ if (isset($_GET['id'])) {
     die("Aucun médecin spécifié.");
 }
 
-// Fetch doctor information
+
 $req_medecin = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience 
                 FROM utilisateur u 
                 JOIN medecin m ON u.id_utilisateur = m.id_medecin 
@@ -26,16 +31,16 @@ if ($res_medecin && mysqli_num_rows($res_medecin) > 0) {
     die("Médecin non trouvé.");
 }
 
-// Get ALL existing appointments (including pending ones)
 $rdv_existants = [];
 $req_rdv = "SELECT DATE_FORMAT(date_heure, '%Y-%m-%d %H:%i') as dt FROM rendez_vous WHERE id_medecin = $medecin_id";
 $res_rdv = mysqli_query($conn, $req_rdv);
 while ($row = mysqli_fetch_assoc($res_rdv)) {
     $rdv_existants[] = $row['dt'];
 }
-
-// Handle form submission
-$erreur = $success = '';
+if(!isset($_SESSION['messagee'])){
+    $_SESSION['messagee'] = '';
+}
+$message = $_SESSION['messagee'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
     if (!isset($_SESSION['user_id'])) {
         $erreur = "Vous devez être connecté pour prendre un rendez-vous.";
@@ -43,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         $patient_id = $_SESSION['user_id'];
         $date_heure = $_POST['date_heure'];
         
-        // Validate datetime
         $date_obj = new DateTime($date_heure);
         $now = new DateTime();
         
@@ -52,34 +56,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prendre_rdv'])) {
         } elseif (in_array($date_heure, $rdv_existants)) {
             $erreur = "Ce créneau est déjà pris, veuillez en choisir un autre.";
         } else {
-            // Insert new appointment
-            $insert_rdv = "INSERT INTO rendez_vous (id_patient, id_medecin, date_heure, statut) 
-                          VALUES ($patient_id, $medecin_id, '$date_heure', 'en attente')";
-            
-            if (mysqli_query($conn, $insert_rdv)) {
-                $success = "Votre rendez-vous a été pris avec succès!";
+
+            $verification_code = rand(1000, 9999);
+            $_SESSION['verification_code'] = $verification_code;
+            $_SESSION['id_medecin'] = $medecin_id;
+            $_SESSION['date'] = $date_heure ;
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'topfadighribi11@gmail.com';
+                $mail->Password   = 'skbqackvjratqaxn';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
                 
-                // Update cached appointments
-                $rdv_existants[] = $date_heure;
-                
-                // Send notification
-                $message_notif = "Nouveau RDV avec Dr. " . $medecin['nom'] . " le " . $date_obj->format('d/m/Y à H:i');
-                $insert_notif = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut) 
-                                VALUES ($patient_id, '$message_notif', NOW(), 'email', 'envoyé')";
-                mysqli_query($conn, $insert_notif);
-            } else {
-                $erreur = "Erreur lors de la prise de rendez-vous: " . mysqli_error($conn);
+                $mail->setFrom('topfadighribi11@gmail.com', 'Curamed');
+                $mail->addAddress($_SESSION['user_email'], $_SESSION['prenom'] . ' ' . $_SESSION['nom']);
+                $mail->isHTML(true);
+                $mail->Subject = 'Votre code de confirmation';
+                $mail->Body    = 'Votre code de confirmation est : <b>' . $verification_code . '</b>';
+                $mail->send();
+
+
+                header("Location: Paiement.php");
+                exit();
+            } catch (Exception $e) {
+                die("L'email n'a pas pu être envoyé. Erreur: " . $mail->ErrorInfo);
             }
         }
     }
 }
 
-// Date handling
 $selectedDate = $_GET['date'] ?? date('Y-m-d');
 $dayOfWeek = date('N', strtotime($selectedDate));
 $jours = [1=>'Lundi',2=>'Mardi',3=>'Mercredi',4=>'Jeudi',5=>'Vendredi',6=>'Samedi',7=>'Dimanche'];
 
-// Get doctor's schedule
 $scheduleQuery = "SELECT * FROM calendrier_medecin 
                  WHERE id_medecin = $medecin_id 
                  AND jour = '".$jours[$dayOfWeek]."'";
@@ -165,13 +177,12 @@ mysqli_close($conn);
     </header>
 
     <section class="doctor-profile-section5">
-        <div class="doctor-container5">
-            <?php if ($erreur): ?>
-                <div class="alert alert-danger5"><?php echo $erreur; ?></div>
-            <?php endif; ?>
-            
-            <?php if ($success): ?>
-                <div class="alert alert-success5"><?php echo $success; ?></div>
+        <div class="doctor-container5">        
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <?= $_SESSION['messagee']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             <?php endif; ?>
 
             <div class="doctor-header5">

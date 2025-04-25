@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = mysqli_real_escape_string($conn, $_POST["email"]);
     $password = mysqli_real_escape_string($conn, $_POST["mdp"]);
 
-    $sql = "SELECT id_utilisateur,email,mot_de_passe,photo_profil,role,type_utilisateur FROM utilisateur WHERE email = ?";
+    $sql = "SELECT id_utilisateur,nom,prenom,email,mot_de_passe,photo_profil,role,type_utilisateur FROM utilisateur WHERE email = ?";
     $stmt = mysqli_prepare($conn, $sql);
 
     if ($stmt === false) {
@@ -37,6 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['photo'] = $user['photo_profil'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['type'] = $user['type_utilisateur'];
+            $_SESSION['nom'] = $user['nom'];
+            $_SESSION['prenom'] = $user['prenom'];
 
 
             echo json_encode(['success' => true]);
