@@ -18,6 +18,19 @@ $req = "SELECT u.*, m.specialite, m.adresse_cabinet, m.experience,m.ville
 $res = mysqli_query($conn, $req);
 $doctorInfo = mysqli_fetch_assoc($res);
 
+function timeOptions($selected = '') {
+    $start = strtotime('08:00');
+    $end = strtotime('18:00');
+    $selected = substr($selected, 0, 5);
+    while($start <= $end) {
+        $time = date('H:i', $start);
+        $sel = ($time === $selected) ? 'selected' : '';
+        echo "<option value='$time' $sel>$time</option>";
+        $start = strtotime('+30 minutes', $start);
+    }
+}
+
+
 
 $jours = [1=>'Lundi',2=>'Mardi',3=>'Mercredi',4=>'Jeudi',5=>'Vendredi',6=>'Samedi',7=>'Dimanche'];
 $message = '';
@@ -44,11 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $template = [];
-$res_tpl = mysqli_query($conn, "SELECT jour,heure_debut,pause_debut,pause_fin,heure_fin
+$res_tpl = mysqli_query($conn, "SELECT jour, heure_debut, pause_debut, pause_fin, heure_fin 
     FROM calendrier_medecin WHERE id_medecin = $id");
 while ($r = mysqli_fetch_assoc($res_tpl)) {
     $template[$r['jour']] = $r;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -62,6 +76,7 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
     <link rel="stylesheet" href="styles/home.css">
     <link rel="icon" type="image/png" sizes="32x32" href="images/logo.png">
     <script src="./scripts/home.js"></script>
+    <script src="./scripts/profile_d.js"></script>
 </head>
 <body>
 
@@ -78,13 +93,63 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
                 
                 <div class="nav-icon notifications-wrapper" title="Notifications">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">0</span>
-                    <div class="notifications-dropdown">
-                        <div class="notification-header">
-                        </div>
-                        <div class="notification-list"></div>
-                    </div>
+                    <?php
+                    $conn = mysqli_connect("localhost", "root", "", "curamed");
+                    $user_id = intval($_SESSION['user_id'] ?? 0);
+                    
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT COUNT(*) as nb FROM notification WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    $row = mysqli_fetch_assoc($result);
+                    ?>
+                    <span class="notification-badge"><?= htmlspecialchars($row['nb']) ?></span>
+    
+            <div class="notifications-dropdown">
+                <div class="notification-header">
+                    <h5>Notifications</h5>
                 </div>
+                <div class="notification-list">
+                    <?php
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT id_rdv,id_notification, message FROM notification 
+                        WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    
+                    while ($row = mysqli_fetch_assoc($result)) :
+                    ?>
+                    <div class="notification-item">
+                        <form method="POST" action="confirmation.php">
+                            <input type="hidden" name="notification_id" 
+                                value="<?= htmlspecialchars($row['id_notification']) ?>">
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
+                            <button type="submit" 
+                                    name="dismiss_notification" 
+                                    class="notification-close-btn" 
+                                    title="Fermer la notification">&times;</button>
+                            
+                            <?php endif; ?>
+                            <p><?= htmlspecialchars($row['message']) ?></p>
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
+                            <div class="action-buttons">
+                                <button type="submit" name="accepter" 
+                                        class="icon-btn fas fa-check text-success" 
+                                        title="Accepter"></button>
+                                <button type="submit" name="refuser" 
+                                        class="icon-btn fas fa-times text-danger" 
+                                        title="Refuser"></button>
+                            </div>
+                            <?php endif; ?>
+                        </form>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+        </div>
+
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
@@ -152,7 +217,7 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
         <!-- Left Column -->
         <div class="row g-4">
             <div class="col-lg-8">
-                <form id="profileForm" action="ton_traitement.php" method="POST">
+                <form id="profileForm" method="POST" onsubmit="return false">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Informations personnelles</h3>
@@ -176,8 +241,14 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
                                     <input type="text" class="form-control" name="genre" value="<?= $doctorInfo['genre'] ?>" disabled>
                                 </div>
                                 <div class="col-12 text-end">
-                                    <button type="button" id="editBtn" class="btn btn-primary">
+                                <button type="button" id="editBtn" class="btn btn-primary">
                                     <i class="fas fa-edit me-2"></i>Modifier
+                                </button>
+                                </div>
+                                <div class="col-12 text-end mt-3">
+                                    <button type="submit" name="delete_account" class="btn btn-danger" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible!');">
+                                        <i class="fas fa-trash me-2"></i>Supprimer le compte
                                     </button>
                                 </div>
                             </div>
@@ -195,97 +266,71 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
                 <div class="alert alert-success d-flex align-items-center gap-2">
                     <i class="fas fa-check-circle"></i>
                     <?= htmlspecialchars($message) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
 
             
             <form method="post">
-                    <div class="table-responsive">
-                        <table class="table calendar-table">
-                            <thead>
-                                <tr>
-                                    <th>Jour</th>
-                                    <th>Off</th>
-                                    <th>Début</th>
-                                    <th>Pause début</th>
-                                    <th>Pause fin</th>
-                                    <th>Fin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($jours as $i => $j): 
-                                    $r = $template[$j] ?? [];
-                                    $off = !isset($template[$j]);
-                                ?>
-                                <tr>
-                                    <td class="weekday-label"><?= $j ?></td>
-                                    <td class="text-center">
-                                        <input type="checkbox" 
-                                            name="off[<?= $i ?>]" 
-                                            class="off-checkbox" 
-                                            <?= $off ? 'checked' : '' ?>>
-                                    </td>
-                                    <td>
-                                        <select name="debut[<?= $i ?>]" class="form-select time-select no-arrow">
-                                            <?php 
-                                            $start_time = strtotime('08:00');
-                                            $end_time = strtotime('18:00');
-                                            while ($start_time <= $end_time) {
-                                                $time = date('H:i', $start_time);
-                                                $selected = ($time == ($r['heure_debut'] ?? '')) ? 'selected' : '';
-                                                echo "<option value='$time' $selected>$time</option>";
-                                                $start_time = strtotime('+30 minutes', $start_time);
-                                            }
-                                            ?>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="pause_debut[<?= $i ?>]" class="form-select time-select no-arrow">
-                                            <?php 
-                                            $start_time = strtotime('08:00');
-                                            $end_time = strtotime('18:00');
-                                            while ($start_time <= $end_time) {
-                                                $time = date('H:i', $start_time);
-                                                $selected = ($time == ($r['pause_debut'] ?? '')) ? 'selected' : '';
-                                                echo "<option value='$time' $selected>$time</option>";
-                                                $start_time = strtotime('+30 minutes', $start_time);
-                                            }
-                                            ?>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="pause_fin[<?= $i ?>]" class="form-select time-select no-arrow">
-                                            <?php 
-                                            $start_time = strtotime('08:00');
-                                            $end_time = strtotime('18:00');
-                                            while ($start_time <= $end_time) {
-                                                $time = date('H:i', $start_time);
-                                                $selected = ($time == ($r['pause_fin'] ?? '')) ? 'selected' : '';
-                                                echo "<option value='$time' $selected>$time</option>";
-                                                $start_time = strtotime('+30 minutes', $start_time);
-                                            }
-                                            ?>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="fin[<?= $i ?>]" class="form-select time-select no-arrow">
-                                            <?php 
-                                            $start_time = strtotime('08:00');
-                                            $end_time = strtotime('18:00');
-                                            while ($start_time <= $end_time) {
-                                                $time = date('H:i', $start_time);
-                                                $selected = ($time == ($r['heure_fin'] ?? '')) ? 'selected' : '';
-                                                echo "<option value='$time' $selected>$time</option>";
-                                                $start_time = strtotime('+30 minutes', $start_time);
-                                            }
-                                            ?>
-                                        </select>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="table-responsive">
+                <table class="table calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Jour</th>
+                            <th>Off</th>
+                            <th>Début</th>
+                            <th>Pause début</th>
+                            <th>Pause fin</th>
+                            <th>Fin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($jours as $i => $j): 
+                            $dayData = $template[$j] ?? [];
+                            $isOff = !isset($template[$j]);
+                        ?>
+                        <tr data-day="<?= $i ?>">
+                            <td class="weekday-label"><?= $j ?></td>
+                            
+                            <td class="text-center">
+                                <input type="checkbox" 
+                                    name="off[<?= $i ?>]" 
+                                    class="off-checkbox" 
+                                    <?= $isOff ? 'checked' : '' ?>>
+                            </td>
+                            
+                            <td>
+                                <select name="debut[<?= $i ?>]" class="form-select time-select no-arrow">
+                                    <option value="">--</option>
+                                    <?php timeOptions($dayData['heure_debut'] ?? ''); ?>
+                                </select>
+                            </td>
+                            
+                            <td>
+                                <select name="pause_debut[<?= $i ?>]" class="form-select time-select no-arrow">
+                                    <option value="">--</option>
+                                    <?php timeOptions($dayData['pause_debut'] ?? ''); ?>
+                                </select>
+                            </td>
+                            
+                            <td>
+                                <select name="pause_fin[<?= $i ?>]" class="form-select time-select no-arrow">
+                                    <option value="">--</option>
+                                    <?php timeOptions($dayData['pause_fin'] ?? ''); ?>
+                                </select>
+                            </td>
+                            
+                            <td>
+                                <select name="fin[<?= $i ?>]" class="form-select time-select no-arrow">
+                                    <option value="">--</option>
+                                    <?php timeOptions($dayData['heure_fin'] ?? ''); ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
                     <button class="save-btn">
                         <i class="fas fa-save"></i>
                         Sauvegarder les modifications

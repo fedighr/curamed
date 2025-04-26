@@ -44,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_query($conn, $notification_p);
 
             $message = "Rendez-vous à " . date('d/m/Y H:i', strtotime($_SESSION['date']));
-            $notification_m = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut)
-                                   VALUES ({$_SESSION['id_medecin']}, '$message', NOW(), 'email', 'envoyé')";
+            $notification_m = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut,id_patient)
+                                   VALUES ({$_SESSION['id_medecin']}, '$message', NOW(), 'email', 'envoyé',{$_SESSION['user_id']})";
             mysqli_query($conn, $notification_m);
             
             mysqli_commit($conn);
@@ -245,7 +245,7 @@ mysqli_close($conn);
             <form method="post">
                 <h2 class="text-center mb-4">Vérification de l'e-mail</h2>
                 <div class="form-group">
-                    <label>Code de vérification</label>
+                    <label>Code de Confirmation</label>
                     <div class="input-icon">
                         <input type="text" name="verification_code" class="form-control" placeholder="XXXX" required>
                     </div>

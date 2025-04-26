@@ -85,7 +85,7 @@ if (!empty($symptomCounts)) {
 
 </head>
 <body>
-     <header class="header">
+<header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
                 <img src="images/logo.png" alt="CuraMed" class="logo-img">
@@ -98,29 +98,63 @@ if (!empty($symptomCounts)) {
                 
                 <div class="nav-icon notifications-wrapper" title="Notifications">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge"><?php
-                        $user_id = intval($_SESSION['user_id']);
-                        $sql = "SELECT count(*) as nb FROM notification WHERE id_utilisateur = $user_id";
-                        $res = mysqli_query($conn, $sql);
-                        $row = mysqli_fetch_assoc($res);
-                        echo($row['nb']);
-                    ?></span>
-                    <div class="notifications-dropdown">
-                        <div class="notification-header">
-                        </div>
-                        <div class="notification-list"></div>
-                        <?php
-                            $sql = "SELECT message FROM notification WHERE id_utilisateur = $user_id";
-                            $res = mysqli_query($conn, $sql);
-
-                            while ($row = mysqli_fetch_assoc($res)) {
-                                ?>
-                                <p><?php echo htmlspecialchars($row['message']); ?></p>
-                                <?php
-                            }
-                            ?>
-                    </div>
+                    <?php
+                    $conn = mysqli_connect("localhost", "root", "", "curamed");
+                    $user_id = intval($_SESSION['user_id'] ?? 0);
+                    
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT COUNT(*) as nb FROM notification WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    $row = mysqli_fetch_assoc($result);
+                    ?>
+                    <span class="notification-badge"><?= htmlspecialchars($row['nb']) ?></span>
+    
+            <div class="notifications-dropdown">
+                <div class="notification-header">
+                    <h5>Notifications</h5>
                 </div>
+                <div class="notification-list">
+                    <?php
+                    $stmt = mysqli_prepare($conn, 
+                        "SELECT id_rdv,id_notification, message FROM notification 
+                        WHERE id_utilisateur = ?");
+                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    
+                    while ($row = mysqli_fetch_assoc($result)) :
+                    ?>
+                    <div class="notification-item">
+                        <form method="POST" action="handle_notifications.php">
+                            <input type="hidden" name="notification_id" 
+                                value="<?= htmlspecialchars($row['id_notification']) ?>">
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
+                            <button type="submit" 
+                                    name="dismiss_notification" 
+                                    class="notification-close-btn" 
+                                    title="Fermer la notification">&times;</button>
+                            
+                            <?php endif; ?>
+                            <p><?= htmlspecialchars($row['message']) ?></p>
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
+                            <div class="action-buttons">
+                                <button type="submit" name="accepter" 
+                                        class="icon-btn fas fa-check text-success" 
+                                        title="Accepter"></button>
+                                <button type="submit" name="refuser" 
+                                        class="icon-btn fas fa-times text-danger" 
+                                        title="Refuser"></button>
+                            </div>
+                            <?php endif; ?>
+                        </form>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+        </div>
+
                 <a href="appointments.html" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>

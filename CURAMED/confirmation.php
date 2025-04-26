@@ -1,128 +1,264 @@
 <?php
+require_once __DIR__ . '/vendor/autoload.php';
 session_start();
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = mysqli_connect("localhost", "root", "", "curamed");
-    
+
     if (!$conn) {
-        $_SESSION['error'] = "Connection failed: " . mysqli_connect_error();
-        header("Location: home.php");
-        exit();
+        die("Connection failed: " . mysqli_connect_error());
     }
+    $sql = "SELECT id_patient from notification where id_utilisateur=".$_SESSION['user_id'];
+    $res=mysqli_query($conn,$sql);
+    $row=mysqli_fetch_assoc($res);
+    if(isset($_POST['accepter'])){
+        $req="UPDATE rendez_vous set statut='confirmé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id'];
+        $res=mysqli_query($conn,$req);
+        $req="SELECT id_rdv from rendez_vous where id_patient=".$row['id_patient']." and id_medecin= ".$_SESSION['user_id'];
+        $res=mysqli_query($conn,$req);
+        $row2=mysqli_fetch_assoc($res);
+        $req="UPDATE paiement set statut = 'payé' where id_patient=" .$row['id_patient']." and id_rdv=".$row2['id_rdv'];
+        if(mysqli_query($conn,$req)){
+            $nom_doctor=$_SESSION['prenom']." ".$_SESSION['nom'];
+            $message = "rendez vous accepter avec docteur " . $nom_doctor;
+            $req = "UPDATE notification SET message = '$message' WHERE id_utilisateur = " . $row['id_patient'];
 
-    mysqli_begin_transaction($conn);
-
-    try {
-        // Validate inputs
-        if (!isset($_POST['id_rdv']) || !is_numeric($_POST['id_rdv'])) {
-            throw new Exception("Invalid appointment ID");
-        }
-
-        $id_rdv = intval($_POST['id_rdv']);
-        $doctor_id = intval($_SESSION['user_id']);
-
-        // Verify the appointment exists and get patient ID
-        $stmt = mysqli_prepare($conn, 
-            "SELECT id_patient, id_medecin, date_heure 
-            FROM rendez_vous 
-            WHERE id_rdv = ?");
-        mysqli_stmt_bind_param($stmt, "i", $id_rdv);
-        mysqli_stmt_execute($stmt);
-        $rdv = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-
-        if (!$rdv) {
-            throw new Exception("Appointment not found");
-        }
-
-        // Verify the logged-in doctor owns this appointment
-        if ($rdv['id_medecin'] != $doctor_id) {
-            throw new Exception("You don't have permission for this appointment");
-        }
-
-        // Get patient's user_id from patient table
-        $stmt = mysqli_prepare($conn, 
-            "SELECT id_utilisateur FROM patient 
-            WHERE id_patient = ?");
-        mysqli_stmt_bind_param($stmt, "i", $rdv['id_patient']);
-        mysqli_stmt_execute($stmt);
-        $patient_user = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+            $res=mysqli_query($conn,$req);
+            $sql =("
+            SELECT u.*, p.* 
+            FROM utilisateur u
+            JOIN patient p ON u.id_utilisateur = p.id_patient
+            WHERE u.id_utilisateur =
+        ".$row['id_patient']);
         
-        if (!$patient_user) {
-            throw new Exception("Patient user not found");
+        $res=mysqli_query($conn,$sql);
+        
+        if(!$patient=mysqli_fetch_assoc($res)) {
+            die("Erreur de requête: " . $stmt->error);
         }
-        $patient_user_id = $patient_user['id_utilisateur'];
+            $mpdf = new \Mpdf\Mpdf([
+                'tempDir' => __DIR__ . '/pdf',
+                'format' => 'A4',
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_top' => 25,
+                'margin_bottom' => 20,
+                'margin_header' => 10,
+                'margin_footer' => 10
+            ]);
+            $styles = '
+                <style>
+                    /* Base styles */
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        margin: 0;
+                        padding: 20px;
+                    }
 
-        // Handle accept/refuse actions
-        if (isset($_POST['accepter'])) {
-            // Update appointment status
-            $stmt = mysqli_prepare($conn, 
-                "UPDATE rendez_vous SET statut = 'confirmé' 
-                WHERE id_rdv = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_rdv);
-            mysqli_stmt_execute($stmt);
+                    /* Header section */
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        padding-bottom: 20px;
+                        border-bottom: 3px solid #007bff;
+                    }
 
-            // Update payment status
-            $stmt = mysqli_prepare($conn, 
-                "UPDATE paiement SET statut = 'payé' 
-                WHERE id_rdv = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_rdv);
-            mysqli_stmt_execute($stmt);
+                    .header h1 {
+                        color: #2c3e50;
+                        margin: 0 0 10px 0;
+                        font-size: 28px;
+                    }
 
-            // Notification message
-            $message = "Rendez-vous confirmé pour le " . 
-                date('d/m/Y H:i', strtotime($rdv['date_heure'])) . 
-                " avec Dr. " . $_SESSION['prenom'] . " " . $_SESSION['nom'];
+                    .header p {
+                        color: #7f8c8d;
+                        font-size: 14px;
+                        margin: 0;
+                    }
 
-        } elseif (isset($_POST['refuser'])) {
-            // Update appointment status
-            $stmt = mysqli_prepare($conn, 
-                "UPDATE rendez_vous SET statut = 'annulé' 
-                WHERE id_rdv = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_rdv);
-            mysqli_stmt_execute($stmt);
+                    /* Profile section */
+                    .profile-section {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                    }
 
-            // Delete payment
-            $stmt = mysqli_prepare($conn, 
-                "DELETE FROM paiement WHERE id_rdv = ?");
-            mysqli_stmt_bind_param($stmt, "i", $id_rdv);
-            mysqli_stmt_execute($stmt);
+                    .profile-img {
+                        width: 120px;
+                        height: 120px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 3px solid #007bff;
+                        margin-right: 25px;
+                    }
 
-            // Notification message
-            $message = "Rendez-vous annulé pour le " . 
-                date('d/m/Y H:i', strtotime($rdv['date_heure'])) . 
-                " avec Dr. " . $_SESSION['prenom'] . " " . $_SESSION['nom'];
-        } else {
-            throw new Exception("No action specified");
+                    .profile-section h2 {
+                        color: #2c3e50;
+                        margin: 0 0 8px 0;
+                        font-size: 24px;
+                    }
+
+                    .profile-section p {
+                        margin: 5px 0;
+                        color: #34495e;
+                    }
+
+                    /* Section titles */
+                    .section-title {
+                        color: #007bff;
+                        font-size: 18px;
+                        margin: 25px 0 15px 0;
+                        padding-bottom: 8px;
+                        border-bottom: 2px solid #e0e0e0;
+                        text-transform: uppercase;
+                    }
+
+                    /* Info tables */
+                    .info-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        background-color: white;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    }
+
+                    .info-table td {
+                        padding: 12px 15px;
+                        border: 1px solid #e0e0e0;
+                    }
+
+                    .info-table tr td:first-child {
+                        font-weight: 600;
+                        background-color: #f8f9fa;
+                        width: 30%;
+                    }
+
+                    /* Patient info block */
+                    .patient-info {
+                        padding: 20px;
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        border: 1px solid #e0e0e0;
+                        white-space: pre-line;
+                        line-height: 1.8;
+                    }
+
+                    /* Responsive design */
+                    @media (max-width: 768px) {
+                        .profile-section {
+                            flex-direction: column;
+                            text-align: center;
+                        }
+                        
+                        .profile-img {
+                            margin-right: 0;
+                            margin-bottom: 15px;
+                        }
+                    }
+                </style>
+                ';
+            $html = $styles . '
+                <div class="header">
+                    <h1>Fiche Médicale du Patient</h1>
+                    <p>Date de génération: '.date('d/m/Y').'</p>
+                </div>
+
+                <div class="profile-section">
+                    <img src="'.$patient['photo_profil'].'" class="profile-img">
+                    <div>
+                        <h2>'.$patient['prenom'].' '.$patient['nom'].'</h2>
+                        <p>Âge: '.$patient['age'].' ans</p>
+                        <p>Genre: '.ucfirst($patient['genre']).'</p>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Informations de Contact</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Téléphone</td>
+                        <td>'.$patient['telephone'].'</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>'.$patient['email'].'</td>
+                    </tr>
+                </table>
+
+                <h3 class="section-title">Informations Médicales</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Taille</td>
+                        <td>'.$patient['taille'].' cm</td>
+                    </tr>
+                    <tr>
+                        <td>Poids</td>
+                        <td>'.$patient['poids'].' kg</td>
+                    </tr>
+                    <tr>
+                        <td>Groupe Sanguin</td>
+                        <td>'.$patient['group_sanguin'].'</td>
+                    </tr>
+                    <tr>
+                        <td>Maladies Chroniques</td>
+                        <td>'.$patient['maladies_chroniques'].'</td>
+                    </tr>
+                </table>
+
+                <h3 class="section-title">Informations Complémentaires</h3>
+                <div class="patient-info">
+                    '.nl2br($patient['informations']).'
+                </div>
+            ';
+
+            $mpdf->SetTitle('Fiche Patient - '.$patient['prenom'].' '.$patient['nom']);
+            $mpdf->WriteHTML($styles);
+            $mpdf->WriteHTML($html);
+            $filename = 'pdf/patient_'.$patient['id_patient'].'_'.date('Ymd').'.pdf';
+            $mpdf->Output($filename, \Mpdf\Output\Destination::FILE);
+            $datee=date('Y-m-d H:i:s');
+            $insert_fiche =("
+                INSERT INTO fiche_medicale 
+                (id_rdv, fichier_pdf, date_creation)
+                VALUES ('{$row2['id_rdv']}', '$filename', '$datee')
+            ");
+
+            $res=mysqli_query($conn,$insert_fiche);
+            if(!$res) {
+                echo "Error creating medical record: ";
+                exit();
+            }
+            $insert_historique =("
+            INSERT INTO historique 
+            (id_patient, id_medecin, id_rdv, date_consultation)
+            VALUES ('{$row['id_patient']}', '{$_SESSION['user_id']}','{$row2['id_rdv']}', '$datee')
+            ");
+
+            $res=mysqli_query($conn,$insert_historique);
+            if(!$res) {
+                echo "Error Inserting historique: ";
+                exit();
+            }
         }
-
-        // Create new notification for patient
-        $stmt = mysqli_prepare($conn, 
-            "INSERT INTO notification 
-            (id_utilisateur, message, date_envoi, type, statut, id_rdv, id_patient)
-            VALUES (?, ?, NOW(), 'email', 'non_lu', ?, ?)");
-        mysqli_stmt_bind_param($stmt, "isii", 
-            $patient_user_id, 
-            $message, 
-            $id_rdv, 
-            $rdv['id_patient']
-        );
-        mysqli_stmt_execute($stmt);
-
-        // Delete doctor's notification
-        $stmt = mysqli_prepare($conn, 
-            "DELETE FROM notification 
-            WHERE id_rdv = ? AND id_utilisateur = ?");
-        mysqli_stmt_bind_param($stmt, "ii", $id_rdv, $doctor_id);
-        mysqli_stmt_execute($stmt);
-
-        mysqli_commit($conn);
-        $_SESSION['success'] = "Action completed successfully";
-    } catch (Exception $e) {
-        mysqli_rollback($conn);
-        $_SESSION['error'] = $e->getMessage();
-    } finally {
-        mysqli_close($conn);
-        header("Location: home.php");
-        exit();
     }
+    if(isset($_POST['refuser'])){
+        $req="UPDATE rendez_vous set statut='annulé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id'];
+        if(mysqli_query($conn,$req)){
+            mysqli_free_result($req);
+        }
+        $req="DELETE from paiement where id_patient =".$row['id_patient']." and id_rdv=".$row2['id_rdv'];
+        if(mysqli_query($conn,$req)){
+            $nom_doctor=$_SESSION['prenom']." ".$_SESSION['nom'];
+            $message = "rendez vous refuser avec docteur " . $nom_doctor;
+            $req = "UPDATE notification SET message = '$message' WHERE id_utilisateur = " . $row['id_patient'];
+            $res=mysqli_query($conn,$req);
+        }
+    }
+    $sql = "DELETE FROM notification WHERE id_utilisateur = " . $_SESSION['user_id'] . " AND id_patient = " . $row['id_patient'];
+    $res=mysqli_query($conn,$sql);
+    header("Location: home.php");
+
 }
+?>

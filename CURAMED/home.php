@@ -55,7 +55,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 <div class="notification-list">
                     <?php
                     $stmt = mysqli_prepare($conn, 
-                        "SELECT id_rdv, message FROM notification 
+                        "SELECT id_rdv,id_notification, message FROM notification 
                         WHERE id_utilisateur = ?");
                     mysqli_stmt_bind_param($stmt, "i", $user_id);
                     mysqli_stmt_execute($stmt);
@@ -65,9 +65,17 @@ $conn=mysqli_connect("localhost","root","","curamed");
                     ?>
                     <div class="notification-item">
                         <form method="POST" action="confirmation.php">
-                            <input type="hidden" name="id_rdv" 
-                                value="<?= htmlspecialchars($row['id_rdv']) ?>">
+                            <input type="hidden" name="notification_id" 
+                                value="<?= htmlspecialchars($row['id_notification']) ?>">
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
+                            <button type="submit" 
+                                    name="dismiss_notification" 
+                                    class="notification-close-btn" 
+                                    title="Fermer la notification">&times;</button>
+                            
+                            <?php endif; ?>
                             <p><?= htmlspecialchars($row['message']) ?></p>
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
                             <div class="action-buttons">
                                 <button type="submit" name="accepter" 
                                         class="icon-btn fas fa-check text-success" 
@@ -76,8 +84,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
                                         class="icon-btn fas fa-times text-danger" 
                                         title="Refuser"></button>
                             </div>
+                            <?php endif; ?>
                         </form>
-                    </div>
+                        </div>
                     <?php endwhile; ?>
                 </div>
             </div>
