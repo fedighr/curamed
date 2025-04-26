@@ -70,7 +70,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <p><?= htmlspecialchars($row['message']) ?></p>
                             <div class="action-buttons">
                                 <button type="submit" name="accepter" 
-                                        class="icon-btn fas fa-check text-success" 
+                                        class="i+-con-btn fas fa-check text-success" 
                                         title="Accepter"></button>
                                 <button type="submit" name="refuser" 
                                         class="icon-btn fas fa-times text-danger" 
@@ -99,6 +99,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
                         </a>
                         <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                        <a href="historique.php" class="dropdown-item">
+                            <i class="fas fa-cog"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>

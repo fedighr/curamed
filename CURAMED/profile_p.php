@@ -73,6 +73,9 @@ $table=mysqli_fetch_assoc($res);
                         <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
+                        <a href="historique.php" class="dropdown-item">
+                            <i class="fas fa-cog"></i> historique
+                        </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
                             <a href="dashboard.php" class="dropdown-item">
