@@ -35,6 +35,7 @@ $table=mysqli_fetch_assoc($res);
 </head>
 <body>
 
+
 <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -81,7 +82,7 @@ $table=mysqli_fetch_assoc($res);
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -123,7 +124,7 @@ $table=mysqli_fetch_assoc($res);
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
@@ -197,10 +198,11 @@ $table=mysqli_fetch_assoc($res);
                                 </button>
                                 </div>
                                 <div class="col-12 text-end mt-3">
-                                    <button type="submit" name="delete_account" class="btn btn-danger" 
-                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible!');">
+                                    <button type="button" class="btn btn-danger" 
+                                            onclick="if(confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible!')) { document.getElementById('profileForm').submit(); }">
                                         <i class="fas fa-trash me-2"></i>Supprimer le compte
                                     </button>
+                                    <input type="hidden" name="delete_account" value="1">
                                 </div>
                             </div>
                     </form>

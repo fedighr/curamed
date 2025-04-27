@@ -68,7 +68,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -78,7 +78,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
                             <div class="action-buttons">
                                 <button type="submit" name="accepter" 
-                                        class="i+-con-btn fas fa-check text-success" 
+                                        class="icon-btn fas fa-check text-success" 
                                         title="Accepter"></button>
                                 <button type="submit" name="refuser" 
                                         class="icon-btn fas fa-times text-danger" 
@@ -110,7 +110,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>

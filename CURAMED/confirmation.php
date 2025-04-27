@@ -11,9 +11,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $res=mysqli_query($conn,$sql);
     $row=mysqli_fetch_assoc($res);
     if(isset($_POST['accepter'])){
-        $req="UPDATE rendez_vous set statut='confirmé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id'];
+        $req="UPDATE rendez_vous set statut='confirmé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id']. " and statut='en attente' ORDER BY id_rdv ASC LIMIT 1 ";
         $res=mysqli_query($conn,$req);
-        $req="SELECT id_rdv from rendez_vous where id_patient=".$row['id_patient']." and id_medecin= ".$_SESSION['user_id'];
+        $req="SELECT id_rdv from rendez_vous where id_patient=".$row['id_patient']." and id_medecin= ".$_SESSION['user_id']. " and statut='confirmé' ORDER BY id_rdv DESC LIMIT 1";
         $res=mysqli_query($conn,$req);
         $row2=mysqli_fetch_assoc($res);
         $req="UPDATE paiement set statut = 'payé' where id_patient=" .$row['id_patient']." and id_rdv=".$row2['id_rdv'];
@@ -256,7 +256,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $res=mysqli_query($conn,$req);
         }
     }
-    $sql = "DELETE FROM notification WHERE id_utilisateur = " . $_SESSION['user_id'] . " AND id_patient = " . $row['id_patient'];
+    $sql = "DELETE FROM notification WHERE id_utilisateur = " . $_SESSION['user_id'] . " AND id_patient = " . $row['id_patient'] ." and id_rdv=".$row2['id_rdv'];
     $res=mysqli_query($conn,$sql);
     header("Location: home.php");
 

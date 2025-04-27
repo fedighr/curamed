@@ -373,7 +373,7 @@ $_SESSION['patient'] = [
                     © 2025 CuraMed. Tous droits réservés.
                 </div>
             </div>
-        </div>
+        </div>      
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $asked[] = $currentSymptom;}
 
 
-        if (count($diseases) <1 && count($asked)!=0) {
+        if (count($diseases) <2 && count($asked)!=0) {
             $results = $diseases;
             $showResults = true;
         }
@@ -204,15 +204,14 @@ if (!empty($symptomCounts)) {
             <h3>Possible Diseases:</h3>
             <ul>
                 <?php foreach ($results as $result): ?>
-                    <li>Disease : <?php $res=mysqli_query($conn,"SELECT nom,specialite from maladies where id_maladie=".$result['id']);
+                    <li>Votre maladie est <?php $res=mysqli_query($conn,"SELECT nom,specialite from maladies where id_maladie=".$result['id']);
                         $row=mysqli_fetch_assoc($res);
-                        echo $result['id'];
-                        echo"  ";
                         echo $row['nom'];
-                        echo"  ";
+                        echo" tu peux voir un ";
                         echo $row['specialite'];?></li>
                 <?php endforeach; ?>
             </ul>
+            <button onclick="window.location.href='search.php?specialite=<?php echo($row['specialite']);?>'">Médecins</button>
         <?php else: ?>
             <p>Vous étes en bonne santé rabbi yberek</p>
         <?php endif; ?>

@@ -9,11 +9,10 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Nouvelle vérification du type d'utilisateur
-$user_type = $_SESSION['type'] ?? 'patient'; // Supposons que 'type' est défini à la connexion
+$user_type = $_SESSION['type'] ?? 'patient';
 $user_id = $_SESSION['user_id'];
 
-// Modification de la requête SQL
+
 $query = "SELECT h.*, 
                  m.nom AS medecin_nom, m.prenom AS medecin_prenom,
                  p.nom AS patient_nom, p.prenom AS patient_prenom
@@ -24,7 +23,7 @@ $query = "SELECT h.*,
           ORDER BY h.date_consultation DESC";
 
 $stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, "i", $user_id); // Un seul paramètre maintenant
+mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -49,6 +48,7 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 
 </head>
 <body>
+
 <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -82,7 +82,7 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                 <div class="notification-list">
                     <?php
                     $stmt = mysqli_prepare($conn, 
-                        "SELECT id_rdv, message FROM notification 
+                        "SELECT id_rdv,id_notification, message FROM notification 
                         WHERE id_utilisateur = ?");
                     mysqli_stmt_bind_param($stmt, "i", $user_id);
                     mysqli_stmt_execute($stmt);
@@ -92,19 +92,28 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                     ?>
                     <div class="notification-item">
                         <form method="POST" action="confirmation.php">
-                            <input type="hidden" name="id_rdv" 
-                                value="<?= htmlspecialchars($row['id_rdv']) ?>">
+                            <input type="hidden" name="notification_id" 
+                                value="<?= htmlspecialchars($row['id_notification']) ?>">
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
+                            <button type="button" 
+                                    name="dismiss_notification" 
+                                    class="notification-close-btn" 
+                                    title="Fermer la notification">&times;</button>
+                            
+                            <?php endif; ?>
                             <p><?= htmlspecialchars($row['message']) ?></p>
+                            <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
                             <div class="action-buttons">
                                 <button type="submit" name="accepter" 
-                                        class="i+-con-btn fas fa-check text-success" 
+                                        class="icon-btn fas fa-check text-success" 
                                         title="Accepter"></button>
                                 <button type="submit" name="refuser" 
                                         class="icon-btn fas fa-times text-danger" 
                                         title="Refuser"></button>
                             </div>
+                            <?php endif; ?>
                         </form>
-                    </div>
+                        </div>
                     <?php endwhile; ?>
                 </div>
             </div>
@@ -128,7 +137,7 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>

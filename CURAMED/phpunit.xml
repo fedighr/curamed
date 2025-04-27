@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php">
+    <php>
+        <server name="DB_HOST" value="localhost"/>
+        <server name="DB_NAME" value="curamed"/>
+        <server name="DB_USER" value="root"/>
+        <server name="DB_PASS" value=""/>
+    </php>
+    
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -123,6 +123,7 @@ $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
     <script src="./scripts/profile.js"></script>
 </head>
 <body>
+
 <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -169,7 +170,7 @@ $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -211,7 +212,7 @@ $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>

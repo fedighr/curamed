@@ -1,5 +1,5 @@
 <?php
-ob_start(); // Start output buffering
+ob_start();
 session_start();
 header('Content-Type: application/json');
 error_reporting(0);
@@ -32,7 +32,7 @@ try {
     $age = intval($_POST['age']);
     $genre = mysqli_real_escape_string($conn, $_POST['genre']);
 
-    // Validate age
+
     if($age < 0 || $age > 150) {
         throw new Exception("Âge invalide");
     }

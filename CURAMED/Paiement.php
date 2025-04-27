@@ -44,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_query($conn, $notification_p);
 
             $message = "Rendez-vous à " . date('d/m/Y H:i', strtotime($_SESSION['date']));
-            $notification_m = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut,id_patient)
-                                   VALUES ({$_SESSION['id_medecin']}, '$message', NOW(), 'email', 'envoyé',{$_SESSION['user_id']})";
+            $notification_m = "INSERT INTO notification (id_utilisateur, message, date_envoi, type, statut,id_patient,id_rdv)
+                                   VALUES ({$_SESSION['id_medecin']}, '$message', NOW(), 'email', 'envoyé',{$_SESSION['user_id']},'$rdv_id')";
             mysqli_query($conn, $notification_m);
             
             mysqli_commit($conn);

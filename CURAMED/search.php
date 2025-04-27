@@ -16,11 +16,15 @@ $sql = "
     JOIN medecin m ON u.id_utilisateur = m.id_medecin
     WHERE 1=1
 ";
-
 if (!empty($_POST['specialite'])) {
   $specialty = mysqli_real_escape_string($conn, $_POST['specialite']);
   $sql .= " AND m.specialite = '$specialty'";
 }
+elseif(isset($_GET['specialite'])){
+  $specialty=mysqli_real_escape_string($conn, $_GET['specialite']);
+  $sql .= " AND m.specialite = '$specialty'";
+}
+
 
 if(!empty($_POST["ville"])){
   $ville = mysqli_real_escape_string($conn, $_POST['ville']);
@@ -97,6 +101,7 @@ mysqli_close($conn);
 </head>
 <body class="bg-light">
 
+
 <header class="header">
         <nav class="nav-container container">
             <a href="home.php" class="logo-link">
@@ -143,7 +148,7 @@ mysqli_close($conn);
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -185,7 +190,7 @@ mysqli_close($conn);
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
