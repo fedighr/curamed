@@ -47,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
             $styles = '
                 <style>
-                    /* Base styles */
                     body {
                         font-family: Arial, sans-serif;
                         line-height: 1.6;
@@ -56,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         padding: 20px;
                     }
 
-                    /* Header section */
                     .header {
                         text-align: center;
                         margin-bottom: 30px;
@@ -76,7 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         margin: 0;
                     }
 
-                    /* Profile section */
                     .profile-section {
                         display: flex;
                         align-items: center;
@@ -106,7 +103,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         color: #34495e;
                     }
 
-                    /* Section titles */
                     .section-title {
                         color: #007bff;
                         font-size: 18px;
@@ -116,7 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         text-transform: uppercase;
                     }
 
-                    /* Info tables */
                     .info-table {
                         width: 100%;
                         border-collapse: collapse;
@@ -136,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         width: 30%;
                     }
 
-                    /* Patient info block */
+
                     .patient-info {
                         padding: 20px;
                         background-color: #f8f9fa;
@@ -146,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         line-height: 1.8;
                     }
 
-                    /* Responsive design */
+
                     @media (max-width: 768px) {
                         .profile-section {
                             flex-direction: column;

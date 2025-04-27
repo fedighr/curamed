@@ -9,11 +9,9 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Nouvelle vérification du type d'utilisateur
-$user_type = $_SESSION['type'] ?? 'patient'; // Supposons que 'type' est défini à la connexion
+$user_type = $_SESSION['type'] ?? 'patient';
 $user_id = $_SESSION['user_id'];
 
-// Modification de la requête SQL
 $query = "SELECT h.*, 
                  m.nom AS medecin_nom, m.prenom AS medecin_prenom,
                  p.nom AS patient_nom, p.prenom AS patient_prenom
@@ -24,7 +22,7 @@ $query = "SELECT h.*,
           ORDER BY h.date_consultation DESC";
 
 $stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, "i", $user_id); // Un seul paramètre maintenant
+mysqli_stmt_bind_param($stmt, "i", $user_id); 
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
@@ -110,7 +108,7 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
             </div>
         </div>
 
-                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                <a href="rendez_vous.php" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 

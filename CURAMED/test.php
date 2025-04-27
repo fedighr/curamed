@@ -249,7 +249,7 @@ if (!empty($symptomCounts)) {
             <?php endforeach; ?>
         </ul>
         
-        <button onclick="window.location.href='seach.php'">Médecins</button>
+        <button onclick="window.location.href='search.php'">Médecins</button>
         <a href="test.php">Recommencer</a>
     <?php endif; ?>
     </section>

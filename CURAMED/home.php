@@ -92,7 +92,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
             </div>
         </div>
 
-                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                <a href="rendez_vous.php" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 
@@ -343,10 +343,10 @@ $conn=mysqli_connect("localhost","root","","curamed");
                         "J'ai pu obtenir un rendez-vous avec un dermatologue en moins de 2 heures pour un problème urgent. Excellent service !"
                     </p>
                     <div class="testimonial-author">
-                        <img src="images/patient1.jpg" alt="Marie D." class="author-avatar">
+                        <img src="images/bakhana.jpeg" alt="Bakha D." class="author-avatar">
                         <div class="author-info">
-                            <strong>Marie D.</strong>
-                            <span>Paris</span>
+                            <strong>Bakha D.</strong>
+                            <span>Siliene</span>
                         </div>
                     </div>
                 </div>
@@ -362,7 +362,8 @@ $conn=mysqli_connect("localhost","root","","curamed");
             <div class="cta-content">
                 <h2>Prêt à consulter ?</h2>
                 <p>Trouvez le médecin qu'il vous faut et prenez rendez-vous en quelques clics</p>
-                <button class="btn btn-primary btn-lg">Trouver un médecin</button>
+             
+                <button class="btn btn-primary btn-lg" onclick="window.location.href='search.php'">Trouver un médecin</button>
             </div>
         </div>
     </section>
