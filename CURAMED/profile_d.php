@@ -221,7 +221,7 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
         <!-- Left Column -->
         <div class="row g-4">
             <div class="col-lg-8">
-                <form id="profileForm" method="POST" onsubmit="return false">
+                <form id="profileForm" method="POST" onsubmit="return false" action="delete_account.php">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Informations personnelles</h3>
@@ -254,7 +254,6 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
                                         onclick="if(confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible!')) { document.getElementById('profileForm').submit(); }">
                                     <i class="fas fa-trash me-2"></i>Supprimer le compte
                                 </button>
-                                <input type="hidden" name="delete_account" value="1">
                                 </div>
                             </div>
                     </div>
@@ -374,15 +373,16 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
             <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                 <?php
                 $doctorId = $_SESSION['user_id'];
-                $today = date('Y-m-d');
                 $query = "SELECT r.id_rdv, r.date_heure, u.nom, u.prenom, f.fichier_pdf 
-                        FROM rendez_vous r
-                        JOIN patient p ON r.id_patient = p.id_patient
-                        JOIN utilisateur u ON p.id_patient = u.id_utilisateur
-                        LEFT JOIN fiche_medicale f ON r.id_rdv = f.id_rdv
-                        WHERE r.id_medecin = $doctorId 
-                        AND DATE(r.date_heure) = '$today' AND statut='confirmé'
-                        ORDER BY r.date_heure";
+                FROM rendez_vous r
+                JOIN patient p ON r.id_patient = p.id_patient
+                JOIN utilisateur u ON p.id_patient = u.id_utilisateur
+                LEFT JOIN fiche_medicale f ON r.id_rdv = f.id_rdv
+                WHERE r.id_medecin = $doctorId 
+                AND DATE(r.date_heure) = CURDATE()
+                AND r.date_heure > NOW()
+                AND statut = 'confirmé'
+                ORDER BY r.date_heure";
                 $result = mysqli_query($conn, $query);
                 
                 if(mysqli_num_rows($result) > 0): ?>

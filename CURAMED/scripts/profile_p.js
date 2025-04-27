@@ -1,8 +1,8 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const editBtn = document.getElementById('editBtn');
     const inputs = document.querySelectorAll('#profileForm input');
     let isEditing = false;
+    
 
     editBtn.addEventListener('click', function() {
         isEditing = !isEditing;

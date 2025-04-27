@@ -2770,8 +2770,8 @@ input:disabled {
     padding: 2rem;
     border-radius: var(--border-radius-lg);
     margin: 3rem auto; /* Centrage horizontal */
-    max-width: 600px; /* Largeur maximale pour le formulaire */
-    text-align: center; /* Centrage du contenu */
+    max-width: 600px;
+    text-align: center;
 }
 
 .hero2 h3 {
@@ -2781,7 +2781,6 @@ input:disabled {
   text-align: center;
 }
 
-/* Answer Buttons */
 .hero2 button {
   padding: 0.8rem 2.5rem;
   border: none;
@@ -2789,7 +2788,7 @@ input:disabled {
   font-weight: 600;
   transition: var(--transition);
   cursor: pointer;
-  min-width: 120px; /* Largeur minimale */
+  min-width: 120px;
 }
 
 .hero2 button[value="yes"] {
@@ -2808,14 +2807,12 @@ input:disabled {
 }
 
 
-/* Progress Text */
 .hero2 p {
   text-align: center;
   color: var(--gray-color);
   margin-top: 1.5rem;
 }
 
-/* Start Over Link */
 .hero2 a {
   display: inline-block;
   margin: 2rem auto 0;
@@ -2836,8 +2833,6 @@ input:disabled {
   color: var(--white);
 }
 
-
-/* Health Message */
 .hero2 > p {
   text-align: center;
   font-size: 1.2rem;
@@ -2847,7 +2842,6 @@ input:disabled {
   color: var(--primary-color);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .hero2 {
       margin: 2rem auto;
@@ -2867,7 +2861,7 @@ input:disabled {
       padding: 1.5rem;
   }
 }
-/* ==================== HISTORIQUE SECTION 5 ==================== */
+
 .dashboard-main5 {
   background: linear-gradient(135deg, rgba(0, 198, 180, 0.05) 0%, #f8f9fa 100%);
   min-height: 100vh;
@@ -2995,7 +2989,6 @@ input:disabled {
   border-bottom-right-radius: 12px;
 }
 
-/* Bouton Détails amélioré */
 .btn-outline-primary5 {
   display: inline-flex;
   align-items: center;
@@ -3043,7 +3036,6 @@ input:disabled {
   color: var(--white);
 }
 
-/* État vide amélioré */
 .empty-state5 {
   text-align: center;
   padding: 4rem 2rem;
@@ -3067,7 +3059,6 @@ input:disabled {
   filter: drop-shadow(0 4px 8px rgba(0, 198, 180, 0.2));
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .calendar-table5 td {
     padding: 1rem;

@@ -127,11 +127,11 @@ if (!empty($symptomCounts)) {
                     while ($row = mysqli_fetch_assoc($result)) :
                     ?>
                     <div class="notification-item">
-                        <form method="POST" action="handle_notifications.php">
+                        <form method="POST" action="confirmation.php">
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -155,7 +155,7 @@ if (!empty($symptomCounts)) {
             </div>
         </div>
 
-                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                <a href="rendez_vous.php" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 
@@ -171,6 +171,9 @@ if (!empty($symptomCounts)) {
                         </a>
                         <a href="settings.php" class="dropdown-item">
                             <i class="fas fa-cog"></i> Paramètres
+                        </a>
+                        <a href="historique.php" class="dropdown-item">
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>

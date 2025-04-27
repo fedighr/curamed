@@ -169,7 +169,7 @@ $table=mysqli_fetch_assoc($res);
 
         <div class="row g-4">
             <div class="col-lg-8">
-                <form id="profileForm" method="POST" onsubmit="return false">
+                <form id="profileForm" method="POST" onsubmit="return false" action="delete_account.php">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-user-circle me-2"></i>Informations personnelles</h3>
@@ -198,11 +198,10 @@ $table=mysqli_fetch_assoc($res);
                                 </button>
                                 </div>
                                 <div class="col-12 text-end mt-3">
-                                    <button type="button" class="btn btn-danger" 
-                                            onclick="if(confirm('Êtes-vous sûr de vouloir supprimer votre compte? Cette action est irréversible!')) { document.getElementById('profileForm').submit(); }">
-                                        <i class="fas fa-trash me-2"></i>Supprimer le compte
-                                    </button>
-                                    <input type="hidden" name="delete_account" value="1">
+                                <button type="button" class="btn btn-danger" 
+                                        onclick="if(confirm('Êtes-vous sûr...')) { document.getElementById('profileForm').submit(); }">
+                                    <i class="fas fa-trash me-2"></i>Supprimer le compte
+                                </button>
                                 </div>
                             </div>
                     </form>

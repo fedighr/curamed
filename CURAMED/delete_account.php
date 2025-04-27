@@ -2,7 +2,6 @@
 session_start();
 $conn=mysqli_connect("localhost","root","","curamed");
 
-if(isset($_POST['delete_account'])) {
     $user_id = $_SESSION['user_id'];
     $user_type = $_SESSION['type'];
 
@@ -21,5 +20,4 @@ if(isset($_POST['delete_account'])) {
         $conn->rollback();
         die("Error deleting account: " . $e->getMessage());
     }
-}
 ?>

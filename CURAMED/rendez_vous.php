@@ -11,7 +11,6 @@ if(!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_type = $_SESSION['type'];
 
-// Récupérer les rendez-vous
 $query = "";
 if($user_type == 'patient') {
     $query = "SELECT r.*, u.nom AS medecin_nom, u.prenom AS medecin_prenom 
@@ -32,7 +31,6 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $res = $stmt->get_result();
 
-// Traitement de l'annulation
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
     $rdv_id = $_POST['rdv_id'];
     $update_stmt = $conn->prepare("UPDATE rendez_vous SET statut = 'annulé' WHERE id_rdv = ?");
@@ -105,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="submit" 
+                            <button type="button" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -115,7 +113,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'medecin'): ?>
                             <div class="action-buttons">
                                 <button type="submit" name="accepter" 
-                                        class="i+-con-btn fas fa-check text-success" 
+                                        class="icon-btn fas fa-check text-success" 
                                         title="Accepter"></button>
                                 <button type="submit" name="refuser" 
                                         class="icon-btn fas fa-times text-danger" 
@@ -129,7 +127,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
             </div>
         </div>
 
-                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                <a href="rendez_vous.php" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 
@@ -147,7 +145,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                             <i class="fas fa-cog"></i> Paramètres
                         </a>
                         <a href="historique.php" class="dropdown-item">
-                            <i class="fas fa-cog"></i> historique
+                        <i class="fas fa-history"></i> historique
                         </a>
                         <?php
                          if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
