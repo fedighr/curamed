@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Ajouter la classe visible dès qu'un élément entre dans la vue
+    
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -10,10 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         threshold: 0.2
     });
 
-    // Sélection des éléments à animer
     document.querySelectorAll('.animate').forEach(el => observer.observe(el));
 
-    // Recherche (logique simple pour test)
+
     document.querySelector('.search-button').addEventListener('click', () => {
         const query = document.querySelector('.search-input').value;
         console.log('Recherche:', query);
@@ -25,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = document.querySelector(".next-btn");
     const cards = document.querySelectorAll(".doctor1-card");
     
-    // Variables avec gestion des erreurs
     if (!track || !prevBtn || !nextBtn || cards.length === 0) {
         console.error("Éléments du carrousel introuvables");
         return;
@@ -34,9 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let cardWidth = cards[0].offsetWidth + 16;
     let scrollPosition = 0;
     let autoScrollInterval;
-    const scrollDuration = 3000; // 3 secondes
+    const scrollDuration = 3000;
 
-    // Fonctions améliorées
     const scrollToPosition = (position) => {
         track.style.scrollBehavior = 'smooth';
         track.scrollLeft = position;
@@ -47,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollPosition = Math.min(scrollPosition + cardWidth, maxScroll);
         scrollToPosition(scrollPosition);
         
-        // Réinitialiser si fin atteinte
         if (scrollPosition >= maxScroll) {
             setTimeout(() => {
                 scrollPosition = 0;
@@ -62,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         scrollToPosition(scrollPosition);
     };
 
-    // Gestion des événements
     const setupEventListeners = () => {
         nextBtn.addEventListener("click", () => {
             clearInterval(autoScrollInterval);
@@ -76,40 +71,37 @@ document.addEventListener("DOMContentLoaded", () => {
             startAutoScroll();
         });
 
-        // Pause au survol
+ 
         track.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
         track.addEventListener('mouseleave', startAutoScroll);
     };
 
     const startAutoScroll = () => {
-        clearInterval(autoScrollInterval); // Nettoyer avant de redémarrer
+        clearInterval(autoScrollInterval);
         autoScrollInterval = setInterval(scrollNext, scrollDuration);
     };
 
-    // Initialisation
     const initCarousel = () => {
         cardWidth = cards[0].offsetWidth + 16;
         setupEventListeners();
         startAutoScroll();
     };
 
-    // Redimensionnement optimisé
     const resizeObserver = new ResizeObserver(() => {
         cardWidth = cards[0].offsetWidth + 16;
     });
     resizeObserver.observe(track);
 
-    // Démarrer le carrousel
     initCarousel();
 
-    // Nettoyage
+
     window.addEventListener('beforeunload', () => {
         clearInterval(autoScrollInterval);
         resizeObserver.disconnect();
     });
 });
   document.addEventListener('DOMContentLoaded', () => {
-    // Gestion du dropdown profil
+
     const profileDropdown = document.querySelector('.profile-dropdown');
     const dropdownMenu = document.querySelector('.dropdown-menu');
 
@@ -118,18 +110,17 @@ document.addEventListener("DOMContentLoaded", () => {
         dropdownMenu.classList.toggle('show');
     });
 
-    // Fermer le dropdown quand on clique ailleurs
+
     document.addEventListener('click', () => {
         dropdownMenu.classList.remove('show');
     });
 
-    // Notifications
+
     document.querySelector('.notifications-btn').addEventListener('click', () => {
-        // Ajouter la logique d'affichage des notifications ici
+
         console.log('Afficher les notifications');
     });
 
-    // Animation au survol du logo
     const logo = document.querySelector('.logo-img');
     logo.addEventListener('mouseenter', () => {
         logo.style.transform = 'scale(1.05)';
@@ -147,7 +138,6 @@ notificationsWrapper.addEventListener('click', (e) => {
     notificationsDropdown.classList.toggle('show');
 });
 
-// Fermer les dropdowns au clic externe
 document.addEventListener('click', (e) => {
     if (!notificationsWrapper.contains(e.target)) {
         notificationsDropdown.classList.remove('show');
@@ -157,7 +147,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Animation hover
 document.querySelectorAll('.nav-icon').forEach(icon => {
     icon.addEventListener('mouseenter', () => {
         icon.style.transform = 'translateY(-3px)';
@@ -165,4 +154,14 @@ document.querySelectorAll('.nav-icon').forEach(icon => {
     icon.addEventListener('mouseleave', () => {
         icon.style.transform = 'none';
     });
+});
+
+document.getElementById('search').addEventListener('submit', function(event) {
+    const searchInput = document.querySelector('input[name="cherche"]').value.trim();
+    const specialiteSelect = document.querySelector('select[name="specialite"]').value;
+
+    if (searchInput === '' && specialiteSelect === '') {
+        alert('Veuillez entrer un nom ou choisir une spécialité.');
+        event.preventDefault();
+    }
 });

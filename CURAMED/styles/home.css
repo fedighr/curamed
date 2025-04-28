@@ -15,7 +15,7 @@
   --transition: all 0.3s ease;
 }
 .btn-custom {
-  background: linear-gradient(135deg, #00C6B4, #00A18E); /* Gradient from #00C6B4 to a slightly darker teal */
+  background: linear-gradient(135deg, #00C6B4, #00A18E);
   color: white;
   border: none;
   border-radius: 30px;
@@ -29,14 +29,13 @@
 
 .btn-custom:hover {
   background: linear-gradient(135deg, #00A18E, #00C6B4);
-  transform: scale(1.05); /* Slight zoom effect on hover */
+  transform: scale(1.05);
 }
 
 .btn-custom:active {
-  transform: scale(1); /* Remove zoom effect when clicked */
+  transform: scale(1);
 }
 
-/* Position buttons to the right */
 .navbar .container {
   display: flex;
   justify-content: space-between;
@@ -54,7 +53,7 @@
 .align-items-center {
   align-items: center;
 }
-/* Base Styles */
+
 * {
   margin: 0;
   padding: 0;
@@ -135,8 +134,7 @@ a {
   margin-bottom: 3rem;
 }
 
-/* Header */
-/* Header */
+
 .header {
   position: fixed;
   top: 0;
@@ -200,7 +198,6 @@ a {
   padding: 1rem;
 }
 
-/* Notifications */
 .notifications-wrapper {
   cursor: pointer;
   position: relative;
@@ -211,6 +208,7 @@ a {
   right: 0;
   top: 120%;
   width: 350px;
+  max-height: 300px;  
   font-size: 0.9rem;
   background: var(--white);
   border-radius: var(--border-radius);
@@ -231,6 +229,7 @@ a {
 }
 
 .notification-header {
+  
   padding: 1rem 1.5rem;
   background: var(--primary-color);
   color: white;
@@ -263,10 +262,11 @@ a {
   max-height: 400px;
   padding: 0.5rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   color: var(--gray-color);
-  font-style: italic;
+  font-style: normal;
 }
 
 .notification-item {
@@ -278,6 +278,7 @@ a {
   transition: var(--transition);
   position: relative;
   font-size: 0.9rem;
+  margin-bottom: 10px;
 }
 
 .notification-item:hover {
@@ -291,7 +292,6 @@ a {
   line-height: 1.4;
 }
 
-/* Badge de notification */
 .notification-badge {
   position: absolute;
   top: -5px;
@@ -344,7 +344,6 @@ a {
   display: none;
 }
 
-/* Hero Section */
 .hero {
   padding: 7rem 0 5rem;
   background: linear-gradient(135deg, rgba(0, 198, 180, 0.1) 0%, rgba(248, 249, 250, 1) 100%);
@@ -382,26 +381,26 @@ a {
   line-height: 1.2;
 }
 .hero {
-  text-align: center; /* Centre le contenu horizontalement */
-  padding: 2rem; /* Optionnel, pour l'espace autour */
+  text-align: center;
+  padding: 2rem;
 }
 
 .hero .btn3 {
   padding: 0.8rem 2.5rem;
   border: none;
-  border-radius: 50px; /* Plus doux et élégant */
+  border-radius: 50px;
   font-weight: 600;
   transition: all 0.3s ease-in-out;
   cursor: pointer;
   min-width: 140px;
   background: var(--primary-color);
   color: var(--white);
-  display: inline-block; /* Permet le centrage */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Effet de profondeur */
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .hero .btn3:hover {
-  background: var(--primary-color-dark); /* À définir dans tes variables */
+  background: var(--primary-color-dark);
   transform: translateY(-2px);
 }
 
@@ -470,10 +469,14 @@ a {
   text-decoration: underline;
 }
 
-/* Stats Section */
 .stats-section {
   padding: 4rem 0;
   background-color: var(--white);
+
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .stats-grid {
@@ -506,7 +509,7 @@ a {
   color: var(--gray-color);
 }
 
-/* Steps Section */
+
 .steps-section {
   padding: 5rem 0;
   background-color: var(--light-color);
@@ -566,7 +569,6 @@ a {
   margin-bottom: 1rem;
   color: var(--secondary-color);
 }
-/* carousel*/
 .doctors1-carousel-section {
   padding: 4rem 0;
   background-color: var(--light-color);
@@ -615,7 +617,7 @@ a {
   display: none;
 }
 
-/* Navigation Buttons */
+
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -655,7 +657,6 @@ a {
   right: 15px;
 }
 
-/* Doctor Cards */
 .doctor1-card {
   flex: 0 0 calc(33.333% - 1rem);
   background: white;
@@ -733,7 +734,6 @@ a {
   box-shadow: 0 0 0 3px rgba(0, 198, 180, 0.5);
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
   .doctor1-card {
     flex: 0 0 calc(50% - 1rem);
@@ -775,11 +775,6 @@ a {
   }
 }
 
-
-
-
-
-/* Features Section */
 .features-section {
   padding: 5rem 0;
   background-color: var(--light-color);
@@ -823,7 +818,7 @@ a {
   color: var(--secondary-color);
 }
 
-/* Testimonials Section */
+
 .testimonials-section {
   padding: 5rem 0;
   background-color: var(--white);
@@ -879,7 +874,6 @@ a {
   color: var(--gray-color);
 }
 
-/* CTA Section */
 .cta-section {
   padding: 5rem 0;
   background-color: var(--primary-color);
@@ -909,7 +903,6 @@ a {
   background-color: var(--light-gray);
 }
 
-/* Footer */
 .footer {
   background-color: var(--secondary-color);
   color: var(--white);
@@ -1022,7 +1015,6 @@ a {
   font-size: 0.9rem;
 }
 
-/* Responsive Styles */
 @media (max-width: 992px) {
   .hero-content {
     flex-direction: column;
@@ -1350,7 +1342,6 @@ input:disabled {
     opacity: 1;
 }
 
-/* Time validation */
 .is-invalid {
     border-color: #dc3545;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
@@ -1374,11 +1365,6 @@ input:disabled {
   box-shadow: var(--shadow-md);
 }
 
-
-
-.notification-item {
-  padding-right: 2rem;
-}
 
 .notification-close-btn:hover {
   background: var(--primary-color);
@@ -1506,7 +1492,6 @@ input:disabled {
   min-height: 500px;
 }
 
-/* Profile Page Styles */
 .profile-main {
   margin-top: 100px;
   padding: 2rem 0;
@@ -1580,7 +1565,6 @@ input:disabled {
   color: var(--primary-color);
 }
 
-/* État d'édition */
 .editing {
   background-color: rgba(0, 198, 180, 0.05);
   border: 2px solid var(--primary-color);
@@ -1617,7 +1601,7 @@ input:disabled {
       font-size: 1.8rem;
   }
 }
-/* Settings Page Styles */
+
 .settings-main {
   margin-top: 100px;
   padding: 2rem 0;
@@ -1717,7 +1701,7 @@ input:disabled {
       flex-direction: column;
   }
 }
-/* Doctor Profile Styles */
+
 .doctor-main {
   margin-top: 100px;
   padding: 2rem 0;
@@ -1901,7 +1885,6 @@ input:disabled {
   padding: 20px;
 }
 
-/* Sidebar */
 .search-sidebar {
   width: 300px;
   background-color: #f8f9fa;
@@ -1959,7 +1942,6 @@ input:disabled {
   font-size: 13px;
 }
 
-/* Main */
 .main-content {
   flex: 1;
 }
@@ -2081,7 +2063,7 @@ input:disabled {
   color: #999;
   font-size: 18px;
 }
-/* Doctor Profile Styles */
+
 .doctor-profile-section5 {
   padding: 6rem 0 4rem;
   background-color: var(--light-color);
@@ -2206,7 +2188,6 @@ input:disabled {
   text-align: center;
 }
 
-/* Section Rendez-vous */
 .appointment-section5 {
   background-color: var(--white);
   padding: 2rem;
@@ -2229,7 +2210,6 @@ input:disabled {
   gap: 2rem;
 }
 
-/* Styles améliorés pour le calendrier et créneaux */
 .appointment-calendar5 {
   background: var(--white);
   padding: 1.5rem;
@@ -2327,7 +2307,6 @@ input:disabled {
   font-weight: bold;
 }
 
-/* Styles améliorés pour les créneaux horaires */
 .appointment-time-slots5 {
   background: var(--white);
   padding: 1.5rem;
@@ -2395,7 +2374,6 @@ input:disabled {
   transform: rotate(-15deg);
 }
 
-/* Animation de chargement */
 .loading-slots {
   display: flex;
   justify-content: center;
@@ -2423,7 +2401,7 @@ input:disabled {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-/* Formulaire de rendez-vous */
+
 .appointment-form5 {
   background: var(--white);
   padding: 2rem;
@@ -2476,12 +2454,6 @@ input:disabled {
   transform: translateY(-2px);
 }
 
-
-
-
-
-
-/* Responsive Design */
 @media (max-width: 992px) {
   .doctor-header5 {
     grid-template-columns: 1fr;
@@ -2631,7 +2603,6 @@ input:disabled {
   color: var(--secondary-color);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .calendar-table {
       font-size: 0.9rem;
@@ -2711,7 +2682,7 @@ input:disabled {
   background-image: none !important; 
   padding-right: 1rem;
 }
-/* Hero2 - Symptom Checker */
+
 .hero2 {
   max-width: 1200px;
   margin: 4rem auto;
@@ -2741,7 +2712,7 @@ input:disabled {
   background: var(--primary-color);
 }
 
-/* Results Section */
+
 .hero2 ul {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -2764,12 +2735,12 @@ input:disabled {
   box-shadow: var(--shadow-sm);
 }
 
-/* Question Form */
+
 .hero2 form {
   background: var(--light-color);
     padding: 2rem;
     border-radius: var(--border-radius-lg);
-    margin: 3rem auto; /* Centrage horizontal */
+    margin: 3rem auto; 
     max-width: 600px;
     text-align: center;
 }

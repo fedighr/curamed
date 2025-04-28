@@ -16,7 +16,6 @@ body {
   flex-direction: column;
 }
 
-/* Header - Merged from both files */
 header {
   background-color: #ffffff;
   padding: 1rem 2rem;
@@ -76,7 +75,6 @@ header {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Side Navigation - Merged from both files */
 .side-nav {
   position: fixed;
   top: 0;
@@ -117,7 +115,6 @@ header {
   cursor: pointer;
 }
 
-/* Hero Section */
 .hero {
   background-color: rgba(14,168,156,0.08);
  
@@ -154,7 +151,6 @@ header {
   margin: 2rem 0;
 }
 
-/* Hide the numbers in the hero step icons */
 .hero .step-icon span {
   display: none;
 }
@@ -181,7 +177,6 @@ header {
   position: relative;
 }
 
-/* Featured Section */
 .featured-section {
   display: flex;
   flex-wrap: wrap;
@@ -242,7 +237,6 @@ header {
   transform: scale(1.03);
 }
 
-/* Stats Section */
 .stats-section {
   padding: 4rem 1rem;
   background: rgba(17,113,187,0.05);
@@ -301,7 +295,6 @@ header {
   font-size: 1.1rem;
 }
 
-/* Why Us Section with Fixed Background */
 .why-us {
   position: relative;
   padding: 4rem 1rem;
@@ -370,7 +363,6 @@ header {
   font-size: 0.95rem;
 }
 
-/* Footer - Merged from both files */
 footer {
   background-color:#16a085;
   color: #ffffff;
@@ -401,7 +393,6 @@ footer {
   opacity: 0.8;
 }
 
-/* MODIFIED RESERVATION/SEARCH STYLES */
 .reservation-container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -513,7 +504,6 @@ footer {
   margin-bottom: 0.5rem;
 }
 
-/* Auth Section from med2.css */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -646,7 +636,6 @@ footer {
   color: #1171bb;
 }
 
-/* Form Elements from med2.css */
 .form-check-inline input[type="radio"] {
   appearance: none;
   width: 22px;
@@ -712,7 +701,6 @@ footer {
   margin-bottom: 1.5rem;
 }
 
-/* Custom checkbox styling */
 .form-check-input[type="checkbox"] {
   width: 18px;
   height: 18px;
@@ -742,7 +730,6 @@ footer {
   color: #0ea89c;
 }
 
-/* Animations */
 @keyframes borderGlow {
   0% { opacity: 0; }
   50% { opacity: 1; }
@@ -770,7 +757,6 @@ footer {
   animation-delay: 0.2s;
 }
 
-/* Media Queries - Merged from both files */
 @media (max-width: 768px) {
   .features-grid {
     grid-template-columns: 1fr 1fr;
@@ -856,21 +842,17 @@ input[type="number"] {
   margin-top: 5px;
 }
 
-/* Remove red border styling on the input container */
 .input-container.error {
-  /* No additional border styling on the container */
   border: none;
   padding: 0;
 }
 
-/* Apply a red border only on the input fields when there's an error */
 .input-container.error input,
 .input-container.error select,
 .input-container.error textarea {
   border: 1px solid red;
 }
 
-/* Optional: Keep label styling unchanged */
 .input-container.error label {
   color: inherit;
 }

@@ -103,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -203,7 +203,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
             </ul>
 
             <div class="tab-content mt-4">
-                <!-- Onglet Rendez-vous à venir -->
+
                 <div class="tab-pane fade show active" id="future" role="tabpanel" aria-labelledby="future-tab">
                     <div class="table-responsive5">
                         <table class="calendar-table5">
@@ -263,7 +263,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                             </thead>
                             <tbody>
                                 <?php 
-                                $res->data_seek(0); // Réinitialiser le pointeur du résultat
+                                $res->data_seek(0);
                                 while($rdv = $res->fetch_assoc()):
                                     $date = new DateTime($rdv['date_heure']);
                                     if($date <= new DateTime() && $rdv['statut'] != 'annulé'): ?>
@@ -284,7 +284,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
                     </div>
                 </div>
 
-                <!-- Onglet Rendez-vous annulés -->
                 <div class="tab-pane fade" id="canceled" role="tabpanel" aria-labelledby="canceled-tab">
                     <div class="table-responsive5">
                         <table class="calendar-table5">

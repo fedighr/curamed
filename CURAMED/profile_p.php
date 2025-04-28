@@ -82,7 +82,7 @@ $table=mysqli_fetch_assoc($res);
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -226,7 +226,7 @@ $table=mysqli_fetch_assoc($res);
                             </div>
                             <div class="col-md-6">
                                 <div class="medical-info-card">
-                                    <i class="fas fa-user-md"></i>
+                                    <i class="fas fa-ruler-vertical"></i>
                                     <div>
                                         <h6>Taille</h6>
                                         <p><?= $table['taille'] ?>CM</p>
@@ -235,7 +235,7 @@ $table=mysqli_fetch_assoc($res);
                             </div>
                             <div class="col-md-6">
                                 <div class="medical-info-card">
-                                    <i class="fas fa-user-md"></i>
+                                    <i class="fas fa-weight"></i>
                                     <div>
                                         <h6>Poids</h6>
                                         <p><?= $table['poids'] ?>KG</p>
@@ -244,10 +244,10 @@ $table=mysqli_fetch_assoc($res);
                             </div>
                             <div class="col-md-6">
                                 <div class="medical-info-card">
-                                    <i class="fas fa-user-md"></i>
+                                    <i class="fas fa-notes-medical"></i>
                                     <div>
                                         <h6>Maladies chroniques</h6>
-                                        <p><?php if(empty($table['maladies_chroniques'])){echo "no maladies chronique";} else{$table['maladies_chroniques'];}?></p>
+                                        <p><?php if(empty($table['maladies_chroniques'])){echo "no maladies chronique";} else{echo($table['maladies_chroniques']);}?></p>
                                     </div>
                                 </div>
                             </div>
@@ -276,76 +276,118 @@ $table=mysqli_fetch_assoc($res);
                 </div>
 
                 <div class="card shadow-sm mt-4">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Contacts d'urgence</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="emergency-contacts">
-                            <div class="emergency-contact mb-3">
-                                <div class="view-mode">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Rendez-vous d'aujourd'hui</h3>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <?php
+                    $patientId = $_SESSION['user_id'];
+                    $query = "SELECT r.id_rdv, r.date_heure, u.nom, u.prenom, f.continue_facture ,m.adresse_cabinet	
+                    FROM rendez_vous r
+                    JOIN medecin m ON r.id_medecin = m.id_medecin
+                    JOIN utilisateur u ON m.id_medecin = u.id_utilisateur
+                    JOIN paiement pe ON r.id_rdv = pe.id_rdv
+                    LEFT JOIN facture f ON pe.id_paiement = f.id_paiement
+                    WHERE r.id_patient = $patientId 
+                    AND DATE(r.date_heure) = CURDATE()
+                    AND r.date_heure > NOW()
+                    AND r.statut = 'confirmé'
+                    ORDER BY r.date_heure";
+                    $result = mysqli_query($conn, $query);
+                    
+                    if(mysqli_num_rows($result) > 0): ?>
+                        <div class="appointment-list">
+                            <?php while($row = mysqli_fetch_assoc($result)): ?>
+                                <div class="appointment-item mb-3 p-3 border rounded">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6> Dr bakhana </h6>
-                                            <p class="text-muted mb-0">Père - 06 12 34 56 78</p>
+                                            <h6 class="mb-1">Dr <?= htmlspecialchars($row['prenom']) ?> <?= htmlspecialchars($row['nom']) ?></h6>
+                                            <small class="text-muted">
+                                                <?= date('H:i', strtotime($row['date_heure'])) ?>
+                                            </small>
+                                            <small class="text-muted">
+                                                <?= $row['adresse_cabinet'] ?>
+                                            </small>
+
                                         </div>
-                                        <button class="btn btn-sm btn-outline-primary edit-btn">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                        <div class="d-flex gap-2">
+                                            <?php if(!empty($row['continue_facture'])): ?>
+                                                <a href="<?= htmlspecialchars($row['continue_facture']) ?>" 
+                                                class="btn btn-sm btn-success"
+                                                target="_blank"
+                                                download>
+                                                    <i class="fas fa-download"></i> Fiche
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="edit-mode d-none">
-                                    <form class="contact-form">
-                                        <div class="row g-2">
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" value="Jean Dupont">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" value="Père">
-                                            </div>
-                                            <div class="col-12">
-                                                <input type="tel" class="form-control" value="06 12 34 56 78">
-                                            </div>
-                                            <div class="col-12 text-end">
-                                                <button type="button" class="btn btn-secondary cancel-btn">Annuler</button>
-                                                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                            <?php endwhile; ?>
                         </div>
-                        <button id="addContactBtn" class="btn btn-primary w-100">
-                            <i class="fas fa-plus me-2"></i>Ajouter un contact
-                        </button>
+                    <?php else: ?>
+                        <div class="text-center py-3 text-muted">
+                            Aucun rendez-vous prévu aujourd'hui
+                        </div>
+                    <?php endif; ?>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
     </main>
-
+    
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <img src="images/logo3.png" alt="CuraMed" class="footer-logo">
+                    <img src="images\Untitled-1.png" alt="CuraMed" class="footer-logo">
                     <p>La solution simple et efficace pour prendre rendez-vous avec des professionnels de santé.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
+                
                 <div class="footer-col">
                     <h4>Patients</h4>
                     <ul>
                         <li><a href="#">Trouver un médecin</a></li>
                         <li><a href="#">Consultation en ligne</a></li>
+                        <li><a href="#">Fonctionnalités</a></li>
+                        <li><a href="#">Tarifs</a></li>
                     </ul>
                 </div>
+                
+                <div class="footer-col">
+                    <h4>Professionnels</h4>
+                    <ul>
+                        <li><a href="#">Solutions pour médecins</a></li>
+                        <li><a href="#">Tarifs</a></li>
+                        <li><a href="#">Témoignages</a></li>
+                        <li><a href="#">Nous rejoindre</a></li>
+                    </ul>
+                </div>
+                
                 <div class="footer-col">
                     <h4>Entreprise</h4>
                     <ul>
                         <li><a href="#">À propos</a></li>
+                        <li><a href="#">Carrières</a></li>
+                        <li><a href="#">Presse</a></li>
                         <li><a href="#">Contact</a></li>
                     </ul>
                 </div>
             </div>
+            
             <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Cookies</a>
+                </div>
                 <div class="copyright">
                     © 2025 CuraMed. Tous droits réservés.
                 </div>

@@ -26,6 +26,7 @@ mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +95,7 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -202,10 +203,41 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
                            
                                 </td>
                                 <td data-label="Détails">
-                                       <a href="profile.php?id=<?= $consultation['id_medecin'] ?>" 
+                                       <a href="profile.php?id=<?= $consultation['id_medecin'] ?>" title="voir page rendez_vous"
                                        class="btn-outline-primary5">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                <?php 
+                                if(isset($_SESSION['type']) && $_SESSION['type']=='patient'): 
+                                    $sql="SELECT id_paiement FROM paiement WHERE id_rdv=".$consultation['id_rdv'];
+                                    $res=mysqli_query($conn,$sql);
+                                    $paiement=mysqli_fetch_assoc($res);
+                                    $sql="SELECT continue_facture FROM facture WHERE id_paiement=".$paiement['id_paiement'];
+                                    $res=mysqli_query($conn,$sql);
+                                    $row=mysqli_fetch_assoc($res);
+                                    ?>
+                                        <a href="<?=htmlspecialchars($row['continue_facture'])?>" title="Facture" 
+                                            class="btn btn-sm btn-primary"
+                                            target="_blank"
+                                            download>
+                                                <i class="fas fa-download"></i>
+                                        </a>
+                                <?php else:
+
+                                    $sql="SELECT fichier_pdf FROM fiche_medicale WHERE id_rdv=".$consultation['id_rdv'];
+                                    $res=mysqli_query($conn,$sql);
+                                    $row=mysqli_fetch_assoc($res);
+
+                                ?>
+
+                                            <a href="<?=htmlspecialchars($row['fichier_pdf'])?>" title="fiche medical" 
+                                            class="btn btn-sm btn-primary"
+                                            target="_blank"
+                                            download>
+                                                <i class="fas fa-download"></i>
+                                        </a>
+
+                                    <?php endif;?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -275,6 +307,6 @@ $historiques = ($result) ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<?php mysqli_close($conn);?>
 </body>
 </html>

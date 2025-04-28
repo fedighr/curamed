@@ -2,11 +2,21 @@
 require_once __DIR__ . '/vendor/autoload.php';
 session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
     $conn = mysqli_connect("localhost", "root", "", "curamed");
 
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
+
+    if(isset($_POST['dismiss_notification'])){
+        $req="DELETE FROM notification WHERE id_notification =".$_POST['notification_id'];
+        $res=mysqli_query($conn,$req);
+        header("Location: home.php");
+        exit();
+    }
+
+
     $sql = "SELECT id_patient from notification where id_utilisateur=".$_SESSION['user_id'];
     $res=mysqli_query($conn,$sql);
     $row=mysqli_fetch_assoc($res);
@@ -20,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(mysqli_query($conn,$req)){
             $nom_doctor=$_SESSION['prenom']." ".$_SESSION['nom'];
             $message = "rendez vous accepter avec docteur " . $nom_doctor;
-            $req = "UPDATE notification SET message = '$message' WHERE id_utilisateur = " . $row['id_patient'];
+            $req = "UPDATE notification SET message = '$message' WHERE id_notification  = " . (intval($_POST['notification_id'])-1);
 
             $res=mysqli_query($conn,$req);
             $sql =("
@@ -211,7 +221,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $mpdf->SetTitle('Fiche Patient - '.$patient['prenom'].' '.$patient['nom']);
             $mpdf->WriteHTML($styles);
             $mpdf->WriteHTML($html);
-            $filename = 'pdf/patient_'.$patient['id_patient'].'_'.date('Ymd').'.pdf';
+            $filename = 'pdf/fiche_medicales/patient_'.$patient['id_patient'].'_'.date('Ymd_His').'.pdf';
             $mpdf->Output($filename, \Mpdf\Output\Destination::FILE);
             $datee=date('Y-m-d H:i:s');
             $insert_fiche =("
@@ -236,22 +246,91 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "Error Inserting historique: ";
                 exit();
             }
+            $id_paiement ="SELECT * FROM paiement where id_rdv=".$row2['id_rdv'];
+
+            $res=mysqli_query($conn,$id_paiement);
+            $resu=mysqli_fetch_assoc($res);
+
+            $mpdf2 = new \Mpdf\Mpdf([
+                'tempDir' => __DIR__ . '/pdf',
+                'format' => 'A4',
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_top' => 25,
+                'margin_bottom' => 20,
+                'margin_header' => 10,
+                'margin_footer' => 10
+            ]);
+            $montant="60 dinars";
+            $html = $styles . '
+                <div class="header">
+                    <h1>Facture Patient</h1>
+                    <p>Date de génération: '.date('d/m/Y').'</p>
+                </div>
+
+                <div class="profile-section">
+                    <img src="'.$patient['photo_profil'].'" class="profile-img">
+                    <div>
+                        <h2>'.$patient['prenom'].' '.$patient['nom'].'</h2>
+                        <p>Âge: '.$patient['age'].' ans</p>
+                        <p>Genre: '.ucfirst($patient['genre']).'</p>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Continue de facutre</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Id paiement</td>
+                        <td>'.$resu['id_paiement'].'</td>
+                    </tr>
+                    <tr>
+                        <td>Montant</td>
+                        <td>'.$montant.'</td>
+                    </tr>
+                    <tr>
+                        <td>Mode paiement</td>
+                        <td>'.$resu['mode_paiement'].'</td>
+                    </tr>                   
+                </table>
+            ';
+
+            $mpdf2->SetTitle('facture - '.$patient['prenom'].' '.$patient['nom']);
+            $mpdf2->WriteHTML($styles);
+            $mpdf2->WriteHTML($html);
+            $filename = 'pdf/factures/facturePatient_'.$patient['id_patient'].'_'.date('Ymd_His').'.pdf';
+            $mpdf2->Output($filename, \Mpdf\Output\Destination::FILE);
+            $datee=date('Y-m-d');
+            $insert_facture =("
+                INSERT INTO facture
+                (id_paiement, date_facture,continue_facture)
+                VALUES ('{$resu['id_paiement']}', '$datee', '$filename')
+            ");
+
+            $res=mysqli_query($conn,$insert_facture);
+            if(!$res) {
+                echo "Error creating facture: ";
+                exit();
+            }
         }
     }
     if(isset($_POST['refuser'])){
-        $req="UPDATE rendez_vous set statut='annulé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id'];
-        if(mysqli_query($conn,$req)){
-            mysqli_free_result($req);
+        $req="UPDATE rendez_vous set statut='annulé' where id_patient=".$row['id_patient']." and id_medecin=".$_SESSION['user_id']. " and statut='en attente' ORDER BY id_rdv ASC LIMIT 1 ";
+        if(!mysqli_query($conn,$req)){
+            echo"erreur";
+            exit();
         }
-        $req="DELETE from paiement where id_patient =".$row['id_patient']." and id_rdv=".$row2['id_rdv'];
+        $req="SELECT id_rdv from rendez_vous where id_patient=".$row['id_patient']." and id_medecin= ".$_SESSION['user_id']. " and statut='annulé' ORDER BY id_rdv DESC LIMIT 1";
+        $res=mysqli_query($conn,$req);
+        $row2=mysqli_fetch_assoc($res);
+        $req="DELETE from paiement where id_patient =".$row['id_patient']." and id_rdv=".$row2['id_rdv']." ORDER BY id_rdv DESC LIMIT 1";
         if(mysqli_query($conn,$req)){
             $nom_doctor=$_SESSION['prenom']." ".$_SESSION['nom'];
             $message = "rendez vous refuser avec docteur " . $nom_doctor;
-            $req = "UPDATE notification SET message = '$message' WHERE id_utilisateur = " . $row['id_patient'];
+            $req = "UPDATE notification SET message = '$message' WHERE id_notification  = " . (intval($_POST['notification_id'])-1);
             $res=mysqli_query($conn,$req);
         }
     }
-    $sql = "DELETE FROM notification WHERE id_utilisateur = " . $_SESSION['user_id'] . " AND id_patient = " . $row['id_patient'] ." and id_rdv=".$row2['id_rdv'];
+    $sql = "DELETE FROM notification WHERE id_notification = " .$_POST['notification_id'];
     $res=mysqli_query($conn,$sql);
     header("Location: home.php");
 

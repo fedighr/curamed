@@ -68,7 +68,7 @@ $conn=mysqli_connect("localhost","root","","curamed");
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -175,9 +175,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
                   
                         <div class="popular-searches">
                             <span>Recherches populaires :</span>
-                            <a href="#">Médecin généraliste</a>
-                            <a href="#">Dermatologue</a>
-                            <a href="#">Pédiatre</a>
+                            <a href="search.php?specialite=Médecine Générale">Médecin généraliste</a>
+                            <a href="search.php?specialite=Dermatologie">Dermatologue</a>
+                            <a href="search.php?specialite=Pédiatre">Pédiatre</a>
                         </div>
                         
                     </div>
@@ -187,8 +187,6 @@ $conn=mysqli_connect("localhost","root","","curamed");
                 </div>
             </div>
         </form>
-        <li>Esseyer notre nouveau modéle Ai pour assurer votre chemin vers le bon médecin :  </li>
-        <button class="btn3" onclick="window.location.href='test.php'">Click ici</button>
         
     </section>
 
@@ -280,7 +278,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
                     <h3 class="doctor1-name">Dr. <?= htmlspecialchars($doctor['prenom'] . ' ' . htmlspecialchars($doctor['nom'])) ?></h3>
                     <p class="specialty"><?= htmlspecialchars($doctor['specialite']) ?></p>
                     <p class="location"><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($doctor['adresse_cabinet']) ?></p>
-                    <button class="choose-btn" onclick="location.href='profile.php?id=<?= $doctor['id_utilisateur'] ?>'">Choisir</button>
+                    <?php if(isset($_SESSION['type']) && $_SESSION['type']=="patient"): ?>
+                        <button class="choose-btn" onclick="location.href='profile.php?id=<?= $doctor['id_utilisateur'] ?>'">Choisir</button>
+                    <?php endif; ?>
                 </div>
                 <?php }?>
         <?php
@@ -361,9 +361,9 @@ $conn=mysqli_connect("localhost","root","","curamed");
         <div class="container">
             <div class="cta-content">
                 <h2>Prêt à consulter ?</h2>
-                <p>Trouvez le médecin qu'il vous faut et prenez rendez-vous en quelques clics</p>
+                <p>Essayez notre nouveau modèle d'IA pour découvrir vos symptômes facilement</p>
              
-                <button class="btn btn-primary btn-lg" onclick="window.location.href='search.php'">Trouver un médecin</button>
+                <button class="btn btn-primary btn-lg" onclick="window.location.href='test.php'">Essayer</button>
             </div>
         </div>
     </section>

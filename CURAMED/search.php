@@ -1,6 +1,11 @@
 <?php
+
 session_start();
 header('Content-Type: text/html; charset=utf-8');
+
+if(!isset($_SESSION["user_id"])){
+  header("Location: login.html");
+}
 
 $conn = mysqli_connect('localhost', 'root', '', 'curamed');
 if (!$conn) {
@@ -148,7 +153,7 @@ mysqli_close($conn);
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -336,7 +341,9 @@ mysqli_close($conn);
               </div>
 
               <div class="action-buttons">
-              <a href="profile.php?id=<?= $doc['id_utilisateur'] ?>" class="btn btn-outline-primary">Prendre RDV</a>
+              <?php if(isset($_SESSION['type']) && $_SESSION['type']=="patient"): ?>
+                <a href="profile.php?id=<?= $doc['id_utilisateur'] ?>" class="btn btn-outline-primary">Prendre RDV</a>
+              <?php endif; ?>
               </div>
             </div>
           </div>

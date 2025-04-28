@@ -1,5 +1,8 @@
 <?php
 session_start();
+if(!isset($_SESSION["user_id"])){
+    header("Location: login.html");
+  }
 $conn = new mysqli("localhost", "root", "", "curamed");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -131,7 +134,7 @@ if (!empty($symptomCounts)) {
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>

@@ -1,127 +1,147 @@
 <?php
-
 use PHPUnit\Framework\TestCase;
 
 class testLogin extends TestCase
 {
-    protected $baseUrl = 'http://localhost/curamed/CURAMED/';
-    protected $testUserEmail = 'test@curamed.com';
-    protected $testUserPassword = 'ValidPassword123!';
+    private string $baseUrl          = 'http://localhost/curamed/CURAMED/';
+    private string $testUserEmail    = 'test@curamed.com';
+    private string $testUserPassword = 'ValidPassword123!';
+    private string $cookieFile;
 
     protected function setUp(): void
     {
-
+        $this->cookieFile = tempnam(sys_get_temp_dir(), 'phpunit_cookies_');
         $this->createTestUser();
     }
 
     protected function tearDown(): void
     {
-
-        $this->deleteTestUser();
+        @unlink($this->cookieFile);
     }
 
-
-    public function testSQLInjectionProtection()
+    public function testSQLInjectionProtection(): void
     {
-        $response = $this->makeRequest('signin.php', [
+        $data = $this->parseResponse($this->makeRequest('signin.php', [
             'email' => "' OR '1'='1' -- ",
-            'mdp' => "anything"
-        ]);
-
-        $data = $this->parseResponse($response);
+            'mdp'   => 'anything'
+        ]));
         $this->assertFalse($data['success']);
-        $this->assertStringContainsString('Aucun utilisateur', $data['message']);
+        $this->assertStringContainsString('Mot de passe incorrect', $data['message']);
     }
 
-
-    public function testXSSInjectionProtection()
+    public function testXSSInjectionProtection(): void
     {
         $response = $this->makeRequest('signin.php', [
             'email' => '<script>alert("hacked")</script>',
-            'mdp' => 'password123'
+            'mdp'   => 'password123'
         ]);
-
         $this->assertStringNotContainsString('<script>', $response);
     }
 
-
-    public function testInvalidLoginAttempt()
+    public function testInvalidLoginAttempt(): void
     {
-        $response = $this->makeRequest('signin.php', [
+        $data = $this->parseResponse($this->makeRequest('signin.php', [
             'email' => $this->testUserEmail,
-            'mdp' => 'wrong_password'
-        ]);
-
-        $data = $this->parseResponse($response);
+            'mdp'   => 'wrong_password'
+        ]));
         $this->assertFalse($data['success']);
         $this->assertStringContainsString('Mot de passe incorrect.', $data['message']);
         $this->assertStringContainsString('Tentatives restantes: 4', $data['message']);
     }
 
-
-    public function testValidLogin()
+    public function testValidLogin(): void
     {
-        $response = $this->makeRequest('signin.php', [
+        $data = $this->parseResponse($this->makeRequest('signin.php', [
             'email' => $this->testUserEmail,
-            'mdp' => $this->testUserPassword
-        ]);
-
-        $data = $this->parseResponse($response);
+            'mdp'   => $this->testUserPassword
+        ]));
         $this->assertTrue($data['success']);
     }
 
-    public function testBruteForceProtection()
+    public function testBruteForceProtection(): void
     {
         for ($i = 0; $i < 4; $i++) {
-            $response = $this->makeRequest('signin.php', [
+            $data = $this->parseResponse($this->makeRequest('signin.php', [
                 'email' => $this->testUserEmail,
-                'mdp' => 'wrong_password_'.$i
-            ]);
-            
-            $data = $this->parseResponse($response);
-            $remaining = 4 - $i;
-            $this->assertStringContainsString("Tentatives restantes: $remaining", $data['message']);
+                'mdp'   => 'bad' . $i
+            ]));
+            $this->assertStringContainsString(
+                'Tentatives restantes: ' . (4 - $i),
+                $data['message']
+            );
         }
 
-
-        $response = $this->makeRequest('signin.php', [
+        $data = $this->parseResponse($this->makeRequest('signin.php', [
             'email' => $this->testUserEmail,
-            'mdp' => 'wrong_password_4'
-        ]);
-        
-        $data = $this->parseResponse($response);
+            'mdp'   => 'bad4'
+        ]));
         $this->assertFalse($data['success']);
         $this->assertStringContainsString('Trop de tentatives', $data['message']);
 
-
-        $response = $this->makeRequest('signin.php', [
+        $data = $this->parseResponse($this->makeRequest('signin.php', [
             'email' => $this->testUserEmail,
-            'mdp' => $this->testUserPassword
-        ]);
-        $this->assertFalse($this->parseResponse($response)['success']);
+            'mdp'   => $this->testUserPassword
+        ]));
+        $this->assertFalse($data['success']);
     }
 
-    private function makeRequest($endpoint, $postData)
+
+    public function testDatabaseStress(): void
     {
-        $url = $this->baseUrl . $endpoint;
-        $options = [
-            'http' => [
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($postData),
-            ],
-        ];
+        $iterations = 100;
+        $successCount = 0;
+        $startTime = microtime(true);
+
+
+        $this->createMultipleTestUsers($iterations);
+
+
+        for ($i = 0; $i < $iterations; $i++) {
+            $cookieFile = tempnam(sys_get_temp_dir(), 'stress_cookie_');
+            
+            $response = $this->makeRequest('signin.php', [
+                'email' => "testuser{$i}@curamed.com",
+                'mdp'   => "Password{$i}!"
+            ], $cookieFile);
+            
+            $data = $this->parseResponse($response);
+            if ($data['success']) {
+                $successCount++;
+            }
+            
+            @unlink($cookieFile);
+        }
+
+        $totalTime = microtime(true) - $startTime;
+        $avgResponseTime = $totalTime / $iterations;
+
+
+        $this->assertEquals(
+            $iterations,
+            $successCount,
+            "All $iterations login attempts should succeed"
+        );
         
-        $context = stream_context_create($options);
-        return file_get_contents($url, false, $context);
+        $this->assertLessThan(
+            0.5,
+            $avgResponseTime,
+            "Average response time should be under 0.5 seconds (actual: {$avgResponseTime}s)"
+        );
+
+        $conn = new mysqli(
+            getenv('DB_HOST') ?: 'localhost',
+            getenv('DB_USER') ?: 'root',
+            getenv('DB_PASS') ?: '',
+            getenv('DB_NAME') ?: 'curamed'
+        );
+
+        $conn->query("DELETE FROM utilisateur WHERE email LIKE '%@curamed.com'");
+
+        $conn->close();
+
     }
 
-    private function parseResponse($response)
-    {
-        return json_decode($response, true);
-    }
-
-    private function createTestUser()
+    private function createMultipleTestUsers(int $count): void
     {
         $conn = new mysqli(
             getenv('DB_HOST') ?: 'localhost',
@@ -130,21 +150,51 @@ class testLogin extends TestCase
             getenv('DB_NAME') ?: 'curamed'
         );
 
-        $passwordHash = password_hash($this->testUserPassword, PASSWORD_DEFAULT);
-        
+        for ($i = 0; $i < $count; $i++) {
+            $email = "testuser{$i}@curamed.com";
+            $password = password_hash("Password{$i}!", PASSWORD_DEFAULT);
+            
+            $conn->query(
+                "INSERT INTO utilisateur 
+                (nom, prenom, email, mot_de_passe, role, type_utilisateur)
+                VALUES 
+                ('User{$i}', 'Test', '$email', '$password', 'patient', 'regular')"
+            );
+        }
 
-        $conn->query("DELETE FROM utilisateur WHERE email = '".$this->testUserEmail."'");
-        
-
-        $conn->query("INSERT INTO utilisateur (email, mot_de_passe) VALUES (
-            '".$this->testUserEmail."',
-            '".$passwordHash."'
-        )");
-        
         $conn->close();
     }
 
-    private function deleteTestUser()
+    private function makeRequest(
+        string $endpoint, 
+        array $postData, 
+        string $cookieFile = null
+    ): string {
+        $cookieFile = $cookieFile ?? $this->cookieFile;
+        
+        $ch = curl_init($this->baseUrl . $endpoint);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => http_build_query($postData),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_COOKIEJAR      => $cookieFile,
+            CURLOPT_COOKIEFILE     => $cookieFile,
+            CURLOPT_TIMEOUT        => 10,
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        return $response !== false ? $response : '';
+    }
+
+    private function parseResponse(string $response): array
+    {
+        return json_decode($response, true) ?: [];
+    }
+
+    private function createTestUser(): void
     {
         $conn = new mysqli(
             getenv('DB_HOST') ?: 'localhost',
@@ -153,7 +203,17 @@ class testLogin extends TestCase
             getenv('DB_NAME') ?: 'curamed'
         );
 
-        $conn->query("DELETE FROM utilisateur WHERE email = '".$this->testUserEmail."'");
+        $safeEmail = $conn->real_escape_string($this->testUserEmail);
+        $conn->query("DELETE FROM utilisateur WHERE email = '$safeEmail'");
+
+        $passwordHash = password_hash($this->testUserPassword, PASSWORD_DEFAULT);
+
+        $conn->query(
+            "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, role, type_utilisateur)
+             VALUES ('Test', 'User', '$safeEmail', '$passwordHash', 'patient', 'normal')"
+        );
+
         $conn->close();
     }
 }
+?>

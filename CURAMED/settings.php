@@ -1,16 +1,68 @@
 <?php
 session_start();
 
-$_SESSION['patient'] = [
-    'photo' => 'images/profil.jpg',
-    'nom' => 'chakroun',
-    'prenom' => 'abdelhedi',
-    'email' => 'abdelhedi.chakroun@example.com',
-    'telephone' => '97370975',
-    'notifications' => true,
-    'newsletter' => false,
-    'theme' => 'light'
-];
+$conn = mysqli_connect("localhost", "root", "", "curamed");
+$error = '';
+
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $sql = "SELECT * FROM utilisateur WHERE id_utilisateur = $user_id";
+    $result = mysqli_query($conn, $sql);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user = mysqli_fetch_assoc($result);
+        $_SESSION['patient'] = [
+            'photo' => $user['photo_profil'],
+            'nom' => $user['nom'],
+            'prenom' => $user['prenom'],
+            'email' => $user['email'],
+            'telephone' => $user['telephone'],
+            'notifications' => true,
+            'newsletter' => false,
+            'theme' => 'light'
+        ];
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_SESSION['user_id'] ?? null;
+
+    if (isset($_POST['email'])) {
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $phone = mysqli_real_escape_string($conn, $_POST['telephone']);
+        
+        $stmt = $conn->prepare("UPDATE utilisateur SET email=?, telephone=? WHERE id_utilisateur=?");
+        $stmt->bind_param("ssi", $email, $phone, $user_id);
+        if ($stmt->execute()) {
+            $_SESSION['patient']['email'] = $email;
+            $_SESSION['patient']['telephone'] = $phone;
+        } else {
+            $error = "Error updating account";
+        }
+    }
+
+    if (isset($_POST['current_password'])) {
+        $current = $_POST['current_password'];
+        $new = $_POST['new_password'];
+        $confirm = $_POST['confirm_password'];
+        
+        $stmt = $conn->prepare("SELECT mot_de_passe FROM utilisateur WHERE id_utilisateur=?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        
+        if (password_verify($current, $result['mot_de_passe'])) {
+            if ($new === $confirm) {
+                $hash = password_hash($new, PASSWORD_DEFAULT);
+                $conn->query("UPDATE utilisateur SET mot_de_passe='$hash' WHERE id_utilisateur=$user_id");
+            } else {
+                $error = "Passwords don't match";
+            }
+        } else {
+            $error = "Wrong current password";
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -71,7 +123,7 @@ $_SESSION['patient'] = [
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -140,6 +192,15 @@ $_SESSION['patient'] = [
     </header>
 
     <main class="settings-main container">
+
+        <?php if($error): ?>
+        <div class="alert alert-danger">
+
+        <?= $error ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php endif; ?>
+
         <div class="settings-header mb-5">
             <h1 class="settings-title"><i class="fas fa-cog me-3"></i>Paramètres</h1>
             <nav class="settings-nav">
@@ -161,50 +222,48 @@ $_SESSION['patient'] = [
         </div>
 
         <div class="tab-content" id="settings-tabs-content">
-            <!-- Onglet Compte -->
+
             <div class="tab-pane fade show active" id="account-tab">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-user-edit me-2"></i>Informations du compte</h3>
                     </div>
                     <div class="card-body">
-                        <form id="accountForm">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Adresse email</label>
-                                    <input type="email" class="form-control" value="<?= $_SESSION['patient']['email'] ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Téléphone</label>
-                                    <input type="tel" class="form-control" value="<?= $_SESSION['patient']['telephone'] ?>">
-                                </div>
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="newsletterCheck" <?= $_SESSION['patient']['newsletter'] ? 'checked' : '' ?>>
-                                        <label class="form-check-label" for="newsletterCheck">
-                                            Recevoir la newsletter
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-12 text-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save me-2"></i>Enregistrer
-                                    </button>
-                                </div>
+                    <form method="POST">
+                    <input type="hidden" name="update_account" value="1">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Adresse email</label>
+                                <input type="email" class="form-control" name="email" 
+                                value="<?= htmlspecialchars($_SESSION['patient']['email']) ?>">
+
                             </div>
-                        </form>
+                            <div class="col-md-6">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-control" name="telephone"
+                                value="<?= htmlspecialchars($_SESSION['patient']['telephone']) ?>">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Enregistrer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Onglet Notifications -->
+
             <div class="tab-pane fade" id="notifications-tab">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Préférences de notifications</h3>
                     </div>
                     <div class="card-body">
-                        <form id="notificationsForm">
+                    <form method="POST">
                             <div class="mb-4">
                                 <h5 class="mb-3"><i class="fas fa-comment-medical me-2"></i>Rendez-vous</h5>
                                 <div class="form-check form-switch mb-2">
@@ -247,51 +306,45 @@ $_SESSION['patient'] = [
                 </div>
             </div>
 
-            <!-- Onglet Sécurité -->
+
             <div class="tab-pane fade" id="security-tab">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
                         <h3 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Sécurité du compte</h3>
                     </div>
                     <div class="card-body">
-                        <form id="securityForm">
-                            <div class="mb-4">
-                                <h5 class="mb-3"><i class="fas fa-key me-2"></i>Changer le mot de passe</h5>
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label">Mot de passe actuel</label>
-                                        <input type="password" class="form-control" placeholder="Entrez votre mot de passe actuel">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Nouveau mot de passe</label>
-                                        <input type="password" class="form-control" placeholder="Créez un nouveau mot de passe">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Confirmer le mot de passe</label>
-                                        <input type="password" class="form-control" placeholder="Confirmez le nouveau mot de passe">
-                                    </div>
+                    <form method="POST">
+                    <input type="hidden" name="change_password" value="1">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fas fa-key me-2"></i>Changer le mot de passe</h5>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Mot de passe actuel</label>
+                                    <input type="password" class="form-control" name="current_password" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" class="form-control" name="new_password" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" name="confirm_password" required>
                                 </div>
                             </div>
-
-                            <div class="mb-4">
-                                <h5 class="mb-3"><i class="fas fa-lock me-2"></i>Authentification à deux facteurs</h5>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="twoFactorAuth">
-                                    <label class="form-check-label" for="twoFactorAuth">Activer l'authentification à deux facteurs</label>
-                                </div>
-                            </div>
-
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Enregistrer
-                                </button>
-                            </div>
-                        </form>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </form>
                     </div>
                 </div>
             </div>
 
-            <!-- Onglet Apparence -->
+
             <div class="tab-pane fade" id="appearance-tab">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">

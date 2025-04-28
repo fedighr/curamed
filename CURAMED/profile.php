@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+if(!isset($_SESSION["user_id"])){
+    header("Location: login.html");
+  }
+
 require 'vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -170,7 +174,7 @@ $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -194,7 +198,7 @@ $schedule = $scheduleResult ? mysqli_fetch_assoc($scheduleResult) : null;
             </div>
         </div>
 
-                <a href="appointments.html" class="nav-icon" title="Rendez-vous">
+                <a href="rendez_vous.php" class="nav-icon" title="Rendez-vous">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
                 

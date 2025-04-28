@@ -11,7 +11,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const email = emailInput.value;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
-    // Validate Email
+
     if (!email.match(emailPattern)) {
         document.getElementById('emailError').textContent = 'Veuillez entrer un e-mail valide.';
         emailContainer.classList.add('error');  

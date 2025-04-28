@@ -121,7 +121,7 @@ function clearErrors() {
     const errorContainers = document.querySelectorAll(".input-container.error");
     errorContainers.forEach(container => container.classList.remove("error"));
     
-    // Clear errors for sex and user type radio buttons, and terms checkbox
+
     const errorRadioSex = document.getElementById("error_sexe");
     if (errorRadioSex) errorRadioSex.innerText = "";
 

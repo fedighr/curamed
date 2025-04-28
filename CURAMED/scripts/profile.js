@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Variables globales
+
     let currentDate = new Date();
     let selectedDate = null;
     let selectedTime = null;
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevMonthBtn = document.querySelector('.calendar-nav5.prev5');
     const nextMonthBtn = document.querySelector('.calendar-nav5.next5');
 
-    // Générer le calendrier avec des améliorations
+
     function generateCalendar(date) {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let daysHtml = '';
         
-        // Entêtes des jours
+
         const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
         dayNames.forEach(day => {
             daysHtml += `<div class="calendar-day-header5">${day}</div>`;
         });
 
-        // Jours du mois précédent
+
         for(let i = firstWeekDay; i > 0; i--) {
             daysHtml += `<div class="calendar-day5 disabled">${prevMonthLastDay - i + 1}</div>`;
         }
 
-        // Jours du mois courant
+
         for(let i = 1; i <= lastDay.getDate(); i++) {
             const dayDate = new Date(year, month, i);
             const isPast = dayDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        // Jours du mois suivant
+
         const daysShown = firstWeekDay + lastDay.getDate();
         const remainingDays = 7 - (daysShown % 7);
         if (remainingDays < 7) {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calendarDays.innerHTML = daysHtml;
         
-        // Si une date est déjà sélectionnée, on la réaffiche
+
         if (selectedDate) {
             const selectedDayElement = document.querySelector(`.calendar-day5[data-date="${selectedDate.toISOString()}"]`);
             if (selectedDayElement) {
@@ -85,14 +85,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Générer les créneaux horaires avec simulation de chargement
+
     async function generateTimeSlots(date) {
         if (!date) {
             timeSlotsContainer.innerHTML = '<p class="text-center">Sélectionnez une date pour voir les disponibilités</p>';
             return;
         }
         
-        // Afficher l'animation de chargement
+
         timeSlotsContainer.innerHTML = `
             <div class="loading-slots">
                 <div class="dot"></div>
@@ -101,13 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Simuler un délai de chargement
+
         await new Promise(resolve => setTimeout(resolve, 800));
         
         const slots = [];
-        const startHour = 8; // Début à 8h
-        const endHour = 20;  // Fin à 20h
-        const interval = 30; // minutes
+        const startHour = 8;
+        const endHour = 20;
+        const interval = 30;
         
         for(let hour = startHour; hour < endHour; hour++) {
             for(let minute = 0; minute < 60; minute += interval) {
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const slotDate = new Date(date);
                 slotDate.setHours(hour, minute);
                 
-                // Vérifier si le créneau est disponible
+
                 const isBooked = await checkSlotAvailability(slotDate);
                 const isPast = slotDate < new Date();
                 

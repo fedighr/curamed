@@ -8,6 +8,12 @@ $conn=mysqli_connect("localhost","root","","curamed");
     try {
         $conn->begin_transaction();
 
+        if (file_exists($_SESSION['photo'])) {
+            if (!unlink($_SESSION['photo'])) {
+                echo "Erreur lors de la suppression de la photo.";
+            }
+        }
+
         $conn->query("DELETE FROM utilisateur WHERE id_utilisateur = $user_id");
 
         $conn->commit();

@@ -55,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if (!empty($_FILES['photo']['name'])) {
+        
         $photo_name = $_FILES['photo']['name'];
         $photo_tmp = $_FILES['photo']['tmp_name'];
         $photo_folder = "user_photos/" . uniqid() . "_" . basename($photo_name);
@@ -162,7 +163,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['nom']) && isset($_POST['prenom'])) {
         $userType = $_POST['user_type'];
         
-        // Handle file upload
         $photo_name = $_FILES['photo']['name'];
         $photo_tmp = $_FILES['photo']['tmp_name'];
         $photo_folder = "user_photos/" . uniqid() . "_" . basename($photo_name);
@@ -170,7 +170,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Erreur lors du téléchargement de l'image.");
         }
 
-        // Insert into utilisateur
         $sql = "INSERT INTO utilisateur (nom, prenom, email, telephone, mot_de_passe, role, type_utilisateur, photo_profil)
                 VALUES (?, ?, ?, ?, ?, 'regular', ?, ?)";
         

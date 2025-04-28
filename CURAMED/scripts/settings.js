@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion des formulaires
+
     const forms = {
         account: document.getElementById('accountForm'),
         notifications: document.getElementById('notificationsForm'),
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
         appearance: document.getElementById('appearanceForm')
     };
 
-    // Soumission des formulaires
+
     for (const [formName, form] of Object.entries(forms)) {
         if (form) {
             form.addEventListener('submit', function(e) {
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Gestion du changement de thème
     const themeRadios = document.querySelectorAll('input[name="theme"]');
     themeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Gestion de la taille du texte
     const textSizeSlider = document.getElementById('textSize');
     if (textSizeSlider) {
         textSizeSlider.addEventListener('input', function() {
@@ -36,9 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function saveSettings(formType) {
     console.log(`Sauvegarde des paramètres ${formType}...`);
-    // Ici vous ajouteriez la logique AJAX pour sauvegarder
+
     
-    // Feedback visuel
+
     const button = document.querySelector(`#${formType}Form button[type="submit"]`);
     const originalText = button.innerHTML;
     
@@ -59,13 +57,13 @@ function applyTheme(theme) {
     document.body.classList.remove('light-theme', 'dark-theme');
     
     if (theme === 'system') {
-        // Détection du thème système
+
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         theme = isDark ? 'dark' : 'light';
     }
     
     document.body.classList.add(`${theme}-theme`);
-    // Ici vous pourriez sauvegarder le thème dans les cookies/localStorage
+
 }
 
 function updateTextSize(size) {
@@ -74,7 +72,7 @@ function updateTextSize(size) {
     document.body.classList.add(`text-${sizes[size]}`);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    // Gestion du dropdown profil
+
     const profileDropdown = document.querySelector('.profile-dropdown');
     const dropdownMenu = document.querySelector('.dropdown-menu');
 
@@ -83,18 +81,18 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdownMenu.classList.toggle('show');
     });
 
-    // Fermer le dropdown quand on clique ailleurs
+
     document.addEventListener('click', () => {
         dropdownMenu.classList.remove('show');
     });
 
-    // Notifications
+
     document.querySelector('.notifications-btn').addEventListener('click', () => {
-        // Ajouter la logique d'affichage des notifications ici
+
         console.log('Afficher les notifications');
     });
 
-    // Animation au survol du logo
+
     const logo = document.querySelector('.logo-img');
     logo.addEventListener('mouseenter', () => {
         logo.style.transform = 'scale(1.05)';
@@ -112,7 +110,7 @@ notificationsWrapper.addEventListener('click', (e) => {
     notificationsDropdown.classList.toggle('show');
 });
 
-// Fermer les dropdowns au clic externe
+
 document.addEventListener('click', (e) => {
     if (!notificationsWrapper.contains(e.target)) {
         notificationsDropdown.classList.remove('show');
@@ -121,7 +119,7 @@ document.addEventListener('click', (e) => {
         dropdownMenu.classList.remove('show');
     }
 });
-// Apply theme on page load
+
 window.addEventListener('DOMContentLoaded', () => {
     const theme = localStorage.getItem('theme');
     if (theme === 'dark') {
@@ -129,11 +127,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // Toggle and store theme
+
   document.getElementById("theme-toggle").addEventListener("click", () => {
     document.body.classList.toggle("dark-theme");
   
-    // Save the current theme
+
     const isDark = document.body.classList.contains("dark-theme");
     localStorage.setItem("theme", isDark ? "dark" : "light");
   });

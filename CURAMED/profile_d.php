@@ -127,7 +127,7 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
                             <input type="hidden" name="notification_id" 
                                 value="<?= htmlspecialchars($row['id_notification']) ?>">
                             <?php if(isset($_SESSION['type']) && $_SESSION['type'] == 'patient'): ?>   
-                            <button type="button" 
+                            <button type="submit" 
                                     name="dismiss_notification" 
                                     class="notification-close-btn" 
                                     title="Fermer la notification">&times;</button>
@@ -218,7 +218,7 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
     </div>
 
     <div class="row g-4">
-        <!-- Left Column -->
+
         <div class="row g-4">
             <div class="col-lg-8">
                 <form id="profileForm" method="POST" onsubmit="return false" action="delete_account.php">
@@ -367,56 +367,56 @@ while ($r = mysqli_fetch_assoc($res_tpl)) {
 
 
             <div class="card shadow-sm mt-4">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Rendez-vous d'aujourd'hui</h3>
-            </div>
-            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                <?php
-                $doctorId = $_SESSION['user_id'];
-                $query = "SELECT r.id_rdv, r.date_heure, u.nom, u.prenom, f.fichier_pdf 
-                FROM rendez_vous r
-                JOIN patient p ON r.id_patient = p.id_patient
-                JOIN utilisateur u ON p.id_patient = u.id_utilisateur
-                LEFT JOIN fiche_medicale f ON r.id_rdv = f.id_rdv
-                WHERE r.id_medecin = $doctorId 
-                AND DATE(r.date_heure) = CURDATE()
-                AND r.date_heure > NOW()
-                AND statut = 'confirmé'
-                ORDER BY r.date_heure";
-                $result = mysqli_query($conn, $query);
-                
-                if(mysqli_num_rows($result) > 0): ?>
-                    <div class="appointment-list">
-                        <?php while($row = mysqli_fetch_assoc($result)): ?>
-                            <div class="appointment-item mb-3 p-3 border rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1"><?= htmlspecialchars($row['prenom']) ?> <?= htmlspecialchars($row['nom']) ?></h6>
-                                        <small class="text-muted">
-                                            <?= date('H:i', strtotime($row['date_heure'])) ?>
-                                        </small>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <?php if(!empty($row['fichier_pdf'])): ?>
-                                            <a href="<?= htmlspecialchars($row['fichier_pdf']) ?>" 
-                                            class="btn btn-sm btn-success"
-                                            target="_blank"
-                                            download>
-                                                <i class="fas fa-download"></i> Fiche
-                                            </a>
-                                        <?php endif; ?>
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Rendez-vous d'aujourd'hui</h3>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <?php
+                    $doctorId = $_SESSION['user_id'];
+                    $query = "SELECT r.id_rdv, r.date_heure, u.nom, u.prenom, f.fichier_pdf 
+                    FROM rendez_vous r
+                    JOIN patient p ON r.id_patient = p.id_patient
+                    JOIN utilisateur u ON p.id_patient = u.id_utilisateur
+                    LEFT JOIN fiche_medicale f ON r.id_rdv = f.id_rdv
+                    WHERE r.id_medecin = $doctorId 
+                    AND DATE(r.date_heure) = CURDATE()
+                    AND r.date_heure > NOW()
+                    AND statut = 'confirmé'
+                    ORDER BY r.date_heure";
+                    $result = mysqli_query($conn, $query);
+                    
+                    if(mysqli_num_rows($result) > 0): ?>
+                        <div class="appointment-list">
+                            <?php while($row = mysqli_fetch_assoc($result)): ?>
+                                <div class="appointment-item mb-3 p-3 border rounded">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><?= htmlspecialchars($row['prenom']) ?> <?= htmlspecialchars($row['nom']) ?></h6>
+                                            <small class="text-muted">
+                                                <?= date('H:i', strtotime($row['date_heure'])) ?>
+                                            </small>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <?php if(!empty($row['fichier_pdf'])): ?>
+                                                <a href="<?= htmlspecialchars($row['fichier_pdf']) ?>" 
+                                                class="btn btn-sm btn-success"
+                                                target="_blank"
+                                                download>
+                                                    <i class="fas fa-download"></i> Fiche
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="text-center py-3 text-muted">
-                        Aucun rendez-vous prévu aujourd'hui
-                    </div>
-                <?php endif; ?>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-3 text-muted">
+                            Aucun rendez-vous prévu aujourd'hui
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 </main>

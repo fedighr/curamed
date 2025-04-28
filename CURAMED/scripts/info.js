@@ -2,10 +2,10 @@ function verif() {
     clearErrors();
 
     const currentPage = window.location.pathname.split('/').pop().toLowerCase();
-    let isValid = true; // define once
+    let isValid = true;
 
     if (currentPage === 'information_patient.html') {
-        // No need to redeclare "isValid" here; just use the outer one.
+
         const tailleInput = document.getElementById("taille");
         const poidsInput = document.getElementById("poids");
         const maladiesChroniquesInput = document.getElementById("maladies_chroniques");
@@ -47,7 +47,7 @@ function verif() {
             this.submit();
         }
     } else {
-        // Medecin validation branch
+
 
         const specialiteInput = document.getElementById('specialite');
         if (!specialiteInput.value) {
@@ -109,26 +109,26 @@ function clearErrors() {
 }
 
 document.getElementById('signup-form').addEventListener('submit', function (event) {
-    event.preventDefault();  // Prevent default form submission
+    event.preventDefault();
 
-    // Call verif function to validate the form
+
     if (verif()) {
-        const formData = new FormData(this);  // Use the current form
+        const formData = new FormData(this);
 
         fetch('signup.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())  // Parse the JSON response
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Redirect to verification page if successful
+
                 window.location.href = 'verification.php';
             } else {
-                // Display error message if email already exists
+
                 if (data.message) {
                     const emailInput = document.getElementById('email');
-                    setError(emailInput, data.message);  // Display error on the email input field
+                    setError(emailInput, data.message);
                 }
             }
         })

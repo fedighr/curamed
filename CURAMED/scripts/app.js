@@ -1,4 +1,3 @@
-// Menu Toggle
 function toggleMenu() {
   const sideNav = document.querySelector('.side-nav');
   const overlay = document.querySelector('.nav-overlay');
@@ -11,7 +10,6 @@ function toggleMenu() {
   document.body.style.overflow = sideNav.classList.contains('show') ? 'hidden' : 'auto';
 }
 
-// Counter Animation
 function animateCounters() {
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;
@@ -42,7 +40,6 @@ function animateCounters() {
   });
 }
 
-// Initialize all functionality
 document.addEventListener('DOMContentLoaded', () => {
   animateCounters();
   
@@ -52,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // Calendar Interaction
   document.querySelectorAll('.time-slots .btn').forEach(btn => {
       btn.addEventListener('click', function() {
           document.querySelectorAll('.time-slots .btn').forEach(b => b.classList.remove('active'));
@@ -60,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
-  // Date Selection
   document.querySelectorAll('.day:not(.disabled)').forEach(day => {
       day.addEventListener('click', function() {
           document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
@@ -68,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
-  // Image error handling
   document.querySelectorAll('img').forEach(img => {
       img.onerror = function() {
           this.src = 'https://via.placeholder.com/150';
@@ -76,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
       };
   });
 
-  // Animation Observer
   const animateOnView = (selector) => {
       const elements = document.querySelectorAll(selector);
       const observer = new IntersectionObserver((entries, obs) => {
@@ -91,6 +84,5 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.forEach(el => observer.observe(el));
   };
 
-  // Apply animations
   animateOnView('.hero, .featured-section, .stats-section, .why-us, .doctor-card, .step, .patient-dashboard, .history-item, .appointment-card');
 });
